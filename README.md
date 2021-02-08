@@ -31,10 +31,10 @@ The gDR suite offers a full stack, allows for a range of users across computatio
  -----------------------------                             |                    -------------------
 ( cell line metadata REST API )                            |                    | go.gene.com/gDR |
  -----------------------------    \                        V                    -------------------
-                                    \                 +-----------+                  +--------+ 
+                                    \                 (-----------)                  +--------+ 
                                       --------------  | gDR MySQL | ---------------- | gDRviz | 
  ----------------------------       /  populate       | database  |  visualize drug  +--------+
-( compound metadata REST API )    /    cell and drug  +-----------+  response curves         
+( compound metadata REST API )    /    cell and drug   -----------  response curves         
  ----------------------------          metadata                      and metrics
 
 
