@@ -13,15 +13,21 @@ The gDR suite offers a full stack, allows for a range of users across computatio
 		| SummarizedExperiment |  /           +----------+   load raw     +----------+
 		+----------------------+                   :        files for analysis
                                                            :
-                                                           :   perform averaging, 
-							   :   normalization, 	    
-							   :   curve fitting	    
-							   :	    
+				      perform averaging,   :   gDRcore::normalize_SE()
+				      normalization, 	   :   gDRcore::
+				      curve fitting	   : 
+
+
+                                                     SummarizedExperiment object
+                                                      with BumpyMatrix assays
+
+							   :	   gDRwrapper::fetch_SE() 
                                                            :
-	+------------+				    +--------------+ 
-	| gDRinternal| ---------------------------- | gDRwrapper   |  
-	+------------+				    +--------------+ 
-                                                           ^
+	+------------+				    +--------------+                      +--------+
+	| gDRinternal| ---------------------------- | gDRwrapper   | -------------------- | gDRviz | 
+	+------------+				    +--------------+  visualize drug                       +--------+
+                                                           ^    
+                                                           |
                                                            | Fetch and push 
                                                            v data to database
 						     --------------

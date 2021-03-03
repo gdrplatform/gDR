@@ -1,0 +1,25 @@
+##############
+# Merging
+##############
+
+TODO: FILL ME
+
+
+#############
+# Analysis
+############
+
+#' @export
+gDRcore::runDrugResponseProcessingPipeline
+
+#' @export
+gDRcore::create_SE
+
+#' @export
+gDRcore::normalize_SE
+
+#' @export
+gDRcore::average_SE
+
+#' @export
+gDRcore::fit_SE

@@ -1,0 +1,10 @@
+# The gDR suite
+
+This vignette is intended for developers. 
+
+# Software stack
+
+
+# Deployment
+
+

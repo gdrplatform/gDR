@@ -1,0 +1,24 @@
+---
+title: "gDRcore: utilities for processing drug response analyses"
+author:
+- name: Allison Vuong
+  email: vuonga1@gene.com
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_depth: 4
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{gDRcore: utilities for drug response calculations}
+  %\VignetteEncoding{UTF-8}
+---
+
+# gDRcore
+The `gDRcore` R package is a central R package in the gDRplatform suite. It is responsible for the primary analyses functions. 
+
+## Data structures.
+The processing steps involved in drug response analyses can be thought of as 2 separate components: 
+1) Merging metadata and raw data files
+2) Processing merged data.frame from (1) and constructs a SummarizedExperiment object.   
+
