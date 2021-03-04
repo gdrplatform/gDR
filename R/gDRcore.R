@@ -3,6 +3,8 @@
 ##############
 
 TODO: FILL ME
+#' @export
+gDRcore::merge_data
 
 
 #############
