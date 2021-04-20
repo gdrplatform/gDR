@@ -26,7 +26,16 @@ Each package has the following 4 branches in github:
 * tst
 * prd 
 
-Feature branches should be named after the ticket number. For example, for a JIRA ticket "GDR-800", the branch containing the change should also be called `GDR-800`.
+Feature branches should be named after the ticket number. For example, for a JIRA ticket "GDR-800", the branch containing the change should also be called `GDR-800`. If a task requires multiple smaller changes, create multiple subtasks. Name the feature branch off of the main ticket, and reference the subtask ticket numbers in commit messages.
 
 Deployed changes should progress through these branches.
-A `feature_branch` should be merged into `master`. Every night in GMT, all changes on `master` will be merged into `dev`, and the apps will be deployed off of the `dev` branch in the "dev" environment at: http://gdrviz-dev.kubnala.science.roche.com/ and friends. The person in GMT time who deploys to a given environment will also move all tickets to the appropriate status lane (i.e. from the `Code Review Approved` to `In Dev` status). The same workflow follows to move changes onto the `test` and `prd` environments. 
+
+A `feature_branch` should be merged into `master`. 
+
+Every night in GMT, all changes on `master` will be merged into `dev`, and the apps will be deployed off of the `dev` branch in the "dev" environment at: http://gdrviz-dev.kubnala.science.roche.com/ and friends. The person in GMT time who deploys to a given environment will also move all tickets to the appropriate status lane (i.e. from the `Code Review Approved` to `In Dev` status).
+
+The following day, testing can be done on the dev server in PST. If testing identifies any issues, move the ticket back to the `In Progress` state to indicate that further work is needed and comment on the issues observed. Good practice is to comment on tickets you tested with `Tested on dev gDRviz-x.y.z, Looks good.`. If a larger change is needed, you can create a subtask.
+
+On Mondays in GMT, the `dev` branch will be merged into `tst`, and deployed on the test environment.
+
+Changes to the prd environment will occur on an ad hoc basis.
