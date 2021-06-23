@@ -1,31 +1,32 @@
 # gDR
 Umbrella package for the gDR programmatic R interface
 
-The gDR suite offers a full stack, allows for a range of users across computational savvy, scientists, etc. made up of several core R packages, a database, a visualization component. 
+The gDR suite offers a full stack solution for storing, processing, and visualizing drug response data. This enables a range of users across computational savvy, (i.e. lab scientists and computational scientists alike) to access the same, standardized data. The suite is made up of several core R packages, a database, a shiny visualization app. 
 
 
 ```       
                                                                                ---------------------
 			+-------------+                                        | go.gene.com/gDRin |
 			| BumpyMatrix |			                       ---------------------
-			+-------------+   \           +----------+                +----------+
-		+----------------------+    --------  | gDRcore  | <------------- | gDRshiny | 
-		| SummarizedExperiment |  /           +----------+   load raw     +----------+
+			+-------------+   \           +----------+                +-----------+
+		+----------------------+    --------  | gDRcore  | <------------- | gDRimport | 
+		| SummarizedExperiment |  /           +----------+   load raw     +-----------+
 		+----------------------+                   :        files for analysis
                                                            :
-				      perform averaging,   :   gDRcore::normalize_SE()
-				      normalization, 	   :   gDRcore::
+				      perform              :   gDRcore::runDrugResponseProcessingPipeline()
+				      normalization, 	   :   
+				      averaging, 	   :   
 				      curve fitting	   : 
-
+                                                           :
 
                                                      SummarizedExperiment object
                                                       with BumpyMatrix assays
 
-							   :	   gDRwrapper::fetch_SE() 
+							   :  gDRwrapper::fetch_SE() 
                                                            :
-	+------------+				    +--------------+                      +--------+
-	| gDRinternal| ---------------------------- | gDRwrapper   | -------------------- | gDRviz | 
-	+------------+				    +--------------+  visualize drug                       +--------+
+                                                    +--------------+                      +--------+
+                                                    | gDRwrapper   | -------------------- | gDRviz |
+                                                    +--------------+  visualize data      +--------+
                                                            ^    
                                                            |
                                                            | Fetch and push 
