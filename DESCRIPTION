@@ -1,13 +1,14 @@
 Package: gDR
 Type: Package
 Title: Umbrella package for R packages in the gDR suite 
-Version: 0.0.1
-Date: 2021-02-03
+Version: 0.0.2
+Date: 2021-06-24
 Authors@R: c(person("Allison", "Vuong", role=c("aut", "cre"), email="vuong.allison@gene.com"), 
              person("Bartosz", "Czech", role=c("aut")),
              person("Arkadiusz", "Gladki", role=c("aut")),
              person("Marc", "Hafner", role=c("aut")),
-             person("Dariusz", "Scigocki", role=c("aut"))
+             person("Dariusz", "Scigocki", role=c("aut")),
+             person("Sergiu", "Mocanu", role=c("aut"))
              )
 Description: Re-exports commonly used processing functions and utilities from individual gDR packages
     for convenient use in an interactive R session.
@@ -18,7 +19,7 @@ Imports:
     BumpyMatrix,
     gDRcore,
     gDRutils (>= 0.0.24),
-    gDRwrapper (>= 0.1.47),
+    gDRtestData (>= 1.0.3)
 Suggests:
     futile.logger,
     knitr,
@@ -29,3 +30,5 @@ RoxygenNote: 7.1.1
 SwitchrLibrary: gDR
 DeploySubPath: gDR
 Encoding: UTF-8
+Depends: 
+    R (>= 2.10)
