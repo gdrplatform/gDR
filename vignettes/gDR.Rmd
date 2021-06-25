@@ -99,8 +99,8 @@ convert_se_assay_to_dt(SE, "Metrics")
 
 ```{r, echo=FALSE}
 library(kableExtra)
-kbl(head(convert_se_assay_to_dt(SE, "Metrics"))) %>%
+kbl(convert_se_assay_to_dt(SE, "Metrics")) %>%
   kable_paper() %>%
-  scroll_box(width = "800px", height = "300px")
+  scroll_box(width = "700px", height = "300px")
 ```
 
