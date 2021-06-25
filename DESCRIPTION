@@ -1,8 +1,8 @@
 Package: gDR
 Type: Package
 Title: Umbrella package for R packages in the gDR suite 
-Version: 0.0.2
-Date: 2021-06-24
+Version: 0.0.3
+Date: 2021-06-25
 Authors@R: c(person("Allison", "Vuong", role=c("aut", "cre"), email="vuong.allison@gene.com"), 
              person("Bartosz", "Czech", role=c("aut")),
              person("Arkadiusz", "Gladki", role=c("aut")),
