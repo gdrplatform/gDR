@@ -29,6 +29,6 @@ below to see their documentation.
 \describe{
   \item{gDRcore}{\code{\link[gDRcore]{average_SE}}, \code{\link[gDRcore]{create_SE}}, \code{\link[gDRcore]{fit_SE}}, \code{\link[gDRcore]{merge_data}}, \code{\link[gDRcore]{normalize_SE}}, \code{\link[gDRcore]{runDrugResponseProcessingPipeline}}}
 
-  \item{gDRutils}{\code{\link[gDRutils]{convert_se_assay_to_dt}}, \code{\link[gDRutils]{fit_curves}}, \code{\link[gDRutils]{flatten}}, \code{\link[gDRutils]{get_header}}, \code{\link[gDRutils]{get_identifier}}, \code{\link[gDRutils]{logisticFit}}, \code{\link[gDRutils]{reset_headers}}, \code{\link[gDRutils]{reset_identifiers}}, \code{\link[gDRutils]{set_identifier}}, \code{\link[gDRutils]{split_SE_components}}, \code{\link[gDRutils]{validate_SE}}}
+  \item{gDRutils}{\code{\link[gDRutils]{convert_se_assay_to_dt}}, \code{\link[gDRutils]{fit_curves}}, \code{\link[gDRutils]{flatten}}, \code{\link[gDRutils:headers]{get_header}}, \code{\link[gDRutils:identifiers]{get_identifier}}, \code{\link[gDRutils]{logisticFit}}, \code{\link[gDRutils:headers]{reset_headers}}, \code{\link[gDRutils:identifiers]{reset_identifiers}}, \code{\link[gDRutils:identifiers]{set_identifier}}, \code{\link[gDRutils]{split_SE_components}}, \code{\link[gDRutils]{validate_SE}}}
 }}
 
