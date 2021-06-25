@@ -1,7 +1,7 @@
 Package: gDR
 Type: Package
 Title: Umbrella package for R packages in the gDR suite 
-Version: 0.0.3
+Version: 0.0.4
 Date: 2021-06-25
 Authors@R: c(person("Allison", "Vuong", role=c("aut", "cre"), email="vuong.allison@gene.com"), 
              person("Bartosz", "Czech", role=c("aut")),
@@ -17,12 +17,14 @@ License: file GNE_LICENSE
 LazyLoad: yes
 Imports:
     BumpyMatrix,
-    gDRcore,
-    gDRutils (>= 0.0.24),
+    gDRcore (>= 1.1.0),
+    gDRimport (>= 0.0.4),
+    gDRutils (>= 1.0.4),
     gDRtestData (>= 1.0.3)
 Suggests:
     futile.logger,
     knitr,
+    kableExtra,
     rmarkdown
 VignetteBuilder: knitr
 ByteCompile: TRUE
