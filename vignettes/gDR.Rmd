@@ -93,7 +93,14 @@ SummarizedExperiment::assayNames(SE)
 
 that can be easily transformed to `data.table` format using `convert_se_assay_to_dt` function:
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, eval=FALSE}
 convert_se_assay_to_dt(SE, "Metrics")
+```
+
+```{r, echo=FALSE}
+library(kableExtra)
+kbl(head(convert_se_assay_to_dt(SE, "Metrics"))) %>%
+  kable_paper() %>%
+  scroll_box(width = "800px", height = "300px")
 ```
 

@@ -24,6 +24,7 @@ Imports:
 Suggests:
     futile.logger,
     knitr,
+    kableExtra,
     rmarkdown
 VignetteBuilder: knitr
 ByteCompile: TRUE
