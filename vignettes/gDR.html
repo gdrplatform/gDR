@@ -1,0 +1,5855 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="gDR team" />
+
+<meta name="date" content="2021-07-01" />
+
+<title>gDR suite</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script src="data:application/javascript;base64,JChkb2N1bWVudCkucmVhZHkoZnVuY3Rpb24oKXsKICAgIGlmICh0eXBlb2YgJCgnW2RhdGEtdG9nZ2xlPSJ0b29sdGlwIl0nKS50b29sdGlwID09PSAnZnVuY3Rpb24nKSB7CiAgICAgICAgJCgnW2RhdGEtdG9nZ2xlPSJ0b29sdGlwIl0nKS50b29sdGlwKCk7CiAgICB9CiAgICBpZiAoJCgnW2RhdGEtdG9nZ2xlPSJwb3BvdmVyIl0nKS5wb3BvdmVyID09PSAnZnVuY3Rpb24nKSB7CiAgICAgICAgJCgnW2RhdGEtdG9nZ2xlPSJwb3BvdmVyIl0nKS5wb3BvdmVyKCk7CiAgICB9Cn0pOwo="></script>
+<link href="data:text/css,%0A%2Elightable%2Dminimal%20%7B%0Aborder%2Dcollapse%3A%20separate%3B%0Aborder%2Dspacing%3A%2016px%201px%3B%0Awidth%3A%20100%25%3B%0Amargin%2Dbottom%3A%2010px%3B%0A%7D%0A%2Elightable%2Dminimal%20td%20%7B%0Amargin%2Dleft%3A%205px%3B%0Amargin%2Dright%3A%205px%3B%0A%7D%0A%2Elightable%2Dminimal%20th%20%7B%0Amargin%2Dleft%3A%205px%3B%0Amargin%2Dright%3A%205px%3B%0A%7D%0A%2Elightable%2Dminimal%20thead%20tr%3Alast%2Dchild%20th%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%2300000050%3B%0Aempty%2Dcells%3A%20hide%3B%0A%7D%0A%2Elightable%2Dminimal%20tbody%20tr%3Afirst%2Dchild%20td%20%7B%0Apadding%2Dtop%3A%200%2E5em%3B%0A%7D%0A%2Elightable%2Dminimal%2Elightable%2Dhover%20tbody%20tr%3Ahover%20%7B%0Abackground%2Dcolor%3A%20%23f5f5f5%3B%0A%7D%0A%2Elightable%2Dminimal%2Elightable%2Dstriped%20tbody%20tr%3Anth%2Dchild%28even%29%20%7B%0Abackground%2Dcolor%3A%20%23f5f5f5%3B%0A%7D%0A%2Elightable%2Dclassic%20%7B%0Aborder%2Dtop%3A%200%2E16em%20solid%20%23111111%3B%0Aborder%2Dbottom%3A%200%2E16em%20solid%20%23111111%3B%0Awidth%3A%20100%25%3B%0Amargin%2Dbottom%3A%2010px%3B%0Amargin%3A%2010px%205px%3B%0A%7D%0A%2Elightable%2Dclassic%20tfoot%20tr%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dclassic%20tfoot%20tr%3Afirst%2Dchild%20td%20%7B%0Aborder%2Dtop%3A%200%2E14em%20solid%20%23111111%3B%0A%7D%0A%2Elightable%2Dclassic%20caption%20%7B%0Acolor%3A%20%23222222%3B%0A%7D%0A%2Elightable%2Dclassic%20td%20%7B%0Apadding%2Dleft%3A%205px%3B%0Apadding%2Dright%3A%205px%3B%0Acolor%3A%20%23222222%3B%0A%7D%0A%2Elightable%2Dclassic%20th%20%7B%0Apadding%2Dleft%3A%205px%3B%0Apadding%2Dright%3A%205px%3B%0Afont%2Dweight%3A%20normal%3B%0Acolor%3A%20%23222222%3B%0A%7D%0A%2Elightable%2Dclassic%20thead%20tr%3Alast%2Dchild%20th%20%7B%0Aborder%2Dbottom%3A%200%2E10em%20solid%20%23111111%3B%0A%7D%0A%2Elightable%2Dclassic%2Elightable%2Dhover%20tbody%20tr%3Ahover%20%7B%0Abackground%2Dcolor%3A%20%23F9EEC1%3B%0A%7D%0A%2Elightable%2Dclassic%2Elightable%2Dstriped%20tbody%20tr%3Anth%2Dchild%28even%29%20%7B%0Abackground%2Dcolor%3A%20%23f5f5f5%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20%7B%0Aborder%2Dtop%3A%203px%20double%20%23111111%3B%0Aborder%2Dbottom%3A%203px%20double%20%23111111%3B%0Awidth%3A%20100%25%3B%0Amargin%2Dbottom%3A%2010px%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20tfoot%20tr%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20tfoot%20tr%3Afirst%2Dchild%20td%20%7B%0Aborder%2Dtop%3A%203px%20double%20%23111111%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20caption%20%7B%0Acolor%3A%20%23222222%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20td%20%7B%0Apadding%2Dleft%3A%205px%3B%0Apadding%2Dright%3A%205px%3B%0Acolor%3A%20%23222222%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20th%20%7B%0Apadding%2Dleft%3A%205px%3B%0Apadding%2Dright%3A%205px%3B%0Afont%2Dweight%3A%20normal%3B%0Acolor%3A%20%23222222%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20tbody%20tr%3Alast%2Dchild%20td%20%7B%0Aborder%2Dbottom%3A%203px%20double%20%23111111%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%20thead%20tr%3Alast%2Dchild%20th%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23111111%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%2Elightable%2Dhover%20tbody%20tr%3Ahover%20%7B%0Abackground%2Dcolor%3A%20%23F9EEC1%3B%0A%7D%0A%2Elightable%2Dclassic%2D2%2Elightable%2Dstriped%20tbody%20tr%3Anth%2Dchild%28even%29%20%7B%0Abackground%2Dcolor%3A%20%23f5f5f5%3B%0A%7D%0A%2Elightable%2Dmaterial%20%7B%0Amin%2Dwidth%3A%20100%25%3B%0Awhite%2Dspace%3A%20nowrap%3B%0Atable%2Dlayout%3A%20fixed%3B%0Afont%2Dfamily%3A%20Roboto%2C%20sans%2Dserif%3B%0Aborder%3A%201px%20solid%20%23EEE%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0Amargin%2Dbottom%3A%2010px%3B%0A%7D%0A%2Elightable%2Dmaterial%20tfoot%20tr%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dmaterial%20tfoot%20tr%3Afirst%2Dchild%20td%20%7B%0Aborder%2Dtop%3A%201px%20solid%20%23EEE%3B%0A%7D%0A%2Elightable%2Dmaterial%20th%20%7B%0Aheight%3A%2056px%3B%0Apadding%2Dleft%3A%2016px%3B%0Apadding%2Dright%3A%2016px%3B%0A%7D%0A%2Elightable%2Dmaterial%20td%20%7B%0Aheight%3A%2052px%3B%0Apadding%2Dleft%3A%2016px%3B%0Apadding%2Dright%3A%2016px%3B%0Aborder%2Dtop%3A%201px%20solid%20%23eeeeee%3B%0A%7D%0A%2Elightable%2Dmaterial%2Elightable%2Dhover%20tbody%20tr%3Ahover%20%7B%0Abackground%2Dcolor%3A%20%23f5f5f5%3B%0A%7D%0A%2Elightable%2Dmaterial%2Elightable%2Dstriped%20tbody%20tr%3Anth%2Dchild%28even%29%20%7B%0Abackground%2Dcolor%3A%20%23f5f5f5%3B%0A%7D%0A%2Elightable%2Dmaterial%2Elightable%2Dstriped%20tbody%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dmaterial%2Elightable%2Dstriped%20thead%20tr%3Alast%2Dchild%20th%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ddd%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%20%7B%0Amin%2Dwidth%3A%20100%25%3B%0Awhite%2Dspace%3A%20nowrap%3B%0Atable%2Dlayout%3A%20fixed%3B%0Afont%2Dfamily%3A%20Roboto%2C%20sans%2Dserif%3B%0Aborder%3A%201px%20solid%20%23FFFFFF12%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0Amargin%2Dbottom%3A%2010px%3B%0Abackground%2Dcolor%3A%20%23363640%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%20tfoot%20tr%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%20tfoot%20tr%3Afirst%2Dchild%20td%20%7B%0Aborder%2Dtop%3A%201px%20solid%20%23FFFFFF12%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%20th%20%7B%0Aheight%3A%2056px%3B%0Apadding%2Dleft%3A%2016px%3B%0Apadding%2Dright%3A%2016px%3B%0Acolor%3A%20%23FFFFFF60%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%20td%20%7B%0Aheight%3A%2052px%3B%0Apadding%2Dleft%3A%2016px%3B%0Apadding%2Dright%3A%2016px%3B%0Acolor%3A%20%23FFFFFF%3B%0Aborder%2Dtop%3A%201px%20solid%20%23FFFFFF12%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%2Elightable%2Dhover%20tbody%20tr%3Ahover%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF12%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%2Elightable%2Dstriped%20tbody%20tr%3Anth%2Dchild%28even%29%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF12%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%2Elightable%2Dstriped%20tbody%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dmaterial%2Ddark%2Elightable%2Dstriped%20thead%20tr%3Alast%2Dchild%20th%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23FFFFFF12%3B%0A%7D%0A%2Elightable%2Dpaper%20%7B%0Awidth%3A%20100%25%3B%0Amargin%2Dbottom%3A%2010px%3B%0Acolor%3A%20%23444%3B%0A%7D%0A%2Elightable%2Dpaper%20tfoot%20tr%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A%2Elightable%2Dpaper%20tfoot%20tr%3Afirst%2Dchild%20td%20%7B%0Aborder%2Dtop%3A%201px%20solid%20%2300000020%3B%0A%7D%0A%2Elightable%2Dpaper%20thead%20tr%3Alast%2Dchild%20th%20%7B%0Acolor%3A%20%23666%3B%0Avertical%2Dalign%3A%20bottom%3B%0Aborder%2Dbottom%3A%201px%20solid%20%2300000020%3B%0Aline%2Dheight%3A%201%2E15em%3B%0Apadding%3A%2010px%205px%3B%0A%7D%0A%2Elightable%2Dpaper%20td%20%7B%0Avertical%2Dalign%3A%20middle%3B%0Aborder%2Dbottom%3A%201px%20solid%20%2300000010%3B%0Aline%2Dheight%3A%201%2E15em%3B%0Apadding%3A%207px%205px%3B%0A%7D%0A%2Elightable%2Dpaper%2Elightable%2Dhover%20tbody%20tr%3Ahover%20%7B%0Abackground%2Dcolor%3A%20%23F9EEC1%3B%0A%7D%0A%2Elightable%2Dpaper%2Elightable%2Dstriped%20tbody%20tr%3Anth%2Dchild%28even%29%20%7B%0Abackground%2Dcolor%3A%20%2300000008%3B%0A%7D%0A%2Elightable%2Dpaper%2Elightable%2Dstriped%20tbody%20td%20%7B%0Aborder%3A%200%3B%0A%7D%0A" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">gDR suite</h1>
+<h4 class="author">gDR team</h4>
+<h4 class="date">2021-07-01</h4>
+
+
+
+<div id="intro" class="section level1">
+<h1>Introduction</h1>
+<p>Over decades, many departments across gRED and Roche have generated large amounts of drug response screening data using Genentech’s rich drug compounds inventory. While extensive labor and time has been invested to generate these data, they are not analyzed in a standardized manner for meaningful comparison. On one hand, large screens are performed across many cell lines and drugs in a semi-automated manner. On the other hand, small-scale studies, which focused on factors that contribute to sensitivity and resistance to certain therapy, are generally performed by each individual scientist with limited automation. These are complementary approaches but were rarely handled the same way. Commercial softwares are available for analyzing large datasets, whereas researchers for small-scale datasets often process data ad hoc through software like PRISM.</p>
+<p>Here, we propose a suite of computational tools that enable the processing, archiving, and visualization of drug response data from any experiment, regardless of size or , thus ensuring reproducibility and implementation of the Findable, Accessible, Interoperable, and Reusable (F.A.I.R.) principles.</p>
+<p>The gDR suite presents a full stack solution to systematically analyze and store drug response data. The core of gDR lies in its database which hosts thousands of experiments and datasets generated by different individual scientists. It includes large panel drug screens with simple design of single agent treatment as well as more complex combinational treatments - either with 2nd drug as a fixed dose or a matrix. When conditions are further complicated with co-treatment of ligands or with cell line genetic perturbations, e.g shRNA treatment or resistant cell lines obtained from a previous screen, as long as the conditions are well defined in metadata, these data will be compatible with all other types of data.</p>
+<p>The processing pipeline takes as input metadata files which includes: metadata on the experimental design, template files specifying the drugs and cell lines used, and the raw data output files obtained from a plate reader or a scanner. Quality control, data normalization, and metric calculations are performed by the processing software and then the data is pushed and stored in the gDR database. The gDR suite provides an Rshiny application for the convenience of users to upload these different metadata files. Data processed by other commercial software or data residing from other databases can also be easily pushed into the gDR database through the REST API.</p>
+<p>Once the data is stored in the database, there are multiple ways to visualize the data depending on the scientific needs. The primary method to do is through our RShiny visualization tool ‘gDRviz’. Here, users can search and select experiments presente in the database, and use downstream visualization modules to look at dose response curves, heatmaps, etc.</p>
+<p>For now we share our initial gDR suite for loading, processing, and managing the data.</p>
+<div id="rpackages" class="section level2">
+<h2>R Packages</h2>
+<p>gDR suite consists of a few packages that power our app and make it a comprehensive tool. All the packages under the gDR umbrella are stored in the <a href="https://github.roche.com/gdrplatform/">gDR platform GitHub organization</a>.</p>
+<p>We are happy to share with you our packages for importing, processing and managing gDR data: * gDRimport * gDRcore * gDRutils * gDRtestData</p>
+</div>
+<div id="usage" class="section level2">
+<h2>Usage</h2>
+<div id="input-data" class="section level3">
+<h3>Input data</h3>
+<p>gDR suite requires three types of data that should be provided: manifest, template(s), and raw data.</p>
+<p>Exemplary data can be found here:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gDR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define path for data stored in gDR package</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>dataDir <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;data1&quot;</span>, <span class="at">package =</span> <span class="st">&quot;gDRimport&quot;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract path for example raw_data</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>manifest <span class="ot">&lt;-</span> <span class="fu">list.files</span>(dataDir, <span class="at">pattern =</span> <span class="st">&quot;manifest&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>template <span class="ot">&lt;-</span> <span class="fu">list.files</span>(dataDir, <span class="at">pattern =</span> <span class="st">&quot;Template&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>raw_data <span class="ot">&lt;-</span> <span class="fu">list.files</span>(dataDir, <span class="at">pattern =</span> <span class="st">&quot;^RawData&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>manifest</span></code></pre></div>
+<p>[1] “/usr/local/lib/R/site-library/gDRimport/extdata/data1/manifest.xlsx”</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>template</span></code></pre></div>
+<p>[1] “/usr/local/lib/R/site-library/gDRimport/extdata/data1/Template_7daytreated.xlsx” [2] “/usr/local/lib/R/site-library/gDRimport/extdata/data1/Template_Untreated.xlsx”</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>raw_data</span></code></pre></div>
+<p>[1] “/usr/local/lib/R/site-library/gDRimport/extdata/data1/RawData_day0.xlsx” [2] “/usr/local/lib/R/site-library/gDRimport/extdata/data1/RawData_day7.xlsx”</p>
+<p>Data can be easily imported by:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import data</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>imported_data <span class="ot">&lt;-</span> <span class="fu">import_data</span>(manifest, template, raw_data)</span></code></pre></div>
+<p>and finally processed by:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run gDR pipeline</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">runDrugResponseProcessingPipeline</span>(imported_data)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>se</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; class: SummarizedExperiment </span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dim: 5 6 </span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; metadata(6): experiment_metadata df_ ... .internal drug_combinations</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; assays(8): RawTreated Controls ... Averaged Metrics</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rownames(5): 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_G00002_G00011_0.149999910525364_2 168_Synthetic drug_Synthetic</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rowData names(8): Duration DrugName ... Gnumber_2 Concentration_2</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_Synthetic cell line_NA_NA_1 CL00012_Synthetic cell</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   line_NA_NA_2 ... CL00015_Synthetic cell line_NA_NA_5</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00018_Synthetic cell line_NA_NA_6</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(4): clid CellLineName Tissue ReferenceDivisionTime</span></span></code></pre></div>
+<p>The processing pipeline will create a SummarizedExperiment containing raw treated and control assays and then will normalize, average, and calculate drug-response metrics from the data.</p>
+<p>SummarizedExperiment object is made up of multiple assays, such as:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>SummarizedExperiment<span class="sc">::</span><span class="fu">assayNames</span>(se)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;RawTreated&quot;           &quot;Controls&quot;             &quot;Normalized&quot;          </span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4] &quot;RefGRvalue&quot;           &quot;RefRelativeViability&quot; &quot;DivisionTime&quot;        </span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [7] &quot;Averaged&quot;             &quot;Metrics&quot;</span></span></code></pre></div>
+<p>that can be easily transformed to <code>data.table</code> format using <code>convert_se_assay_to_dt</code> function:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">convert_se_assay_to_dt</span>(se, <span class="st">&quot;Metrics&quot;</span>)</span></code></pre></div>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:300px; overflow-x: scroll; width:700px; ">
+<table class=" lightable-paper" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+rId
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+cId
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+x_mean
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+x_AOC
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+x_AOC_range
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+xc50
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+x_max
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+c50
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+x_inf
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+x_0
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+h
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+r2
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+x_sd_avg
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+fit_type
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+maxlog10Concentration
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+N_conc
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+normalization_type
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+fit_source
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Duration
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+DrugName
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+DrugName_2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+drug_moa
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+drug_moa_2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Gnumber
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Gnumber_2
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Concentration_2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+clid
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+CellLineName
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Tissue
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+ReferenceDivisionTime
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
+</td>
+<td style="text-align:left;">
+CL00011_Synthetic cell line_NA_NA_1
+</td>
+<td style="text-align:right;">
+0.1942553
+</td>
+<td style="text-align:right;">
+0.8057447
+</td>
+<td style="text-align:right;">
+0.8151329
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.0975250
+</td>
+<td style="text-align:right;">
+0.0330963
+</td>
+<td style="text-align:right;">
+0.1507239
+</td>
+<td style="text-align:right;">
+0.2745000
+</td>
+<td style="text-align:right;">
+5.0000000
+</td>
+<td style="text-align:right;">
+0.7569503
+</td>
+<td style="text-align:right;">
+0.1510705
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00011
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
+</td>
+<td style="text-align:left;">
+CL00011_Synthetic cell line_NA_NA_1
+</td>
+<td style="text-align:right;">
+0.1060173
+</td>
+<td style="text-align:right;">
+0.8939827
+</td>
+<td style="text-align:right;">
+0.9171796
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.0989250
+</td>
+<td style="text-align:right;">
+0.0255599
+</td>
+<td style="text-align:right;">
+0.0166901
+</td>
+<td style="text-align:right;">
+0.2936000
+</td>
+<td style="text-align:right;">
+5.0000000
+</td>
+<td style="text-align:right;">
+0.8457433
+</td>
+<td style="text-align:right;">
+0.2819913
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00011
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
+</td>
+<td style="text-align:left;">
+CL00012_Synthetic cell line_NA_NA_2
+</td>
+<td style="text-align:right;">
+0.0620985
+</td>
+<td style="text-align:right;">
+0.9379015
+</td>
+<td style="text-align:right;">
+0.9521256
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.0246375
+</td>
+<td style="text-align:right;">
+0.0085171
+</td>
+<td style="text-align:right;">
+0.0226485
+</td>
+<td style="text-align:right;">
+0.2090000
+</td>
+<td style="text-align:right;">
+1.1231641
+</td>
+<td style="text-align:right;">
+0.9942285
+</td>
+<td style="text-align:right;">
+0.0182234
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00012
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
+</td>
+<td style="text-align:left;">
+CL00012_Synthetic cell line_NA_NA_2
+</td>
+<td style="text-align:right;">
+-0.2340373
+</td>
+<td style="text-align:right;">
+1.2340373
+</td>
+<td style="text-align:right;">
+1.2803147
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.3872250
+</td>
+<td style="text-align:right;">
+0.0144445
+</td>
+<td style="text-align:right;">
+-0.3957578
+</td>
+<td style="text-align:right;">
+0.2131000
+</td>
+<td style="text-align:right;">
+1.1220963
+</td>
+<td style="text-align:right;">
+0.9921707
+</td>
+<td style="text-align:right;">
+0.0489193
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00012
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
+</td>
+<td style="text-align:left;">
+CL00013_Synthetic cell line_NA_NA_3
+</td>
+<td style="text-align:right;">
+0.1377834
+</td>
+<td style="text-align:right;">
+0.8622166
+</td>
+<td style="text-align:right;">
+0.8810665
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.0539875
+</td>
+<td style="text-align:right;">
+0.0264235
+</td>
+<td style="text-align:right;">
+0.0578972
+</td>
+<td style="text-align:right;">
+0.3021000
+</td>
+<td style="text-align:right;">
+1.5508849
+</td>
+<td style="text-align:right;">
+0.9931899
+</td>
+<td style="text-align:right;">
+0.0872169
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00013
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
+</td>
+<td style="text-align:left;">
+CL00013_Synthetic cell line_NA_NA_3
+</td>
+<td style="text-align:right;">
+-0.1339332
+</td>
+<td style="text-align:right;">
+1.1339332
+</td>
+<td style="text-align:right;">
+1.1733122
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.3544625
+</td>
+<td style="text-align:right;">
+0.0319755
+</td>
+<td style="text-align:right;">
+-0.3523827
+</td>
+<td style="text-align:right;">
+0.2684000
+</td>
+<td style="text-align:right;">
+1.0359726
+</td>
+<td style="text-align:right;">
+0.9949766
+</td>
+<td style="text-align:right;">
+0.1931078
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00013
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
+</td>
+<td style="text-align:left;">
+CL00014_Synthetic cell line_NA_NA_4
+</td>
+<td style="text-align:right;">
+0.5024361
+</td>
+<td style="text-align:right;">
+0.4975639
+</td>
+<td style="text-align:right;">
+0.4975639
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+0.3313500
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.5024361
+</td>
+<td style="text-align:right;">
+0.5024361
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+-0.0000011
+</td>
+<td style="text-align:right;">
+0.0638498
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00014
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
+</td>
+<td style="text-align:left;">
+CL00014_Synthetic cell line_NA_NA_4
+</td>
+<td style="text-align:right;">
+-0.9325014
+</td>
+<td style="text-align:right;">
+1.9325014
+</td>
+<td style="text-align:right;">
+1.9325014
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.9997000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+-0.9325014
+</td>
+<td style="text-align:right;">
+-0.9325014
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+0.1745603
+</td>
+<td style="text-align:right;">
+0.0814275
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00014
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
+</td>
+<td style="text-align:left;">
+CL00015_Synthetic cell line_NA_NA_5
+</td>
+<td style="text-align:right;">
+0.1739511
+</td>
+<td style="text-align:right;">
+0.8260489
+</td>
+<td style="text-align:right;">
+0.8435659
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.1160000
+</td>
+<td style="text-align:right;">
+0.0070355
+</td>
+<td style="text-align:right;">
+0.1311180
+</td>
+<td style="text-align:right;">
+0.3561000
+</td>
+<td style="text-align:right;">
+1.2027465
+</td>
+<td style="text-align:right;">
+0.9661154
+</td>
+<td style="text-align:right;">
+0.0536479
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00015
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
+</td>
+<td style="text-align:left;">
+CL00015_Synthetic cell line_NA_NA_5
+</td>
+<td style="text-align:right;">
+0.0705376
+</td>
+<td style="text-align:right;">
+0.9294624
+</td>
+<td style="text-align:right;">
+0.9569127
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.0543000
+</td>
+<td style="text-align:right;">
+0.0088850
+</td>
+<td style="text-align:right;">
+-0.0263741
+</td>
+<td style="text-align:right;">
+0.3988000
+</td>
+<td style="text-align:right;">
+0.8664553
+</td>
+<td style="text-align:right;">
+0.9752713
+</td>
+<td style="text-align:right;">
+0.1004615
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00015
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
+</td>
+<td style="text-align:left;">
+CL00018_Synthetic cell line_NA_NA_6
+</td>
+<td style="text-align:right;">
+0.2498753
+</td>
+<td style="text-align:right;">
+0.7501247
+</td>
+<td style="text-align:right;">
+0.7751133
+</td>
+<td style="text-align:right;">
+0.0008280
+</td>
+<td style="text-align:right;">
+0.1110750
+</td>
+<td style="text-align:right;">
+0.0190013
+</td>
+<td style="text-align:right;">
+0.1323693
+</td>
+<td style="text-align:right;">
+0.5227000
+</td>
+<td style="text-align:right;">
+0.8887545
+</td>
+<td style="text-align:right;">
+0.9827362
+</td>
+<td style="text-align:right;">
+0.0409327
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00018
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
+</td>
+<td style="text-align:left;">
+CL00018_Synthetic cell line_NA_NA_6
+</td>
+<td style="text-align:right;">
+-0.0515717
+</td>
+<td style="text-align:right;">
+1.0515717
+</td>
+<td style="text-align:right;">
+1.0921952
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.3572250
+</td>
+<td style="text-align:right;">
+0.0293137
+</td>
+<td style="text-align:right;">
+-0.3109347
+</td>
+<td style="text-align:right;">
+0.4312000
+</td>
+<td style="text-align:right;">
+0.7878950
+</td>
+<td style="text-align:right;">
+0.9851073
+</td>
+<td style="text-align:right;">
+0.0718829
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00018
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
+</td>
+<td style="text-align:left;">
+CL00011_Synthetic cell line_NA_NA_1
+</td>
+<td style="text-align:right;">
+0.1358483
+</td>
+<td style="text-align:right;">
+0.8641517
+</td>
+<td style="text-align:right;">
+0.8776042
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.0226125
+</td>
+<td style="text-align:right;">
+0.0516652
+</td>
+<td style="text-align:right;">
+0.0423672
+</td>
+<td style="text-align:right;">
+0.2745000
+</td>
+<td style="text-align:right;">
+1.2720953
+</td>
+<td style="text-align:right;">
+0.9337115
+</td>
+<td style="text-align:right;">
+0.0860124
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00011
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
+</td>
+<td style="text-align:left;">
+CL00011_Synthetic cell line_NA_NA_1
+</td>
+<td style="text-align:right;">
+-0.0579227
+</td>
+<td style="text-align:right;">
+1.0579227
+</td>
+<td style="text-align:right;">
+1.0734951
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.4442625
+</td>
+<td style="text-align:right;">
+0.2188378
+</td>
+<td style="text-align:right;">
+-0.4985466
+</td>
+<td style="text-align:right;">
+0.2936000
+</td>
+<td style="text-align:right;">
+0.6085913
+</td>
+<td style="text-align:right;">
+0.9865197
+</td>
+<td style="text-align:right;">
+0.1744260
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00011
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
+</td>
+<td style="text-align:left;">
+CL00012_Synthetic cell line_NA_NA_2
+</td>
+<td style="text-align:right;">
+0.1132080
+</td>
+<td style="text-align:right;">
+0.8867920
+</td>
+<td style="text-align:right;">
+0.8941845
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.0269250
+</td>
+<td style="text-align:right;">
+0.0930986
+</td>
+<td style="text-align:right;">
+0.0286865
+</td>
+<td style="text-align:right;">
+0.2090000
+</td>
+<td style="text-align:right;">
+1.0749528
+</td>
+<td style="text-align:right;">
+0.9639994
+</td>
+<td style="text-align:right;">
+0.0394729
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00012
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
+</td>
+<td style="text-align:left;">
+CL00012_Synthetic cell line_NA_NA_2
+</td>
+<td style="text-align:right;">
+-0.0558422
+</td>
+<td style="text-align:right;">
+1.0558422
+</td>
+<td style="text-align:right;">
+1.0678260
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.3696500
+</td>
+<td style="text-align:right;">
+0.2187124
+</td>
+<td style="text-align:right;">
+-0.3999437
+</td>
+<td style="text-align:right;">
+0.2131000
+</td>
+<td style="text-align:right;">
+0.8407608
+</td>
+<td style="text-align:right;">
+0.9918508
+</td>
+<td style="text-align:right;">
+0.0821818
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00012
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
+</td>
+<td style="text-align:left;">
+CL00013_Synthetic cell line_NA_NA_3
+</td>
+<td style="text-align:right;">
+0.1787868
+</td>
+<td style="text-align:right;">
+0.8212132
+</td>
+<td style="text-align:right;">
+0.8288194
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.0572875
+</td>
+<td style="text-align:right;">
+0.1211098
+</td>
+<td style="text-align:right;">
+0.0564623
+</td>
+<td style="text-align:right;">
+0.3021000
+</td>
+<td style="text-align:right;">
+0.7497000
+</td>
+<td style="text-align:right;">
+0.9580252
+</td>
+<td style="text-align:right;">
+0.0991727
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00013
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
+</td>
+<td style="text-align:left;">
+CL00013_Synthetic cell line_NA_NA_3
+</td>
+<td style="text-align:right;">
+-0.0159833
+</td>
+<td style="text-align:right;">
+1.0159833
+</td>
+<td style="text-align:right;">
+1.0234030
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.3367250
+</td>
+<td style="text-align:right;">
+0.6360538
+</td>
+<td style="text-align:right;">
+-0.5180804
+</td>
+<td style="text-align:right;">
+0.2684000
+</td>
+<td style="text-align:right;">
+0.4531620
+</td>
+<td style="text-align:right;">
+0.9876047
+</td>
+<td style="text-align:right;">
+0.2042916
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00013
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
+</td>
+<td style="text-align:left;">
+CL00014_Synthetic cell line_NA_NA_4
+</td>
+<td style="text-align:right;">
+0.5146361
+</td>
+<td style="text-align:right;">
+0.4853639
+</td>
+<td style="text-align:right;">
+0.4853639
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+0.4396375
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.5146361
+</td>
+<td style="text-align:right;">
+0.5146361
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+-0.0000031
+</td>
+<td style="text-align:right;">
+0.0945934
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00014
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
+</td>
+<td style="text-align:left;">
+CL00014_Synthetic cell line_NA_NA_4
+</td>
+<td style="text-align:right;">
+-0.9268639
+</td>
+<td style="text-align:right;">
+1.9268639
+</td>
+<td style="text-align:right;">
+1.9268639
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.9955875
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+-0.9268639
+</td>
+<td style="text-align:right;">
+-0.9268639
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+0.0024624
+</td>
+<td style="text-align:right;">
+0.2581121
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00014
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
+</td>
+<td style="text-align:left;">
+CL00015_Synthetic cell line_NA_NA_5
+</td>
+<td style="text-align:right;">
+0.2037594
+</td>
+<td style="text-align:right;">
+0.7962406
+</td>
+<td style="text-align:right;">
+0.8064689
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.1299250
+</td>
+<td style="text-align:right;">
+0.0212948
+</td>
+<td style="text-align:right;">
+0.1276923
+</td>
+<td style="text-align:right;">
+0.3561000
+</td>
+<td style="text-align:right;">
+0.5883218
+</td>
+<td style="text-align:right;">
+0.9520612
+</td>
+<td style="text-align:right;">
+0.0584477
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00015
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
+</td>
+<td style="text-align:left;">
+CL00015_Synthetic cell line_NA_NA_5
+</td>
+<td style="text-align:right;">
+0.1334787
+</td>
+<td style="text-align:right;">
+0.8665213
+</td>
+<td style="text-align:right;">
+0.8810446
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.0154750
+</td>
+<td style="text-align:right;">
+0.0377735
+</td>
+<td style="text-align:right;">
+-0.0410428
+</td>
+<td style="text-align:right;">
+0.3988000
+</td>
+<td style="text-align:right;">
+0.4728938
+</td>
+<td style="text-align:right;">
+0.9751840
+</td>
+<td style="text-align:right;">
+0.0999310
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00015
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
+</td>
+<td style="text-align:left;">
+CL00018_Synthetic cell line_NA_NA_6
+</td>
+<td style="text-align:right;">
+0.4051480
+</td>
+<td style="text-align:right;">
+0.5948520
+</td>
+<td style="text-align:right;">
+0.5973839
+</td>
+<td style="text-align:right;">
+0.0175918
+</td>
+<td style="text-align:right;">
+0.2246250
+</td>
+<td style="text-align:right;">
+0.3787751
+</td>
+<td style="text-align:right;">
+0.2140715
+</td>
+<td style="text-align:right;">
+0.5227000
+</td>
+<td style="text-align:right;">
+0.8253357
+</td>
+<td style="text-align:right;">
+0.9370612
+</td>
+<td style="text-align:right;">
+0.0849627
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00018
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
+</td>
+<td style="text-align:left;">
+CL00018_Synthetic cell line_NA_NA_6
+</td>
+<td style="text-align:right;">
+0.2414209
+</td>
+<td style="text-align:right;">
+0.7585791
+</td>
+<td style="text-align:right;">
+0.7598267
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.0754750
+</td>
+<td style="text-align:right;">
+0.5886215
+</td>
+<td style="text-align:right;">
+-0.1275191
+</td>
+<td style="text-align:right;">
+0.4312000
+</td>
+<td style="text-align:right;">
+0.7349133
+</td>
+<td style="text-align:right;">
+0.9675531
+</td>
+<td style="text-align:right;">
+0.1242147
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:right;">
+0.1499999
+</td>
+<td style="text-align:left;">
+CL00018
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00011_Synthetic cell line_NA_NA_1
+</td>
+<td style="text-align:right;">
+0.9157913
+</td>
+<td style="text-align:right;">
+0.0842087
+</td>
+<td style="text-align:right;">
+0.0573383
+</td>
+<td style="text-align:right;">
+7.4683485
+</td>
+<td style="text-align:right;">
+0.4225500
+</td>
+<td style="text-align:right;">
+5.7741811
+</td>
+<td style="text-align:right;">
+0.1449920
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.3311221
+</td>
+<td style="text-align:right;">
+0.9199573
+</td>
+<td style="text-align:right;">
+0.8794050
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00011
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00011_Synthetic cell line_NA_NA_1
+</td>
+<td style="text-align:right;">
+0.7420679
+</td>
+<td style="text-align:right;">
+0.2579321
+</td>
+<td style="text-align:right;">
+0.2582018
+</td>
+<td style="text-align:right;">
+4.1712724
+</td>
+<td style="text-align:right;">
+0.3065500
+</td>
+<td style="text-align:right;">
+100.0000000
+</td>
+<td style="text-align:right;">
+-0.7636441
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.2918356
+</td>
+<td style="text-align:right;">
+0.7732475
+</td>
+<td style="text-align:right;">
+0.7276889
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00011
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00012_Synthetic cell line_NA_NA_2
+</td>
+<td style="text-align:right;">
+0.1763718
+</td>
+<td style="text-align:right;">
+0.8236282
+</td>
+<td style="text-align:right;">
+0.9008089
+</td>
+<td style="text-align:right;">
+0.0055320
+</td>
+<td style="text-align:right;">
+0.0257000
+</td>
+<td style="text-align:right;">
+0.0053721
+</td>
+<td style="text-align:right;">
+0.0194392
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.3524577
+</td>
+<td style="text-align:right;">
+0.9982204
+</td>
+<td style="text-align:right;">
+0.1388661
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00012
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00012_Synthetic cell line_NA_NA_2
+</td>
+<td style="text-align:right;">
+-0.0904008
+</td>
+<td style="text-align:right;">
+1.0904008
+</td>
+<td style="text-align:right;">
+1.1968927
+</td>
+<td style="text-align:right;">
+0.0054828
+</td>
+<td style="text-align:right;">
+-0.3786875
+</td>
+<td style="text-align:right;">
+0.0093276
+</td>
+<td style="text-align:right;">
+-0.4002242
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.1066609
+</td>
+<td style="text-align:right;">
+0.9890300
+</td>
+<td style="text-align:right;">
+0.1503558
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00012
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00013_Synthetic cell line_NA_NA_3
+</td>
+<td style="text-align:right;">
+0.3758869
+</td>
+<td style="text-align:right;">
+0.6241131
+</td>
+<td style="text-align:right;">
+0.6876649
+</td>
+<td style="text-align:right;">
+0.0258708
+</td>
+<td style="text-align:right;">
+0.1094750
+</td>
+<td style="text-align:right;">
+0.0209660
+</td>
+<td style="text-align:right;">
+0.1006267
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.0689717
+</td>
+<td style="text-align:right;">
+0.9842555
+</td>
+<td style="text-align:right;">
+0.2672302
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00013
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00013_Synthetic cell line_NA_NA_3
+</td>
+<td style="text-align:right;">
+0.2018558
+</td>
+<td style="text-align:right;">
+0.7981442
+</td>
+<td style="text-align:right;">
+0.8710695
+</td>
+<td style="text-align:right;">
+0.0186345
+</td>
+<td style="text-align:right;">
+-0.1850875
+</td>
+<td style="text-align:right;">
+0.0275090
+</td>
+<td style="text-align:right;">
+-0.2076859
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.8918977
+</td>
+<td style="text-align:right;">
+0.9901850
+</td>
+<td style="text-align:right;">
+0.3550212
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00013
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00014_Synthetic cell line_NA_NA_4
+</td>
+<td style="text-align:right;">
+1.0835556
+</td>
+<td style="text-align:right;">
+-0.0835556
+</td>
+<td style="text-align:right;">
+-0.0835556
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+0.9520000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.0835556
+</td>
+<td style="text-align:right;">
+1.0835556
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+-3.2271731
+</td>
+<td style="text-align:right;">
+0.3927635
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00014
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00014_Synthetic cell line_NA_NA_4
+</td>
+<td style="text-align:right;">
+1.1000000
+</td>
+<td style="text-align:right;">
+-0.1000000
+</td>
+<td style="text-align:right;">
+-0.1000000
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+1.1000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.1000000
+</td>
+<td style="text-align:right;">
+1.1000000
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+198.9694133
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00014
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00015_Synthetic cell line_NA_NA_5
+</td>
+<td style="text-align:right;">
+0.3006246
+</td>
+<td style="text-align:right;">
+0.6993754
+</td>
+<td style="text-align:right;">
+0.7760475
+</td>
+<td style="text-align:right;">
+0.0097058
+</td>
+<td style="text-align:right;">
+0.1255250
+</td>
+<td style="text-align:right;">
+0.0079424
+</td>
+<td style="text-align:right;">
+0.1293874
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.4934640
+</td>
+<td style="text-align:right;">
+0.9962006
+</td>
+<td style="text-align:right;">
+0.1677657
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00015
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00015_Synthetic cell line_NA_NA_5
+</td>
+<td style="text-align:right;">
+0.2062848
+</td>
+<td style="text-align:right;">
+0.7937152
+</td>
+<td style="text-align:right;">
+0.8736452
+</td>
+<td style="text-align:right;">
+0.0096880
+</td>
+<td style="text-align:right;">
+-0.0281125
+</td>
+<td style="text-align:right;">
+0.0101895
+</td>
+<td style="text-align:right;">
+-0.0296460
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.1411804
+</td>
+<td style="text-align:right;">
+0.9937822
+</td>
+<td style="text-align:right;">
+0.1839219
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00015
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00018_Synthetic cell line_NA_NA_6
+</td>
+<td style="text-align:right;">
+0.3964219
+</td>
+<td style="text-align:right;">
+0.6035781
+</td>
+<td style="text-align:right;">
+0.6776300
+</td>
+<td style="text-align:right;">
+0.0236186
+</td>
+<td style="text-align:right;">
+0.1155375
+</td>
+<td style="text-align:right;">
+0.0195603
+</td>
+<td style="text-align:right;">
+0.1463226
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.8364343
+</td>
+<td style="text-align:right;">
+0.9872148
+</td>
+<td style="text-align:right;">
+0.1736033
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00018
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00018_Synthetic cell line_NA_NA_6
+</td>
+<td style="text-align:right;">
+0.1324605
+</td>
+<td style="text-align:right;">
+0.8675395
+</td>
+<td style="text-align:right;">
+0.9669921
+</td>
+<td style="text-align:right;">
+0.0184650
+</td>
+<td style="text-align:right;">
+-0.3435875
+</td>
+<td style="text-align:right;">
+0.0247495
+</td>
+<td style="text-align:right;">
+-0.2758215
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.4997197
+</td>
+<td style="text-align:right;">
+0.9915452
+</td>
+<td style="text-align:right;">
+0.2066486
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00018
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00011_Synthetic cell line_NA_NA_1
+</td>
+<td style="text-align:right;">
+0.6675856
+</td>
+<td style="text-align:right;">
+0.3324144
+</td>
+<td style="text-align:right;">
+0.3265645
+</td>
+<td style="text-align:right;">
+0.4942034
+</td>
+<td style="text-align:right;">
+0.0260500
+</td>
+<td style="text-align:right;">
+0.4793539
+</td>
+<td style="text-align:right;">
+0.0425442
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+2.9149107
+</td>
+<td style="text-align:right;">
+0.9751992
+</td>
+<td style="text-align:right;">
+0.7335509
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00011
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00011_Synthetic cell line_NA_NA_1
+</td>
+<td style="text-align:right;">
+0.5092443
+</td>
+<td style="text-align:right;">
+0.4907557
+</td>
+<td style="text-align:right;">
+0.4815982
+</td>
+<td style="text-align:right;">
+0.3199532
+</td>
+<td style="text-align:right;">
+-0.4177500
+</td>
+<td style="text-align:right;">
+0.5757493
+</td>
+<td style="text-align:right;">
+-0.4882461
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.1597048
+</td>
+<td style="text-align:right;">
+0.9858751
+</td>
+<td style="text-align:right;">
+0.5983619
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00011
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00012_Synthetic cell line_NA_NA_2
+</td>
+<td style="text-align:right;">
+0.5280236
+</td>
+<td style="text-align:right;">
+0.4719764
+</td>
+<td style="text-align:right;">
+0.5032275
+</td>
+<td style="text-align:right;">
+0.1412510
+</td>
+<td style="text-align:right;">
+0.0287125
+</td>
+<td style="text-align:right;">
+0.1364323
+</td>
+<td style="text-align:right;">
+0.0343081
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+2.0479422
+</td>
+<td style="text-align:right;">
+0.9883568
+</td>
+<td style="text-align:right;">
+0.4206678
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00012
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00012_Synthetic cell line_NA_NA_2
+</td>
+<td style="text-align:right;">
+0.3917856
+</td>
+<td style="text-align:right;">
+0.6082144
+</td>
+<td style="text-align:right;">
+0.6350017
+</td>
+<td style="text-align:right;">
+0.1334565
+</td>
+<td style="text-align:right;">
+-0.3565875
+</td>
+<td style="text-align:right;">
+0.2132507
+</td>
+<td style="text-align:right;">
+-0.3854092
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.2192246
+</td>
+<td style="text-align:right;">
+0.9971520
+</td>
+<td style="text-align:right;">
+0.3224084
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00012
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00013_Synthetic cell line_NA_NA_3
+</td>
+<td style="text-align:right;">
+0.6964541
+</td>
+<td style="text-align:right;">
+0.3035459
+</td>
+<td style="text-align:right;">
+0.2972009
+</td>
+<td style="text-align:right;">
+0.6576141
+</td>
+<td style="text-align:right;">
+0.0839375
+</td>
+<td style="text-align:right;">
+0.5713836
+</td>
+<td style="text-align:right;">
+0.0796726
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.2348974
+</td>
+<td style="text-align:right;">
+0.9725079
+</td>
+<td style="text-align:right;">
+0.4597644
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00013
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00013_Synthetic cell line_NA_NA_3
+</td>
+<td style="text-align:right;">
+0.6181384
+</td>
+<td style="text-align:right;">
+0.3818616
+</td>
+<td style="text-align:right;">
+0.3653957
+</td>
+<td style="text-align:right;">
+0.5500695
+</td>
+<td style="text-align:right;">
+-0.2493000
+</td>
+<td style="text-align:right;">
+1.0956978
+</td>
+<td style="text-align:right;">
+-0.4109312
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.8704942
+</td>
+<td style="text-align:right;">
+0.9693143
+</td>
+<td style="text-align:right;">
+0.4324716
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00013
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00014_Synthetic cell line_NA_NA_4
+</td>
+<td style="text-align:right;">
+1.0930667
+</td>
+<td style="text-align:right;">
+-0.0930667
+</td>
+<td style="text-align:right;">
+-0.0930667
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+1.0376000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.0930667
+</td>
+<td style="text-align:right;">
+1.0930667
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+-22.5223743
+</td>
+<td style="text-align:right;">
+0.4070704
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00014
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00014_Synthetic cell line_NA_NA_4
+</td>
+<td style="text-align:right;">
+1.1000000
+</td>
+<td style="text-align:right;">
+-0.1000000
+</td>
+<td style="text-align:right;">
+-0.1000000
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+1.1000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.1000000
+</td>
+<td style="text-align:right;">
+1.1000000
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+933.1517996
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00014
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00015_Synthetic cell line_NA_NA_5
+</td>
+<td style="text-align:right;">
+0.6212296
+</td>
+<td style="text-align:right;">
+0.3787704
+</td>
+<td style="text-align:right;">
+0.3972096
+</td>
+<td style="text-align:right;">
+0.2289400
+</td>
+<td style="text-align:right;">
+0.1477125
+</td>
+<td style="text-align:right;">
+0.1921395
+</td>
+<td style="text-align:right;">
+0.1586195
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+2.1776689
+</td>
+<td style="text-align:right;">
+0.9790070
+</td>
+<td style="text-align:right;">
+0.4328923
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00015
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00015_Synthetic cell line_NA_NA_5
+</td>
+<td style="text-align:right;">
+0.5787348
+</td>
+<td style="text-align:right;">
+0.4212652
+</td>
+<td style="text-align:right;">
+0.4390018
+</td>
+<td style="text-align:right;">
+0.2273410
+</td>
+<td style="text-align:right;">
+0.0277750
+</td>
+<td style="text-align:right;">
+0.2172171
+</td>
+<td style="text-align:right;">
+0.0348513
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.5860621
+</td>
+<td style="text-align:right;">
+0.9952295
+</td>
+<td style="text-align:right;">
+0.3232242
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00015
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00018_Synthetic cell line_NA_NA_6
+</td>
+<td style="text-align:right;">
+0.7183950
+</td>
+<td style="text-align:right;">
+0.2816050
+</td>
+<td style="text-align:right;">
+0.2844183
+</td>
+<td style="text-align:right;">
+0.5804956
+</td>
+<td style="text-align:right;">
+0.2528125
+</td>
+<td style="text-align:right;">
+0.3587385
+</td>
+<td style="text-align:right;">
+0.2594293
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.5200749
+</td>
+<td style="text-align:right;">
+0.9647530
+</td>
+<td style="text-align:right;">
+0.3207924
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00018
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00018_Synthetic cell line_NA_NA_6
+</td>
+<td style="text-align:right;">
+0.6327896
+</td>
+<td style="text-align:right;">
+0.3672104
+</td>
+<td style="text-align:right;">
+0.3661747
+</td>
+<td style="text-align:right;">
+0.4248574
+</td>
+<td style="text-align:right;">
+-0.0174125
+</td>
+<td style="text-align:right;">
+0.4422487
+</td>
+<td style="text-align:right;">
+-0.0269880
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.3103516
+</td>
+<td style="text-align:right;">
+0.9794162
+</td>
+<td style="text-align:right;">
+0.3390794
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00004
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00018
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
+</td>
+<td style="text-align:left;">
+CL00011_Synthetic cell line_NA_NA_1
+</td>
+<td style="text-align:right;">
+0.3225188
+</td>
+<td style="text-align:right;">
+0.6774813
+</td>
+<td style="text-align:right;">
+0.6774813
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.3225188
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.3225188
+</td>
+<td style="text-align:right;">
+0.3225188
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.2540203
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+-0.823909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00011
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
+</td>
+<td style="text-align:left;">
+CL00011_Synthetic cell line_NA_NA_1
+</td>
+<td style="text-align:right;">
+0.2600750
+</td>
+<td style="text-align:right;">
+0.7399250
+</td>
+<td style="text-align:right;">
+0.7399250
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.2600750
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.2600750
+</td>
+<td style="text-align:right;">
+0.2600750
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.3936048
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+-0.823909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00011
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
+</td>
+<td style="text-align:left;">
+CL00012_Synthetic cell line_NA_NA_2
+</td>
+<td style="text-align:right;">
+0.2208375
+</td>
+<td style="text-align:right;">
+0.7791625
+</td>
+<td style="text-align:right;">
+0.7791625
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.2208375
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.2208375
+</td>
+<td style="text-align:right;">
+0.2208375
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.0966011
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+-0.823909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00012
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
+</td>
+<td style="text-align:left;">
+CL00012_Synthetic cell line_NA_NA_2
+</td>
+<td style="text-align:right;">
+0.2097750
+</td>
+<td style="text-align:right;">
+0.7902250
+</td>
+<td style="text-align:right;">
+0.7902250
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.2097750
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.2097750
+</td>
+<td style="text-align:right;">
+0.2097750
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.1751115
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+-0.823909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00012
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
+</td>
+<td style="text-align:left;">
+CL00013_Synthetic cell line_NA_NA_3
+</td>
+<td style="text-align:right;">
+0.3258687
+</td>
+<td style="text-align:right;">
+0.6741313
+</td>
+<td style="text-align:right;">
+0.6741313
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.3258687
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.3258687
+</td>
+<td style="text-align:right;">
+0.3258687
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.2157772
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+-0.823909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00013
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
+</td>
+<td style="text-align:left;">
+CL00013_Synthetic cell line_NA_NA_3
+</td>
+<td style="text-align:right;">
+0.2335688
+</td>
+<td style="text-align:right;">
+0.7664312
+</td>
+<td style="text-align:right;">
+0.7664312
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.2335688
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.2335688
+</td>
+<td style="text-align:right;">
+0.2335688
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.3486418
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+-0.823909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00013
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
+</td>
+<td style="text-align:left;">
+CL00014_Synthetic cell line_NA_NA_4
+</td>
+<td style="text-align:right;">
+0.4415188
+</td>
+<td style="text-align:right;">
+0.5584813
+</td>
+<td style="text-align:right;">
+0.5584813
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.4415188
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.4415188
+</td>
+<td style="text-align:right;">
+0.4415188
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.0834596
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+-0.823909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00014
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
+</td>
+<td style="text-align:left;">
+CL00014_Synthetic cell line_NA_NA_4
+</td>
+<td style="text-align:right;">
+-0.9948750
+</td>
+<td style="text-align:right;">
+1.9948750
+</td>
+<td style="text-align:right;">
+1.9948750
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+-0.9948750
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+-0.9948750
+</td>
+<td style="text-align:right;">
+-0.9948750
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.0075936
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+-0.823909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00014
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
+</td>
+<td style="text-align:left;">
+CL00015_Synthetic cell line_NA_NA_5
+</td>
+<td style="text-align:right;">
+0.4100875
+</td>
+<td style="text-align:right;">
+0.5899125
+</td>
+<td style="text-align:right;">
+0.5899125
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.4100875
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.4100875
+</td>
+<td style="text-align:right;">
+0.4100875
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.2420290
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+-0.823909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00015
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
+</td>
+<td style="text-align:left;">
+CL00015_Synthetic cell line_NA_NA_5
+</td>
+<td style="text-align:right;">
+0.4164125
+</td>
+<td style="text-align:right;">
+0.5835875
+</td>
+<td style="text-align:right;">
+0.5835875
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.4164125
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.4164125
+</td>
+<td style="text-align:right;">
+0.4164125
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.2915313
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+-0.823909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00015
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
+</td>
+<td style="text-align:left;">
+CL00018_Synthetic cell line_NA_NA_6
+</td>
+<td style="text-align:right;">
+0.5511625
+</td>
+<td style="text-align:right;">
+0.4488375
+</td>
+<td style="text-align:right;">
+0.4488375
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+0.5511625
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.5511625
+</td>
+<td style="text-align:right;">
+0.5511625
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.2142295
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+-0.823909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00018
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
+</td>
+<td style="text-align:left;">
+CL00018_Synthetic cell line_NA_NA_6
+</td>
+<td style="text-align:right;">
+0.4447875
+</td>
+<td style="text-align:right;">
+0.5552125
+</td>
+<td style="text-align:right;">
+0.5552125
+</td>
+<td style="text-align:right;">
+-Inf
+</td>
+<td style="text-align:right;">
+0.4447875
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.4447875
+</td>
+<td style="text-align:right;">
+0.4447875
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.2938049
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+-0.823909
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00011
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00018
+</td>
+<td style="text-align:left;">
+Synthetic cell line
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
