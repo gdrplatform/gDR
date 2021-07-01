@@ -5,6 +5,15 @@ The gDR suite offers a full stack solution for storing, processing, and visualiz
 
 
 ```       
+
+                                                     +-----+
+                                                     | gDR |
+                                                     +-----+
+                                                        |
+          +---------------------------------------------------------------------------------------------------+
+          |                                                                                                   |
+          |                                                                                                   |
+   
                                                                                ---------------------
 			+-------------+                                        | go.gene.com/gDRin |
 			| BumpyMatrix |			                       ---------------------
