@@ -38,6 +38,15 @@ RSTUDIO_VOLUME_MOUNT_POINT = /mnt/vol
 IMAGE_FULLNAME = gdr_core
 ```
 
+It is necessary to update rplatform/dependencies.yaml to use github.com instead of github.roche.com for gDRutils, gDRtestData and gDRstyle. eg.
+```{}
+  gDRstyle:
+    ver: '>=0.0.3'
+    url: https://github.com/gdrplatform/gDRstyle.git
+    ref: main
+    subdir: ~
+```
+
 Launch 'rstudio' container with Rstudio available at http://localhost:8787 (default credentials are rstudio/rstudio)
 ```{sh, eval=FALSE}
 docker-compose -f rplatform/docker-compose.yml --project-directory . up -d --force-recreate
