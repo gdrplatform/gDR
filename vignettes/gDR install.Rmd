@@ -1,0 +1,52 @@
+---
+title: "gDR install"
+author: "gDR team"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Installation
+
+The easiest way to use functions from gDR packages is use docker image. Here is one of the way to that. 
+
+## Clone repo and build image
+
+Firstly clone gDRcore repo (where is gDRcore package, and files necessary to prepare docker image - Dockerfile and docker-compose.yaml), and two additional repos with additional packages inside gDRcore dir.
+
+```{sh, eval=FALSE}
+git clone https://github.com/gdrplatform/gDRcore.git
+cd gDRcore
+git clone https://github.com/gdrplatform/gDR.git
+git clone https://github.com/gdrplatform/gDRimport.git
+```
+
+Then build the docker image.
+```{sh, eval=FALSE}
+docker build -t gdr_core .
+```
+
+Define the .env file (in the project's root dir - gDRcore) with the following content:
+```{eval=FALSE}
+RSTUDIO_CONTAINER_NAME = rstudio
+RSTUDIO_PORT = 8787
+LISTEN_PORT = 8787
+RSTUDIO_VOLUME_MOUNT_POINT = /mnt/vol
+IMAGE_FULLNAME = gdr_core
+```
+
+Launch 'rstudio' container with Rstudio available at http://localhost:8787 (default credentials are rstudio/rstudio)
+```{sh, eval=FALSE}
+docker-compose -f rplatform/docker-compose.yml --project-directory . up -d --force-recreate
+```
+
+In Rstudio (http://localhost:8787) install additional packages:
+```{r, eval=FALSE}
+remotes::install_local("/mnt/vol/gDRimport/gDRimport/")
+remotes::install_local("/mnt/vol/gDR")
+```
+
+Now environment is ready to use gDR, example of use you can see in vignette [gDR](gDR.html)
