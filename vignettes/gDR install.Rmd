@@ -1,0 +1,61 @@
+---
+title: "gDR installation instructions"
+author: "gDR team"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Installation
+
+The easiest way to use functions from gDR package is by using Docker image. Here is one of the ways to do that. 
+
+## Clone repo and build image
+
+Firstly, clone gDRcore repository (containing gDRcore package, and files necessary to build Docker image - Dockerfile and docker-compose.yaml). Then, enter 'gDRcore' directory and clone two additional repositories: gDRimport and gDR.
+
+```{sh, eval=FALSE}
+git clone https://github.com/gdrplatform/gDRcore.git
+cd gDRcore
+git clone https://github.com/gdrplatform/gDR.git
+git clone https://github.com/gdrplatform/gDRimport.git
+```
+
+Then build the Docker image.
+```{sh, eval=FALSE}
+docker build -t gdr_core .
+```
+
+Define the .env file (in the project's root dir - gDRcore) with the following content:
+```{eval=FALSE}
+RSTUDIO_CONTAINER_NAME = rstudio
+RSTUDIO_PORT = 8787
+LISTEN_PORT = 8787
+RSTUDIO_VOLUME_MOUNT_POINT = /mnt/vol
+IMAGE_FULLNAME = gdr_core
+```
+
+It is necessary to update rplatform/dependencies.yaml to use github.com instead of github.roche.com for gDRutils, gDRtestData and gDRstyle. For example, the section for gDRstyle should be updated as follows:
+```{}
+  gDRstyle:
+    ver: '>=0.0.3'
+    url: https://github.com/gdrplatform/gDRstyle.git
+    ref: main
+    subdir: ~
+```
+
+Create 'rstudio' container with RStudio IDE available at http://localhost:8787 (default credentials are rstudio/rstudio).
+```{sh, eval=FALSE}
+docker-compose -f rplatform/docker-compose.yml --project-directory . up -d --force-recreate
+```
+
+In Rstudio (http://localhost:8787) install additional packages:
+```{r, eval=FALSE}
+remotes::install_local("/mnt/vol/gDRimport/gDRimport/")
+remotes::install_local("/mnt/vol/gDR")
+```
+
+You've just successfully set up the environment for the gDR umbrella package. Please see [gDR vignette](gDR.html) for examples of usage.
