@@ -24,6 +24,19 @@ git clone https://github.com/gdrplatform/gDR.git
 git clone https://github.com/gdrplatform/gDRimport.git
 ```
 
+It is necessary to update rplatform/dependencies.yaml to use github.com instead of github.roche.com for gDRutils, gDRtestData and gDRstyle. 
+For example, the section for gDRstyle should be updated as follows:
+```{}
+  gDRstyle:
+    ver: '>=0.0.3'
+    url: https://github.com/gdrplatform/gDRstyle.git
+    ref: main
+    subdir: ~
+    source: GITHUB
+```
+Also, please note that gDRutils, gDRtestData and gDRstyle repositories are currently internal, not public ones. This means you have to generate an access token on https://github.com/settings/tokens to be able to access them.
+Once you generate the access_token please write it as a single line in the file: `gDRcore/rplatform/.github_access_token.txt`. 
+
 Then build the Docker image.
 ```{sh, eval=FALSE}
 docker build -t gdr_core .
@@ -36,15 +49,6 @@ RSTUDIO_PORT = 8787
 LISTEN_PORT = 8787
 RSTUDIO_VOLUME_MOUNT_POINT = /mnt/vol
 IMAGE_FULLNAME = gdr_core
-```
-
-It is necessary to update rplatform/dependencies.yaml to use github.com instead of github.roche.com for gDRutils, gDRtestData and gDRstyle. For example, the section for gDRstyle should be updated as follows:
-```{}
-  gDRstyle:
-    ver: '>=0.0.3'
-    url: https://github.com/gdrplatform/gDRstyle.git
-    ref: main
-    subdir: ~
 ```
 
 Create 'rstudio' container with RStudio IDE available at http://localhost:8787 (default credentials are rstudio/rstudio).
