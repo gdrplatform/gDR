@@ -99,9 +99,10 @@ convert_se_assay_to_dt(se, "Metrics")
 ```
 
 ```{r, echo=FALSE}
+remotes::install_cran("kableExtra")
 library(kableExtra)
-kbl(convert_se_assay_to_dt(se, "Metrics")) %>%
-  kable_paper() %>%
+kbl(convert_se_assay_to_dt(se, "Metrics")) |>
+  kable_paper() |>
   scroll_box(width = "700px", height = "300px")
 ```
 
