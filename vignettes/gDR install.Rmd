@@ -48,7 +48,7 @@ docker-compose -f rplatform/docker-compose.yml --project-directory . up -d --for
 
 In Rstudio (http://localhost:8787) install additional packages:
 ```{r, eval=FALSE}
-Sys.setenv(GITHUB_TOKEN = "your_github_access_token_generate_previously")
+Sys.setenv(GITHUB_TOKEN = "your_github_access_token_generated_previously")
 remotes::install_local("/mnt/vol/gDRimport")
 remotes::install_local("/mnt/vol/gDR")
 ```
