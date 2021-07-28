@@ -34,6 +34,7 @@ We are happy to share with you our packages for importing, processing and managi
 - gDRcore
 - gDRutils
 - gDRtestData
+- gDRcomponents
 
 ## Data structures 
 The gDR data model is based on the SummarizedExperiment and BumpyMatrix. If readers are unfamiliar with these data models, we recommend first reading [SummarizedExperiment vignettes](https://bioconductor.org/packages/release/bioc/vignettes/SummarizedExperiment/inst/doc/SummarizedExperiment.html), followed by the [BumpyMatrix vignettes](https://www.bioconductor.org/packages/devel/bioc/vignettes/BumpyMatrix/inst/doc/BumpyMatrix.html). The SummarizedExperiment data structure enables ease of subsetting within the SummarizedExperiment object, but also provides ease when trying to correlate drug response data with genomic data, as these data may jointly stored in a MultiAssayExperiment. The BumpyMatrix allows for storage of multi-dimensional data while retaining a matrix abstraction.
@@ -161,6 +162,24 @@ kbl(convert_se_assay_to_dt(se, "Metrics")) |>
   kable_paper() |>
   scroll_box(width = "700px", height = "300px")
 ```
+
+
+## Pulling project Summarized Experiment object
+The current approach uses AWS as the main source of all the processing data. `gDRcomponents` package is the main package for managing all the cached data and making the connection with AWS. Before starting with this package, make sure, that all the AWS-dependent variables are defined as environmental variables. 
+
+The basic usage of this package for pulling down Summarized Experiments objects requires using three basic functions.
+
+### `getProjects("aws")`
+This function returns data.table with the information about projects that are currently stored on AWS. Column `project_id` can be used as an identifier for projects that can be  pulled using `pullProjectSE` function.
+
+### `getMetaProjects("aws")`
+This function returns data.table with meta projects to which projects belong. The conception of meta projects allows us to group multiple projects into categories. Please note that one project might belong to multiple meta projects.
+
+### `pullProjectSE(project_id, "aws")`
+The core function for pulling SummarizedExperiments of projects based on their project_id (output of `getProjects()`).
+
+Note: Some core/testing data are stored in the indendepndent storage (called fixed data). If you want to access them, use parameter `fixed = TRUE` in functions `getProjects()` and `getMetaProjects()`.
+
 
 # Appendix
 Once the data is stored in the database, there are multiple ways to visualize the data depending on the scientific needs. The primary method to do is through our RShiny visualization tool 'gDRviz'. Here, users can search and select experiments present in the database, and use downstream visualization modules to look at dose response curves, heatmaps, etc.
