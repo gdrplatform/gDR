@@ -26,7 +26,8 @@ Suggests:
     futile.logger,
     knitr,
     kableExtra,
-    rmarkdown
+    rmarkdown,
+    gDRinternal (>= 1.0.4)
 VignetteBuilder: knitr
 ByteCompile: TRUE
 RoxygenNote: 7.1.1
