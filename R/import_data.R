@@ -18,7 +18,7 @@ import_data <- function(manifest_file,
                         instrument = "EnVision",
                         collapse_Drugs = TRUE) {
   loaded_data <- load_data(manifest_file = manifest_file,
-                           df_template_files= template_file,
+                           df_template_files = template_file,
                            results_file = results_file,
                            instrument = instrument)
   merge_data(manifest = loaded_data$manifest,
