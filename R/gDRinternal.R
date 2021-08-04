@@ -1,2 +1,0 @@
-#' @export
-gDRinternal::connect

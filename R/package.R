@@ -2,5 +2,4 @@
 #' @importFrom gDRcore merge_data runDrugResponseProcessingPipeline create_SE normalize_SE average_SE fit_SE
 #' @importFrom gDRimport load_data
 #' @importFrom gDRcomponents getDrugs getCellLines getProjects getMetaProjects pullProjectSE
-#' @importFrom gDRinternal connect
 NULL
