@@ -12,7 +12,7 @@
 
 <meta name="author" content="gDR team" />
 
-<meta name="date" content="2021-07-28" />
+<meta name="date" content="2021-08-04" />
 
 <title>gDR suite</title>
 
@@ -143,7 +143,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">gDR suite</h1>
 <h4 class="author">gDR team</h4>
-<h4 class="date">2021-07-28</h4>
+<h4 class="date">2021-08-04</h4>
 
 
 
@@ -221,51 +221,36 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Next, we can transform the long table into our initial SummarizedExperiment object. To do so, we need to tell the software: - What should go on rows and columns versus be nested in the assay. - Which rows in our table to consider as “control” versus “treated” for normalization.</p>
 <p>We can do so by setting the <code>untreated_tag</code> identifier like <code>set_identifier(&quot;untreated_tag&quot; = c(&quot;MY_CONTROL_TERMINOLOGY_HERE&quot;))</code>. and specifying the <code>nested_keys</code> argument within <code>create_SE</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">create_SE</span>(imported_data)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in identify_keys(df_, nested_keys, override_untrt_controls,</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; identifiers): ignoring nested_keys input: &#39;masked&#39; which are not present in</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; data.frame</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] Missing reference controls &#39;ref_Endpoint&#39; for: (&#39;4&#39;)</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] No partial match found</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] Missing reference controls &#39;ref_Endpoint&#39; for: (&#39;5&#39;)</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] No partial match found</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] Missing reference controls &#39;ref_Endpoint&#39; for: (&#39;11&#39;)</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] No partial match found</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] Missing reference controls &#39;ref_Endpoint&#39; for: (&#39;13&#39;)</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] No partial match found</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] Missing reference controls &#39;ref_Endpoint&#39; for: (&#39;16&#39;)</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] No partial match found</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] Missing reference controls &#39;ref_Endpoint&#39; for: (&#39;20&#39;)</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] No partial match found</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] Missing reference controls &#39;ref_Endpoint&#39; for: (&#39;23&#39;)</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] No partial match found</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] Missing reference controls &#39;ref_Endpoint&#39; for: (&#39;26&#39;)</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] No partial match found</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] Missing reference controls &#39;ref_Endpoint&#39; for: (&#39;29&#39;)</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] No partial match found</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] Missing reference controls &#39;ref_Endpoint&#39; for: (&#39;30&#39;)</span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] No partial match found</span></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] Missing reference controls &#39;ref_Endpoint&#39; for: (&#39;36&#39;)</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] No partial match found</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] Missing reference controls &#39;ref_Endpoint&#39; for: (&#39;39&#39;)</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-07-28 14:24:15] No partial match found</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>se</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; class: SummarizedExperiment </span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dim: 5 6 </span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; metadata(4): experiment_metadata df_ Keys identifiers</span></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; assays(2): RawTreated Controls</span></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rownames(5):</span></span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2</span></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4</span></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5</span></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6</span></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rowData names(8): Duration DrugName ... Gnumber_2 Concentration_2</span></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_cellline_BA_breast_26_cellline_BA_1</span></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00012_cellline_CA_breast_30_cellline_CA_2 ...</span></span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00015_cellline_FA_breast_42_cellline_FA_5</span></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00018_cellline_IB_breast_54_cellline_IB_6</span></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(5): clid CellLineName Tissue ReferenceDivisionTime</span></span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   parental_identifier</span></span></code></pre></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-04 17:03:55] </span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-04 17:03:55] </span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-04 17:03:55] No partial match found for treatment: (&#39;3&#39;)</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;5&#39;)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;9&#39;)</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;11&#39;)</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;16&#39;)</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;18&#39;)</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;24&#39;)</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;26&#39;)</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;29&#39;)</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;33&#39;)</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;36&#39;)</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;41&#39;)</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-04 17:03:55]</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>se</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; class: SummarizedExperiment </span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dim: 5 6 </span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; metadata(4): df_ identifiers experiment_metadata Keys</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; assays(2): RawTreated Controls</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rownames(5): 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_G00002_G00011_0.149999910525364_2 168_Synthetic drug_Synthetic</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rowData names(8): Duration DrugName ... Gnumber_2 Concentration_2</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_NA_NA_NA_1 CL00012_NA_NA_NA_2 ...</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00015_NA_NA_NA_5 CL00018_NA_NA_NA_6</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(4): clid CellLineName Tissue ReferenceDivisionTime</span></span></code></pre></div>
 <p>Note that this has created a SummarizedExperiment object with <code>rowData</code>, <code>colData</code>, <code>metadata</code> and 2 <code>assays</code>.</p>
 </div>
 <div id="normalizing-averaging-and-fitting-data-3" class="section level3">
@@ -277,21 +262,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>se</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; class: SummarizedExperiment </span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dim: 5 6 </span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; metadata(6): experiment_metadata df_ ... fit_parameters .internal</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; metadata(6): df_ identifiers ... fit_parameters .internal</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; assays(8): RawTreated Controls ... Averaged Metrics</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rownames(5):</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rownames(5): 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_G00002_G00011_0.149999910525364_2 168_Synthetic drug_Synthetic</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6</span></span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rowData names(8): Duration DrugName ... Gnumber_2 Concentration_2</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_cellline_BA_breast_26_cellline_BA_1</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00012_cellline_CA_breast_30_cellline_CA_2 ...</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00015_cellline_FA_breast_42_cellline_FA_5</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00018_cellline_IB_breast_54_cellline_IB_6</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(5): clid CellLineName Tissue ReferenceDivisionTime</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   parental_identifier</span></span></code></pre></div>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_NA_NA_NA_1 CL00012_NA_NA_NA_2 ...</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00015_NA_NA_NA_5 CL00018_NA_NA_NA_6</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(4): clid CellLineName Tissue ReferenceDivisionTime</span></span></code></pre></div>
 </div>
 <div id="rundrugresponseprocessingpipeline" class="section level3">
 <h3>runDrugResponseProcessingPipeline</h3>
@@ -301,21 +283,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pipeline_se</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; class: SummarizedExperiment </span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dim: 5 6 </span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; metadata(7): experiment_metadata df_ ... .internal drug_combinations</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; metadata(7): df_ identifiers ... .internal drug_combinations</span></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; assays(8): RawTreated Controls ... Averaged Metrics</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rownames(5):</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rownames(5): 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_G00002_G00011_0.149999910525364_2 168_Synthetic drug_Synthetic</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6</span></span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rowData names(8): Duration DrugName ... Gnumber_2 Concentration_2</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_cellline_BA_breast_26_cellline_BA_1</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00012_cellline_CA_breast_30_cellline_CA_2 ...</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00015_cellline_FA_breast_42_cellline_FA_5</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00018_cellline_IB_breast_54_cellline_IB_6</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(5): clid CellLineName Tissue ReferenceDivisionTime</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   parental_identifier</span></span></code></pre></div>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_NA_NA_NA_1 CL00012_NA_NA_NA_2 ...</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00015_NA_NA_NA_5 CL00018_NA_NA_NA_6</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(4): clid CellLineName Tissue ReferenceDivisionTime</span></span></code></pre></div>
 <p>Note that our final SummarizedExperiment object is made up of multiple assays, such as:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>SummarizedExperiment<span class="sc">::</span><span class="fu">assayNames</span>(se)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;RawTreated&quot;           &quot;Controls&quot;             &quot;Normalized&quot;          </span></span>
@@ -416,21 +395,18 @@ CellLineName
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 Tissue
 </th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-ReferenceDivisionTime
-</th>
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
-parental_identifier
+ReferenceDivisionTime
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left;">
-168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00011_cellline_BA_breast_26_cellline_BA_1
+CL00011_NA_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.1942553
@@ -484,16 +460,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_002
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00002
@@ -508,24 +484,21 @@ G00011
 CL00011
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-26
+NA
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00011_cellline_BA_breast_26_cellline_BA_1
+CL00011_NA_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.1060173
@@ -579,16 +552,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_002
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00002
@@ -603,24 +576,21 @@ G00011
 CL00011
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-26
+NA
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00012_cellline_CA_breast_30_cellline_CA_2
+CL00012_NA_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.0620985
@@ -674,16 +644,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_002
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00002
@@ -698,24 +668,21 @@ G00011
 CL00012
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-30
+NA
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00012_cellline_CA_breast_30_cellline_CA_2
+CL00012_NA_NA_NA_2
 </td>
 <td style="text-align:right;">
 -0.2340373
@@ -769,16 +736,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_002
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00002
@@ -793,24 +760,21 @@ G00011
 CL00012
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-30
+NA
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00013_cellline_DA_breast_34_cellline_DA_3
+CL00013_NA_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.1377834
@@ -864,16 +828,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_002
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00002
@@ -888,24 +852,21 @@ G00011
 CL00013
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-34
+NA
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00013_cellline_DA_breast_34_cellline_DA_3
+CL00013_NA_NA_NA_3
 </td>
 <td style="text-align:right;">
 -0.1339332
@@ -959,16 +920,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_002
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00002
@@ -983,24 +944,21 @@ G00011
 CL00013
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-34
+NA
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00014_cellline_EA_breast_38_cellline_EA_4
+CL00014_NA_NA_NA_4
 </td>
 <td style="text-align:right;">
 0.5024361
@@ -1054,16 +1012,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_002
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00002
@@ -1078,24 +1036,21 @@ G00011
 CL00014
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-38
+NA
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00014_cellline_EA_breast_38_cellline_EA_4
+CL00014_NA_NA_NA_4
 </td>
 <td style="text-align:right;">
 -0.9325014
@@ -1149,16 +1104,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_002
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00002
@@ -1173,24 +1128,21 @@ G00011
 CL00014
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-38
+NA
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00015_cellline_FA_breast_42_cellline_FA_5
+CL00015_NA_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.1739511
@@ -1244,16 +1196,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_002
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00002
@@ -1268,24 +1220,21 @@ G00011
 CL00015
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-42
+NA
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00015_cellline_FA_breast_42_cellline_FA_5
+CL00015_NA_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.0705376
@@ -1339,16 +1288,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_002
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00002
@@ -1363,24 +1312,21 @@ G00011
 CL00015
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-42
+NA
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00018_cellline_IB_breast_54_cellline_IB_6
+CL00018_NA_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.2498753
@@ -1434,16 +1380,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_002
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00002
@@ -1458,24 +1404,21 @@ G00011
 CL00018
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-54
+NA
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_002_drug_011_moa_A_moa_B_G00002_G00011_0.149999910525364_2
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00018_cellline_IB_breast_54_cellline_IB_6
+CL00018_NA_NA_NA_6
 </td>
 <td style="text-align:right;">
 -0.0515717
@@ -1529,16 +1472,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_002
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00002
@@ -1553,1164 +1496,21 @@ G00011
 CL00018
 </td>
 <td style="text-align:left;">
-cellline_IB
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-54
-</td>
-<td style="text-align:left;">
-cellline_IB
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3
-</td>
-<td style="text-align:left;">
-CL00011_cellline_BA_breast_26_cellline_BA_1
-</td>
-<td style="text-align:right;">
-0.9157913
-</td>
-<td style="text-align:right;">
-0.0842087
-</td>
-<td style="text-align:right;">
-0.0573383
-</td>
-<td style="text-align:right;">
-7.4683485
-</td>
-<td style="text-align:right;">
-0.4225500
-</td>
-<td style="text-align:right;">
-5.7741811
-</td>
-<td style="text-align:right;">
-0.1449920
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-1.3311221
-</td>
-<td style="text-align:right;">
-0.9199573
-</td>
-<td style="text-align:right;">
-0.8794050
-</td>
-<td style="text-align:left;">
-DRC3pHillFitModelFixS0
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-RV
-</td>
-<td style="text-align:left;">
-gDR
-</td>
-<td style="text-align:right;">
-168
-</td>
-<td style="text-align:left;">
-drug_002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-moa_A
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-G00002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-CL00011
-</td>
-<td style="text-align:left;">
-cellline_BA
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-26
-</td>
-<td style="text-align:left;">
-cellline_BA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3
-</td>
-<td style="text-align:left;">
-CL00011_cellline_BA_breast_26_cellline_BA_1
-</td>
-<td style="text-align:right;">
-0.7420679
-</td>
-<td style="text-align:right;">
-0.2579321
-</td>
-<td style="text-align:right;">
-0.2582018
-</td>
-<td style="text-align:right;">
-4.1712724
-</td>
-<td style="text-align:right;">
-0.3065500
-</td>
-<td style="text-align:right;">
-100.0000000
-</td>
-<td style="text-align:right;">
--0.7636441
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-0.2918356
-</td>
-<td style="text-align:right;">
-0.7732475
-</td>
-<td style="text-align:right;">
-0.7276889
-</td>
-<td style="text-align:left;">
-DRC3pHillFitModelFixS0
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-GR
-</td>
-<td style="text-align:left;">
-gDR
-</td>
-<td style="text-align:right;">
-168
-</td>
-<td style="text-align:left;">
-drug_002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-moa_A
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-G00002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-CL00011
-</td>
-<td style="text-align:left;">
-cellline_BA
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-26
-</td>
-<td style="text-align:left;">
-cellline_BA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3
-</td>
-<td style="text-align:left;">
-CL00012_cellline_CA_breast_30_cellline_CA_2
-</td>
-<td style="text-align:right;">
-0.1763718
-</td>
-<td style="text-align:right;">
-0.8236282
-</td>
-<td style="text-align:right;">
-0.9008089
-</td>
-<td style="text-align:right;">
-0.0055320
-</td>
-<td style="text-align:right;">
-0.0257000
-</td>
-<td style="text-align:right;">
-0.0053721
-</td>
-<td style="text-align:right;">
-0.0194392
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-1.3524577
-</td>
-<td style="text-align:right;">
-0.9982204
-</td>
-<td style="text-align:right;">
-0.1388661
-</td>
-<td style="text-align:left;">
-DRC3pHillFitModelFixS0
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-RV
-</td>
-<td style="text-align:left;">
-gDR
-</td>
-<td style="text-align:right;">
-168
-</td>
-<td style="text-align:left;">
-drug_002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-moa_A
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-G00002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-CL00012
-</td>
-<td style="text-align:left;">
-cellline_CA
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:left;">
-cellline_CA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3
-</td>
-<td style="text-align:left;">
-CL00012_cellline_CA_breast_30_cellline_CA_2
-</td>
-<td style="text-align:right;">
--0.0904008
-</td>
-<td style="text-align:right;">
-1.0904008
-</td>
-<td style="text-align:right;">
-1.1968927
-</td>
-<td style="text-align:right;">
-0.0054828
-</td>
-<td style="text-align:right;">
--0.3786875
-</td>
-<td style="text-align:right;">
-0.0093276
-</td>
-<td style="text-align:right;">
--0.4002242
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-1.1066609
-</td>
-<td style="text-align:right;">
-0.9890300
-</td>
-<td style="text-align:right;">
-0.1503558
-</td>
-<td style="text-align:left;">
-DRC3pHillFitModelFixS0
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-GR
-</td>
-<td style="text-align:left;">
-gDR
-</td>
-<td style="text-align:right;">
-168
-</td>
-<td style="text-align:left;">
-drug_002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-moa_A
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-G00002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-CL00012
-</td>
-<td style="text-align:left;">
-cellline_CA
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:left;">
-cellline_CA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3
-</td>
-<td style="text-align:left;">
-CL00013_cellline_DA_breast_34_cellline_DA_3
-</td>
-<td style="text-align:right;">
-0.3758869
-</td>
-<td style="text-align:right;">
-0.6241131
-</td>
-<td style="text-align:right;">
-0.6876649
-</td>
-<td style="text-align:right;">
-0.0258708
-</td>
-<td style="text-align:right;">
-0.1094750
-</td>
-<td style="text-align:right;">
-0.0209660
-</td>
-<td style="text-align:right;">
-0.1006267
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-1.0689717
-</td>
-<td style="text-align:right;">
-0.9842555
-</td>
-<td style="text-align:right;">
-0.2672302
-</td>
-<td style="text-align:left;">
-DRC3pHillFitModelFixS0
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-RV
-</td>
-<td style="text-align:left;">
-gDR
-</td>
-<td style="text-align:right;">
-168
-</td>
-<td style="text-align:left;">
-drug_002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-moa_A
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-G00002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-CL00013
-</td>
-<td style="text-align:left;">
-cellline_DA
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-34
-</td>
-<td style="text-align:left;">
-cellline_DA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3
-</td>
-<td style="text-align:left;">
-CL00013_cellline_DA_breast_34_cellline_DA_3
-</td>
-<td style="text-align:right;">
-0.2018558
-</td>
-<td style="text-align:right;">
-0.7981442
-</td>
-<td style="text-align:right;">
-0.8710695
-</td>
-<td style="text-align:right;">
-0.0186345
-</td>
-<td style="text-align:right;">
--0.1850875
-</td>
-<td style="text-align:right;">
-0.0275090
-</td>
-<td style="text-align:right;">
--0.2076859
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-0.8918977
-</td>
-<td style="text-align:right;">
-0.9901850
-</td>
-<td style="text-align:right;">
-0.3550212
-</td>
-<td style="text-align:left;">
-DRC3pHillFitModelFixS0
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-GR
-</td>
-<td style="text-align:left;">
-gDR
-</td>
-<td style="text-align:right;">
-168
-</td>
-<td style="text-align:left;">
-drug_002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-moa_A
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-G00002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-CL00013
-</td>
-<td style="text-align:left;">
-cellline_DA
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-34
-</td>
-<td style="text-align:left;">
-cellline_DA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3
-</td>
-<td style="text-align:left;">
-CL00014_cellline_EA_breast_38_cellline_EA_4
-</td>
-<td style="text-align:right;">
-1.0835556
-</td>
-<td style="text-align:right;">
--0.0835556
-</td>
-<td style="text-align:right;">
--0.0835556
-</td>
-<td style="text-align:right;">
-Inf
-</td>
-<td style="text-align:right;">
-0.9520000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1.0835556
-</td>
-<td style="text-align:right;">
-1.0835556
-</td>
-<td style="text-align:right;">
-0.0001000
-</td>
-<td style="text-align:right;">
--3.2271731
-</td>
-<td style="text-align:right;">
-0.3927635
-</td>
-<td style="text-align:left;">
-DRCConstantFitResult
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-RV
-</td>
-<td style="text-align:left;">
-gDR
-</td>
-<td style="text-align:right;">
-168
-</td>
-<td style="text-align:left;">
-drug_002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-moa_A
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-G00002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-CL00014
-</td>
-<td style="text-align:left;">
-cellline_EA
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-38
-</td>
-<td style="text-align:left;">
-cellline_EA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3
-</td>
-<td style="text-align:left;">
-CL00014_cellline_EA_breast_38_cellline_EA_4
-</td>
-<td style="text-align:right;">
-1.1000000
-</td>
-<td style="text-align:right;">
--0.1000000
-</td>
-<td style="text-align:right;">
--0.1000000
-</td>
-<td style="text-align:right;">
-Inf
-</td>
-<td style="text-align:right;">
-1.1000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1.1000000
-</td>
-<td style="text-align:right;">
-1.1000000
-</td>
-<td style="text-align:right;">
-0.0001000
-</td>
-<td style="text-align:right;">
 NA
 </td>
-<td style="text-align:right;">
-198.9694133
+<td style="text-align:left;">
+NA
 </td>
 <td style="text-align:left;">
-DRCConstantFitResult
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-GR
-</td>
-<td style="text-align:left;">
-gDR
-</td>
-<td style="text-align:right;">
-168
-</td>
-<td style="text-align:left;">
-drug_002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-moa_A
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-G00002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-CL00014
-</td>
-<td style="text-align:left;">
-cellline_EA
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-38
-</td>
-<td style="text-align:left;">
-cellline_EA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00015_cellline_FA_breast_42_cellline_FA_5
-</td>
-<td style="text-align:right;">
-0.3006246
-</td>
-<td style="text-align:right;">
-0.6993754
-</td>
-<td style="text-align:right;">
-0.7760475
-</td>
-<td style="text-align:right;">
-0.0097058
-</td>
-<td style="text-align:right;">
-0.1255250
-</td>
-<td style="text-align:right;">
-0.0079424
-</td>
-<td style="text-align:right;">
-0.1293874
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-1.4934640
-</td>
-<td style="text-align:right;">
-0.9962006
-</td>
-<td style="text-align:right;">
-0.1677657
-</td>
-<td style="text-align:left;">
-DRC3pHillFitModelFixS0
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-RV
-</td>
-<td style="text-align:left;">
-gDR
-</td>
-<td style="text-align:right;">
-168
-</td>
-<td style="text-align:left;">
-drug_002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-moa_A
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-G00002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-CL00015
-</td>
-<td style="text-align:left;">
-cellline_FA
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-42
-</td>
-<td style="text-align:left;">
-cellline_FA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3
-</td>
-<td style="text-align:left;">
-CL00015_cellline_FA_breast_42_cellline_FA_5
-</td>
-<td style="text-align:right;">
-0.2062848
-</td>
-<td style="text-align:right;">
-0.7937152
-</td>
-<td style="text-align:right;">
-0.8736452
-</td>
-<td style="text-align:right;">
-0.0096880
-</td>
-<td style="text-align:right;">
--0.0281125
-</td>
-<td style="text-align:right;">
-0.0101895
-</td>
-<td style="text-align:right;">
--0.0296460
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-1.1411804
-</td>
-<td style="text-align:right;">
-0.9937822
-</td>
-<td style="text-align:right;">
-0.1839219
-</td>
-<td style="text-align:left;">
-DRC3pHillFitModelFixS0
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-GR
-</td>
-<td style="text-align:left;">
-gDR
-</td>
-<td style="text-align:right;">
-168
-</td>
-<td style="text-align:left;">
-drug_002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-moa_A
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-G00002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-CL00015
-</td>
-<td style="text-align:left;">
-cellline_FA
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-42
-</td>
-<td style="text-align:left;">
-cellline_FA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3
-</td>
-<td style="text-align:left;">
-CL00018_cellline_IB_breast_54_cellline_IB_6
-</td>
-<td style="text-align:right;">
-0.3964219
-</td>
-<td style="text-align:right;">
-0.6035781
-</td>
-<td style="text-align:right;">
-0.6776300
-</td>
-<td style="text-align:right;">
-0.0236186
-</td>
-<td style="text-align:right;">
-0.1155375
-</td>
-<td style="text-align:right;">
-0.0195603
-</td>
-<td style="text-align:right;">
-0.1463226
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-1.8364343
-</td>
-<td style="text-align:right;">
-0.9872148
-</td>
-<td style="text-align:right;">
-0.1736033
-</td>
-<td style="text-align:left;">
-DRC3pHillFitModelFixS0
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-RV
-</td>
-<td style="text-align:left;">
-gDR
-</td>
-<td style="text-align:right;">
-168
-</td>
-<td style="text-align:left;">
-drug_002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-moa_A
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-G00002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-CL00018
-</td>
-<td style="text-align:left;">
-cellline_IB
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-54
-</td>
-<td style="text-align:left;">
-cellline_IB
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-168_drug_002_vehicle_moa_A_vehicle_G00002_vehicle_0_3
-</td>
-<td style="text-align:left;">
-CL00018_cellline_IB_breast_54_cellline_IB_6
-</td>
-<td style="text-align:right;">
-0.1324605
-</td>
-<td style="text-align:right;">
-0.8675395
-</td>
-<td style="text-align:right;">
-0.9669921
-</td>
-<td style="text-align:right;">
-0.0184650
-</td>
-<td style="text-align:right;">
--0.3435875
-</td>
-<td style="text-align:right;">
-0.0247495
-</td>
-<td style="text-align:right;">
--0.2758215
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-1.4997197
-</td>
-<td style="text-align:right;">
-0.9915452
-</td>
-<td style="text-align:right;">
-0.2066486
-</td>
-<td style="text-align:left;">
-DRC3pHillFitModelFixS0
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:left;">
-GR
-</td>
-<td style="text-align:left;">
-gDR
-</td>
-<td style="text-align:right;">
-168
-</td>
-<td style="text-align:left;">
-drug_002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-moa_A
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:left;">
-G00002
-</td>
-<td style="text-align:left;">
-vehicle
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:left;">
-CL00018
-</td>
-<td style="text-align:left;">
-cellline_IB
-</td>
-<td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-54
-</td>
-<td style="text-align:left;">
-cellline_IB
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4
-</td>
-<td style="text-align:left;">
-CL00011_cellline_BA_breast_26_cellline_BA_1
+CL00011_NA_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.1358483
@@ -2764,16 +1564,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00004
@@ -2788,24 +1588,21 @@ G00011
 CL00011
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-26
+NA
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00011_cellline_BA_breast_26_cellline_BA_1
+CL00011_NA_NA_NA_1
 </td>
 <td style="text-align:right;">
 -0.0579227
@@ -2859,16 +1656,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00004
@@ -2883,24 +1680,21 @@ G00011
 CL00011
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-26
+NA
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00012_cellline_CA_breast_30_cellline_CA_2
+CL00012_NA_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.1132080
@@ -2954,16 +1748,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00004
@@ -2978,24 +1772,21 @@ G00011
 CL00012
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-30
+NA
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00012_cellline_CA_breast_30_cellline_CA_2
+CL00012_NA_NA_NA_2
 </td>
 <td style="text-align:right;">
 -0.0558422
@@ -3049,16 +1840,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00004
@@ -3073,24 +1864,21 @@ G00011
 CL00012
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-30
+NA
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00013_cellline_DA_breast_34_cellline_DA_3
+CL00013_NA_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.1787868
@@ -3144,16 +1932,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00004
@@ -3168,24 +1956,21 @@ G00011
 CL00013
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-34
+NA
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00013_cellline_DA_breast_34_cellline_DA_3
+CL00013_NA_NA_NA_3
 </td>
 <td style="text-align:right;">
 -0.0159833
@@ -3239,16 +2024,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00004
@@ -3263,24 +2048,21 @@ G00011
 CL00013
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-34
+NA
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00014_cellline_EA_breast_38_cellline_EA_4
+CL00014_NA_NA_NA_4
 </td>
 <td style="text-align:right;">
 0.5146361
@@ -3334,16 +2116,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00004
@@ -3358,24 +2140,21 @@ G00011
 CL00014
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-38
+NA
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00014_cellline_EA_breast_38_cellline_EA_4
+CL00014_NA_NA_NA_4
 </td>
 <td style="text-align:right;">
 -0.9268639
@@ -3429,16 +2208,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00004
@@ -3453,24 +2232,21 @@ G00011
 CL00014
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-38
+NA
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00015_cellline_FA_breast_42_cellline_FA_5
+CL00015_NA_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.2037594
@@ -3524,16 +2300,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00004
@@ -3548,24 +2324,21 @@ G00011
 CL00015
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-42
+NA
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00015_cellline_FA_breast_42_cellline_FA_5
+CL00015_NA_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.1334787
@@ -3619,16 +2392,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00004
@@ -3643,24 +2416,21 @@ G00011
 CL00015
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-42
+NA
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00018_cellline_IB_breast_54_cellline_IB_6
+CL00018_NA_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.4051480
@@ -3714,16 +2484,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00004
@@ -3738,24 +2508,21 @@ G00011
 CL00018
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-54
+NA
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_drug_011_moa_A_moa_B_G00004_G00011_0.149999910525364_4
+168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00018_cellline_IB_breast_54_cellline_IB_6
+CL00018_NA_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.2414209
@@ -3809,16 +2576,16 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 G00004
@@ -3833,24 +2600,1125 @@ G00011
 CL00018
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-54
+NA
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00011_cellline_BA_breast_26_cellline_BA_1
+CL00011_NA_NA_NA_1
+</td>
+<td style="text-align:right;">
+0.9157913
+</td>
+<td style="text-align:right;">
+0.0842087
+</td>
+<td style="text-align:right;">
+0.0573383
+</td>
+<td style="text-align:right;">
+7.4683485
+</td>
+<td style="text-align:right;">
+0.4225500
+</td>
+<td style="text-align:right;">
+5.7741811
+</td>
+<td style="text-align:right;">
+0.1449920
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.3311221
+</td>
+<td style="text-align:right;">
+0.9199573
+</td>
+<td style="text-align:right;">
+0.8794050
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00011
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00011_NA_NA_NA_1
+</td>
+<td style="text-align:right;">
+0.7420679
+</td>
+<td style="text-align:right;">
+0.2579321
+</td>
+<td style="text-align:right;">
+0.2582018
+</td>
+<td style="text-align:right;">
+4.1712724
+</td>
+<td style="text-align:right;">
+0.3065500
+</td>
+<td style="text-align:right;">
+100.0000000
+</td>
+<td style="text-align:right;">
+-0.7636441
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.2918356
+</td>
+<td style="text-align:right;">
+0.7732475
+</td>
+<td style="text-align:right;">
+0.7276889
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00011
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00012_NA_NA_NA_2
+</td>
+<td style="text-align:right;">
+0.1763718
+</td>
+<td style="text-align:right;">
+0.8236282
+</td>
+<td style="text-align:right;">
+0.9008089
+</td>
+<td style="text-align:right;">
+0.0055320
+</td>
+<td style="text-align:right;">
+0.0257000
+</td>
+<td style="text-align:right;">
+0.0053721
+</td>
+<td style="text-align:right;">
+0.0194392
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.3524577
+</td>
+<td style="text-align:right;">
+0.9982204
+</td>
+<td style="text-align:right;">
+0.1388661
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00012
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00012_NA_NA_NA_2
+</td>
+<td style="text-align:right;">
+-0.0904008
+</td>
+<td style="text-align:right;">
+1.0904008
+</td>
+<td style="text-align:right;">
+1.1968927
+</td>
+<td style="text-align:right;">
+0.0054828
+</td>
+<td style="text-align:right;">
+-0.3786875
+</td>
+<td style="text-align:right;">
+0.0093276
+</td>
+<td style="text-align:right;">
+-0.4002242
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.1066609
+</td>
+<td style="text-align:right;">
+0.9890300
+</td>
+<td style="text-align:right;">
+0.1503558
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00012
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00013_NA_NA_NA_3
+</td>
+<td style="text-align:right;">
+0.3758869
+</td>
+<td style="text-align:right;">
+0.6241131
+</td>
+<td style="text-align:right;">
+0.6876649
+</td>
+<td style="text-align:right;">
+0.0258708
+</td>
+<td style="text-align:right;">
+0.1094750
+</td>
+<td style="text-align:right;">
+0.0209660
+</td>
+<td style="text-align:right;">
+0.1006267
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.0689717
+</td>
+<td style="text-align:right;">
+0.9842555
+</td>
+<td style="text-align:right;">
+0.2672302
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00013
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00013_NA_NA_NA_3
+</td>
+<td style="text-align:right;">
+0.2018558
+</td>
+<td style="text-align:right;">
+0.7981442
+</td>
+<td style="text-align:right;">
+0.8710695
+</td>
+<td style="text-align:right;">
+0.0186345
+</td>
+<td style="text-align:right;">
+-0.1850875
+</td>
+<td style="text-align:right;">
+0.0275090
+</td>
+<td style="text-align:right;">
+-0.2076859
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+0.8918977
+</td>
+<td style="text-align:right;">
+0.9901850
+</td>
+<td style="text-align:right;">
+0.3550212
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00013
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00014_NA_NA_NA_4
+</td>
+<td style="text-align:right;">
+1.0835556
+</td>
+<td style="text-align:right;">
+-0.0835556
+</td>
+<td style="text-align:right;">
+-0.0835556
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+0.9520000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.0835556
+</td>
+<td style="text-align:right;">
+1.0835556
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+-3.2271731
+</td>
+<td style="text-align:right;">
+0.3927635
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00014
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00014_NA_NA_NA_4
+</td>
+<td style="text-align:right;">
+1.1000000
+</td>
+<td style="text-align:right;">
+-0.1000000
+</td>
+<td style="text-align:right;">
+-0.1000000
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+1.1000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.1000000
+</td>
+<td style="text-align:right;">
+1.1000000
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+198.9694133
+</td>
+<td style="text-align:left;">
+DRCConstantFitResult
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00014
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00015_NA_NA_NA_5
+</td>
+<td style="text-align:right;">
+0.3006246
+</td>
+<td style="text-align:right;">
+0.6993754
+</td>
+<td style="text-align:right;">
+0.7760475
+</td>
+<td style="text-align:right;">
+0.0097058
+</td>
+<td style="text-align:right;">
+0.1255250
+</td>
+<td style="text-align:right;">
+0.0079424
+</td>
+<td style="text-align:right;">
+0.1293874
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.4934640
+</td>
+<td style="text-align:right;">
+0.9962006
+</td>
+<td style="text-align:right;">
+0.1677657
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00015
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00015_NA_NA_NA_5
+</td>
+<td style="text-align:right;">
+0.2062848
+</td>
+<td style="text-align:right;">
+0.7937152
+</td>
+<td style="text-align:right;">
+0.8736452
+</td>
+<td style="text-align:right;">
+0.0096880
+</td>
+<td style="text-align:right;">
+-0.0281125
+</td>
+<td style="text-align:right;">
+0.0101895
+</td>
+<td style="text-align:right;">
+-0.0296460
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.1411804
+</td>
+<td style="text-align:right;">
+0.9937822
+</td>
+<td style="text-align:right;">
+0.1839219
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00015
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00018_NA_NA_NA_6
+</td>
+<td style="text-align:right;">
+0.3964219
+</td>
+<td style="text-align:right;">
+0.6035781
+</td>
+<td style="text-align:right;">
+0.6776300
+</td>
+<td style="text-align:right;">
+0.0236186
+</td>
+<td style="text-align:right;">
+0.1155375
+</td>
+<td style="text-align:right;">
+0.0195603
+</td>
+<td style="text-align:right;">
+0.1463226
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.8364343
+</td>
+<td style="text-align:right;">
+0.9872148
+</td>
+<td style="text-align:right;">
+0.1736033
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+RV
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00018
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
+</td>
+<td style="text-align:left;">
+CL00018_NA_NA_NA_6
+</td>
+<td style="text-align:right;">
+0.1324605
+</td>
+<td style="text-align:right;">
+0.8675395
+</td>
+<td style="text-align:right;">
+0.9669921
+</td>
+<td style="text-align:right;">
+0.0184650
+</td>
+<td style="text-align:right;">
+-0.3435875
+</td>
+<td style="text-align:right;">
+0.0247495
+</td>
+<td style="text-align:right;">
+-0.2758215
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.4997197
+</td>
+<td style="text-align:right;">
+0.9915452
+</td>
+<td style="text-align:right;">
+0.2066486
+</td>
+<td style="text-align:left;">
+DRC3pHillFitModelFixS0
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+GR
+</td>
+<td style="text-align:left;">
+gDR
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+Synthetic drug
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:left;">
+G00002
+</td>
+<td style="text-align:left;">
+vehicle
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:left;">
+CL00018
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
+</td>
+<td style="text-align:left;">
+CL00011_NA_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.6675856
@@ -3904,13 +3772,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -3928,24 +3796,21 @@ vehicle
 CL00011
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-26
+NA
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00011_cellline_BA_breast_26_cellline_BA_1
+CL00011_NA_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.5092443
@@ -3999,13 +3864,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -4023,24 +3888,21 @@ vehicle
 CL00011
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-26
+NA
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00012_cellline_CA_breast_30_cellline_CA_2
+CL00012_NA_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.5280236
@@ -4094,13 +3956,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -4118,24 +3980,21 @@ vehicle
 CL00012
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-30
+NA
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00012_cellline_CA_breast_30_cellline_CA_2
+CL00012_NA_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.3917856
@@ -4189,13 +4048,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -4213,24 +4072,21 @@ vehicle
 CL00012
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-30
+NA
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00013_cellline_DA_breast_34_cellline_DA_3
+CL00013_NA_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.6964541
@@ -4284,13 +4140,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -4308,24 +4164,21 @@ vehicle
 CL00013
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-34
+NA
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00013_cellline_DA_breast_34_cellline_DA_3
+CL00013_NA_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.6181384
@@ -4379,13 +4232,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -4403,24 +4256,21 @@ vehicle
 CL00013
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-34
+NA
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00014_cellline_EA_breast_38_cellline_EA_4
+CL00014_NA_NA_NA_4
 </td>
 <td style="text-align:right;">
 1.0930667
@@ -4474,13 +4324,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -4498,24 +4348,21 @@ vehicle
 CL00014
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-38
+NA
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00014_cellline_EA_breast_38_cellline_EA_4
+CL00014_NA_NA_NA_4
 </td>
 <td style="text-align:right;">
 1.1000000
@@ -4569,13 +4416,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -4593,24 +4440,21 @@ vehicle
 CL00014
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-38
+NA
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00015_cellline_FA_breast_42_cellline_FA_5
+CL00015_NA_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.6212296
@@ -4664,13 +4508,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -4688,24 +4532,21 @@ vehicle
 CL00015
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-42
+NA
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00015_cellline_FA_breast_42_cellline_FA_5
+CL00015_NA_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.5787348
@@ -4759,13 +4600,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -4783,24 +4624,21 @@ vehicle
 CL00015
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-42
+NA
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00018_cellline_IB_breast_54_cellline_IB_6
+CL00018_NA_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.7183950
@@ -4854,13 +4692,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -4878,24 +4716,21 @@ vehicle
 CL00018
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-54
+NA
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_004_vehicle_moa_A_vehicle_G00004_vehicle_0_5
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00018_cellline_IB_breast_54_cellline_IB_6
+CL00018_NA_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.6327896
@@ -4949,13 +4784,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_004
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_A
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -4973,24 +4808,21 @@ vehicle
 CL00018
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-54
+NA
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00011_cellline_BA_breast_26_cellline_BA_1
+CL00011_NA_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.3225188
@@ -5044,13 +4876,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -5068,24 +4900,21 @@ vehicle
 CL00011
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-26
+NA
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00011_cellline_BA_breast_26_cellline_BA_1
+CL00011_NA_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.2600750
@@ -5139,13 +4968,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -5163,24 +4992,21 @@ vehicle
 CL00011
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-26
+NA
 </td>
 <td style="text-align:left;">
-cellline_BA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00012_cellline_CA_breast_30_cellline_CA_2
+CL00012_NA_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.2208375
@@ -5234,13 +5060,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -5258,24 +5084,21 @@ vehicle
 CL00012
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-30
+NA
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00012_cellline_CA_breast_30_cellline_CA_2
+CL00012_NA_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.2097750
@@ -5329,13 +5152,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -5353,24 +5176,21 @@ vehicle
 CL00012
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-30
+NA
 </td>
 <td style="text-align:left;">
-cellline_CA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00013_cellline_DA_breast_34_cellline_DA_3
+CL00013_NA_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.3258687
@@ -5424,13 +5244,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -5448,24 +5268,21 @@ vehicle
 CL00013
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-34
+NA
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00013_cellline_DA_breast_34_cellline_DA_3
+CL00013_NA_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.2335688
@@ -5519,13 +5336,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -5543,24 +5360,21 @@ vehicle
 CL00013
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-34
+NA
 </td>
 <td style="text-align:left;">
-cellline_DA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00014_cellline_EA_breast_38_cellline_EA_4
+CL00014_NA_NA_NA_4
 </td>
 <td style="text-align:right;">
 0.4415188
@@ -5614,13 +5428,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -5638,24 +5452,21 @@ vehicle
 CL00014
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-38
+NA
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00014_cellline_EA_breast_38_cellline_EA_4
+CL00014_NA_NA_NA_4
 </td>
 <td style="text-align:right;">
 -0.9948750
@@ -5709,13 +5520,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -5733,24 +5544,21 @@ vehicle
 CL00014
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-38
+NA
 </td>
 <td style="text-align:left;">
-cellline_EA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00015_cellline_FA_breast_42_cellline_FA_5
+CL00015_NA_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.4100875
@@ -5804,13 +5612,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -5828,24 +5636,21 @@ vehicle
 CL00015
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-42
+NA
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00015_cellline_FA_breast_42_cellline_FA_5
+CL00015_NA_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.4164125
@@ -5899,13 +5704,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -5923,24 +5728,21 @@ vehicle
 CL00015
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-42
+NA
 </td>
 <td style="text-align:left;">
-cellline_FA
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00018_cellline_IB_breast_54_cellline_IB_6
+CL00018_NA_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.5511625
@@ -5994,13 +5796,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -6018,24 +5820,21 @@ vehicle
 CL00018
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-54
+NA
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-168_drug_011_vehicle_moa_B_vehicle_G00011_vehicle_0_6
+168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00018_cellline_IB_breast_54_cellline_IB_6
+CL00018_NA_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.4447875
@@ -6089,13 +5888,13 @@ gDR
 168
 </td>
 <td style="text-align:left;">
-drug_011
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
 </td>
 <td style="text-align:left;">
-moa_B
+Synthetic drug
 </td>
 <td style="text-align:left;">
 vehicle
@@ -6113,39 +5912,18 @@ vehicle
 CL00018
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 <td style="text-align:left;">
-breast
-</td>
-<td style="text-align:right;">
-54
+NA
 </td>
 <td style="text-align:left;">
-cellline_IB
+NA
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-</div>
-</div>
-<div id="pulling-project-summarized-experiment-object" class="section level2">
-<h2>Pulling project Summarized Experiment object</h2>
-<p>The current approach uses AWS as the main source of all the processing data. <code>gDRcomponents</code> package is the main package for managing all the cached data and making the connection with AWS. Before starting with this package, make sure, that all the AWS-dependent variables are defined as environmental variables.</p>
-<p>The basic usage of this package for pulling down Summarized Experiments objects requires using three basic functions.</p>
-<div id="getprojectsaws" class="section level3">
-<h3><code>getProjects(&quot;aws&quot;)</code></h3>
-<p>This function returns data.table with the information about projects that are currently stored on AWS. Column <code>project_id</code> can be used as an identifier for projects that can be pulled using <code>pullProjectSE</code> function.</p>
-</div>
-<div id="getmetaprojectsaws" class="section level3">
-<h3><code>getMetaProjects(&quot;aws&quot;)</code></h3>
-<p>This function returns data.table with meta projects to which projects belong. The conception of meta projects allows us to group multiple projects into categories. Please note that one project might belong to multiple meta projects.</p>
-</div>
-<div id="pullprojectseproject_id-aws" class="section level3">
-<h3><code>pullProjectSE(project_id, &quot;aws&quot;)</code></h3>
-<p>The core function for pulling SummarizedExperiments of projects based on their project_id (output of <code>getProjects()</code>).</p>
-<p>Note: Some core/testing data are stored in the indendepndent storage (called fixed data). If you want to access them, use parameter <code>fixed = TRUE</code> in functions <code>getProjects()</code> and <code>getMetaProjects()</code>.</p>
 </div>
 </div>
 </div>
