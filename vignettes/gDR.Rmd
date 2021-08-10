@@ -112,19 +112,18 @@ To do so, we need to tell the software:
 - Which rows in our table to consider as "control" versus "treated" for normalization.
 
 We can do so by setting the `untreated_tag` identifier like `set_identifier("untreated_tag" = c("MY_CONTROL_TERMINOLOGY_HERE"))`.
-and specifying the `nested_keys` argument within `create_SE`.
+and specifying the `nested_keys` argument within `create_and_normalize_SE`.
 
 ```{r}
-se <- create_SE(imported_data)
+se <- create_and_normalize_SE(imported_data)
 se
 ```
-Note that this has created a SummarizedExperiment object with `rowData`, `colData`, `metadata` and 2 `assays`.
+Note that this has created a SummarizedExperiment object with `rowData`, `colData`, `metadata` and 3 `assays`.
 
 
-### Normalizing, averaging, and fitting data (3)
-Next, we can normalize, average, and fit the data of interest. 
+### Averaging and fitting data (3)
+Next, we can average and fit the data of interest. 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE}
-se <- normalize_SE(se)
 se <- average_SE(se)
 se <- fit_SE(se)
 ```

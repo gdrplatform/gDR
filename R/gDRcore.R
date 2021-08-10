@@ -15,6 +15,9 @@ gDRcore::merge_data
 gDRcore::runDrugResponseProcessingPipeline
 
 #' @export
+gDRcore::create_and_normalize_SE
+
+#' @export
 gDRcore::create_SE
 
 #' @export
