@@ -17,7 +17,7 @@ License: file GNE_LICENSE
 LazyLoad: yes
 Imports:
     BumpyMatrix,
-    gDRcore (>= 1.1.0),
+    gDRcore (>= 1.1.4),
     gDRimport (>= 0.0.4),
     gDRutils (>= 1.0.4),
     gDRtestData (>= 1.0.3),

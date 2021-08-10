@@ -11,6 +11,7 @@
 \alias{pullProjectSE}
 \alias{merge_data}
 \alias{runDrugResponseProcessingPipeline}
+\alias{create_and_normalize_SE}
 \alias{create_SE}
 \alias{normalize_SE}
 \alias{average_SE}
@@ -36,7 +37,7 @@ below to see their documentation.
 \describe{
   \item{gDRcomponents}{\code{\link[gDRcomponents:getResource]{getCellLines}}, \code{\link[gDRcomponents:getResource]{getDrugs}}, \code{\link[gDRcomponents:getResource]{getMetaProjects}}, \code{\link[gDRcomponents:getResource]{getProjects}}, \code{\link[gDRcomponents:getResource]{pullProjectSE}}}
 
-  \item{gDRcore}{\code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{average_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{create_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{fit_SE}}, \code{\link[gDRcore]{merge_data}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{normalize_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{runDrugResponseProcessingPipeline}}}
+  \item{gDRcore}{\code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{average_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{create_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{create_and_normalize_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{fit_SE}}, \code{\link[gDRcore]{merge_data}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{normalize_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{runDrugResponseProcessingPipeline}}}
 
   \item{gDRimport}{\code{\link[gDRimport]{load_data}}}
 
