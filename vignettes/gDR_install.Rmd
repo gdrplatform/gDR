@@ -3,6 +3,10 @@ title: "gDR installation instructions"
 author: "gDR team"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Installing the drug response processing pipeline}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
