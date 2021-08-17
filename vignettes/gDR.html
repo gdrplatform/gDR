@@ -12,7 +12,7 @@
 
 <meta name="author" content="gDR team" />
 
-<meta name="date" content="2021-08-04" />
+<meta name="date" content="2021-08-17" />
 
 <title>gDR suite</title>
 
@@ -143,7 +143,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">gDR suite</h1>
 <h4 class="author">gDR team</h4>
-<h4 class="date">2021-08-04</h4>
+<h4 class="date">2021-08-17</h4>
 
 
 
@@ -219,11 +219,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="transforming-data-into-a-summarizedexperiment-2" class="section level3">
 <h3>Transforming data into a SummarizedExperiment (2)</h3>
 <p>Next, we can transform the long table into our initial SummarizedExperiment object. To do so, we need to tell the software: - What should go on rows and columns versus be nested in the assay. - Which rows in our table to consider as “control” versus “treated” for normalization.</p>
-<p>We can do so by setting the <code>untreated_tag</code> identifier like <code>set_identifier(&quot;untreated_tag&quot; = c(&quot;MY_CONTROL_TERMINOLOGY_HERE&quot;))</code>. and specifying the <code>nested_keys</code> argument within <code>create_SE</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">create_SE</span>(imported_data)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-04 17:03:55] </span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-04 17:03:55] </span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-04 17:03:55] No partial match found for treatment: (&#39;3&#39;)</span></span>
+<p>We can do so by setting the <code>untreated_tag</code> identifier like <code>set_identifier(&quot;untreated_tag&quot; = c(&quot;MY_CONTROL_TERMINOLOGY_HERE&quot;))</code>. and specifying the <code>nested_keys</code> argument within <code>create_and_normalize_SE</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">create_and_normalize_SE</span>(imported_data)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-17 22:55:26] </span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-17 22:55:26] </span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-17 22:55:26] No partial match found for treatment: (&#39;3&#39;)</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;5&#39;)</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;9&#39;)</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;11&#39;)</span></span>
@@ -235,12 +235,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;33&#39;)</span></span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;36&#39;)</span></span>
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;41&#39;)</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-04 17:03:55]</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-17 22:55:26]</span></span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>se</span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; class: SummarizedExperiment </span></span>
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dim: 5 6 </span></span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; metadata(4): df_ identifiers experiment_metadata Keys</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; assays(2): RawTreated Controls</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; assays(6): RawTreated Controls ... RefRelativeViability DivisionTime</span></span>
 <span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rownames(5): 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic</span></span>
 <span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_G00002_G00011_0.149999910525364_2 168_Synthetic drug_Synthetic</span></span>
 <span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3</span></span>
@@ -251,14 +251,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_NA_NA_NA_1 CL00012_NA_NA_NA_2 ...</span></span>
 <span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00015_NA_NA_NA_5 CL00018_NA_NA_NA_6</span></span>
 <span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(4): clid CellLineName Tissue ReferenceDivisionTime</span></span></code></pre></div>
-<p>Note that this has created a SummarizedExperiment object with <code>rowData</code>, <code>colData</code>, <code>metadata</code> and 2 <code>assays</code>.</p>
+<p>Note that this has created a SummarizedExperiment object with <code>rowData</code>, <code>colData</code>, <code>metadata</code> and 3 <code>assays</code>.</p>
 </div>
-<div id="normalizing-averaging-and-fitting-data-3" class="section level3">
-<h3>Normalizing, averaging, and fitting data (3)</h3>
-<p>Next, we can normalize, average, and fit the data of interest.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">normalize_SE</span>(se)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">average_SE</span>(se)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">fit_SE</span>(se)</span></code></pre></div>
+<div id="averaging-and-fitting-data-3" class="section level3">
+<h3>Averaging and fitting data (3)</h3>
+<p>Next, we can average and fit the data of interest.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">average_SE</span>(se)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">fit_SE</span>(se)</span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>se</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; class: SummarizedExperiment </span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dim: 5 6 </span></span>
