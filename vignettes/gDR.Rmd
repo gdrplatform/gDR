@@ -103,7 +103,7 @@ imported_data <- import_data(manifest, template, raw_data)
 head(imported_data)
 ```
 
-This function will expect certain "identifiers" that tell the processing functions which columns in the long table map to certain expected fields, so that each column is interpreted correctly. For more details regarding these identifiers, see the "Details" section of `?identifiers`. Use `set_identifier` to set up the correct mappings between the expected fields and your long table column names.
+This function will expect certain "identifiers" that tell the processing functions which columns in the long table map to certain expected fields, so that each column is interpreted correctly. For more details regarding these identifiers, see the "Details" section of `?identifiers`. Use `set_env_identifier` or `set_SE_identifiers` to set up the correct mappings between the expected fields and your long table column names.
 
 ### Transforming data into a SummarizedExperiment (2)
 Next, we can transform the long table into our initial SummarizedExperiment object.
@@ -111,7 +111,7 @@ To do so, we need to tell the software:
 - What should go on rows and columns versus be nested in the assay.
 - Which rows in our table to consider as "control" versus "treated" for normalization.
 
-We can do so by setting the `untreated_tag` identifier like `set_identifier("untreated_tag" = c("MY_CONTROL_TERMINOLOGY_HERE"))`.
+We can do so by setting the `untreated_tag` identifier like `set_env_identifier("untreated_tag" = c("MY_CONTROL_TERMINOLOGY_HERE"))`.
 and specifying the `nested_keys` argument within `create_and_normalize_SE`.
 
 ```{r}
