@@ -8,16 +8,19 @@ gDRutils::logisticFit
 gDRutils::get_header
 
 #' @export
-gDRutils::reset_headers
+gDRutils::get_env_identifiers
 
 #' @export
-gDRutils::get_identifier
+gDRutils::get_SE_identifiers
 
 #' @export
-gDRutils::set_identifier
+gDRutils::set_env_identifier
 
 #' @export
-gDRutils::reset_identifiers
+gDRutils::set_SE_identifiers
+
+#' @export
+gDRutils::reset_env_identifiers
 
 #' @export
 gDRutils::convert_se_assay_to_dt

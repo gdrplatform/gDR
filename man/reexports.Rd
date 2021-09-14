@@ -20,10 +20,11 @@
 \alias{fit_curves}
 \alias{logisticFit}
 \alias{get_header}
-\alias{reset_headers}
-\alias{get_identifier}
-\alias{set_identifier}
-\alias{reset_identifiers}
+\alias{get_env_identifiers}
+\alias{get_SE_identifiers}
+\alias{set_env_identifier}
+\alias{set_SE_identifiers}
+\alias{reset_env_identifiers}
 \alias{convert_se_assay_to_dt}
 \alias{validate_SE}
 \alias{flatten}
@@ -41,6 +42,6 @@ below to see their documentation.
 
   \item{gDRimport}{\code{\link[gDRimport]{load_data}}}
 
-  \item{gDRutils}{\code{\link[gDRutils]{convert_se_assay_to_dt}}, \code{\link[gDRutils]{fit_curves}}, \code{\link[gDRutils]{flatten}}, \code{\link[gDRutils:headers]{get_header}}, \code{\link[gDRutils:identifiers]{get_identifier}}, \code{\link[gDRutils]{logisticFit}}, \code{\link[gDRutils:headers]{reset_headers}}, \code{\link[gDRutils:identifiers]{reset_identifiers}}, \code{\link[gDRutils:identifiers]{set_identifier}}, \code{\link[gDRutils]{split_SE_components}}, \code{\link[gDRutils]{validate_SE}}}
+  \item{gDRutils}{\code{\link[gDRutils]{convert_se_assay_to_dt}}, \code{\link[gDRutils]{fit_curves}}, \code{\link[gDRutils]{flatten}}, \code{\link[gDRutils:identifiers]{get_SE_identifiers}}, \code{\link[gDRutils:identifiers]{get_env_identifiers}}, \code{\link[gDRutils:headers]{get_header}}, \code{\link[gDRutils]{logisticFit}}, \code{\link[gDRutils:identifiers]{reset_env_identifiers}}, \code{\link[gDRutils:identifiers]{set_SE_identifiers}}, \code{\link[gDRutils:identifiers]{set_env_identifier}}, \code{\link[gDRutils]{split_SE_components}}, \code{\link[gDRutils]{validate_SE}}}
 }}
 

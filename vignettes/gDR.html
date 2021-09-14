@@ -12,7 +12,7 @@
 
 <meta name="author" content="gDR team" />
 
-<meta name="date" content="2021-08-17" />
+<meta name="date" content="2021-09-13" />
 
 <title>gDR suite</title>
 
@@ -143,7 +143,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">gDR suite</h1>
 <h4 class="author">gDR team</h4>
-<h4 class="date">2021-08-17</h4>
+<h4 class="date">2021-09-13</h4>
 
 
 
@@ -214,43 +214,68 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import data</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>imported_data <span class="ot">&lt;-</span> <span class="fu">import_data</span>(manifest, template, raw_data)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(imported_data)</span></code></pre></div>
-<p>This function will expect certain “identifiers” that tell the processing functions which columns in the long table map to certain expected fields, so that each column is interpreted correctly. For more details regarding these identifiers, see the “Details” section of <code>?identifiers</code>. Use <code>set_identifier</code> to set up the correct mappings between the expected fields and your long table column names.</p>
+<p>This function will expect certain “identifiers” that tell the processing functions which columns in the long table map to certain expected fields, so that each column is interpreted correctly. For more details regarding these identifiers, see the “Details” section of <code>?identifiers</code>. Use <code>set_env_identifier</code> or <code>set_SE_identifiers</code> to set up the correct mappings between the expected fields and your long table column names.</p>
 </div>
 <div id="transforming-data-into-a-summarizedexperiment-2" class="section level3">
 <h3>Transforming data into a SummarizedExperiment (2)</h3>
 <p>Next, we can transform the long table into our initial SummarizedExperiment object. To do so, we need to tell the software: - What should go on rows and columns versus be nested in the assay. - Which rows in our table to consider as “control” versus “treated” for normalization.</p>
-<p>We can do so by setting the <code>untreated_tag</code> identifier like <code>set_identifier(&quot;untreated_tag&quot; = c(&quot;MY_CONTROL_TERMINOLOGY_HERE&quot;))</code>. and specifying the <code>nested_keys</code> argument within <code>create_and_normalize_SE</code>.</p>
+<p>We can do so by setting the <code>untreated_tag</code> identifier like <code>set_env_identifier(&quot;untreated_tag&quot; = c(&quot;MY_CONTROL_TERMINOLOGY_HERE&quot;))</code>. and specifying the <code>nested_keys</code> argument within <code>create_and_normalize_SE</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">create_and_normalize_SE</span>(imported_data)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-17 22:55:26] </span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-17 22:55:26] </span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-17 22:55:26] No partial match found for treatment: (&#39;3&#39;)</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;5&#39;)</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;9&#39;)</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;11&#39;)</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;16&#39;)</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;18&#39;)</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;24&#39;)</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;26&#39;)</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;29&#39;)</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;33&#39;)</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;36&#39;)</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;41&#39;)</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-08-17 22:55:26]</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>se</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; class: SummarizedExperiment </span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dim: 5 6 </span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; metadata(4): df_ identifiers experiment_metadata Keys</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; assays(6): RawTreated Controls ... RefRelativeViability DivisionTime</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rownames(5): 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_G00002_G00011_0.149999910525364_2 168_Synthetic drug_Synthetic</span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3</span></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rowData names(8): Duration DrugName ... Gnumber_2 Concentration_2</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_NA_NA_NA_1 CL00012_NA_NA_NA_2 ...</span></span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00015_NA_NA_NA_5 CL00018_NA_NA_NA_6</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(4): clid CellLineName Tissue ReferenceDivisionTime</span></span></code></pre></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: &#39;gDRutils::get_identifier&#39; is deprecated.</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use &#39;get_env_identifiers&#39; instead.</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: &#39;gDRutils::get_identifier&#39; is deprecated.</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use &#39;get_env_identifiers&#39; instead.</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: &#39;gDRutils::get_identifier&#39; is deprecated.</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use &#39;get_env_identifiers&#39; instead.</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: &#39;gDRutils::get_identifier&#39; is deprecated.</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use &#39;get_env_identifiers&#39; instead.</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-09-13 13:00:17]</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: &#39;gDRutils::get_identifier&#39; is deprecated.</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use &#39;get_env_identifiers&#39; instead.</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-09-13 13:00:17]</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: &#39;gDRutils::get_identifier&#39; is deprecated.</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use &#39;get_env_identifiers&#39; instead.</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-09-13 13:00:17] No partial match found for treatment: (&#39;3&#39;)</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;5&#39;)</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;9&#39;)</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;11&#39;)</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;16&#39;)</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;18&#39;)</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;24&#39;)</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;26&#39;)</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;29&#39;)</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;33&#39;)</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;36&#39;)</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; No partial match found for treatment: (&#39;41&#39;)</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: &#39;gDRutils::get_identifier&#39; is deprecated.</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use &#39;get_env_identifiers&#39; instead.</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; INFO [2021-09-13 13:00:17]</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>se</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; class: SummarizedExperiment </span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dim: 5 6 </span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; metadata(4): df_ identifiers experiment_metadata Keys</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; assays(6): RawTreated Controls ... RefRelativeViability DivisionTime</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rownames(5): 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_G00002_G00011_0.149999910525364_2 168_Synthetic drug_Synthetic</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rowData names(8): Duration DrugName ... Gnumber_2 Concentration_2</span></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_Synthetic cell line_NA_NA_1 CL00012_Synthetic cell</span></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   line_NA_NA_2 ... CL00015_Synthetic cell line_NA_NA_5</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00018_Synthetic cell line_NA_NA_6</span></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(4): clid CellLineName Tissue ReferenceDivisionTime</span></span></code></pre></div>
 <p>Note that this has created a SummarizedExperiment object with <code>rowData</code>, <code>colData</code>, <code>metadata</code> and 3 <code>assays</code>.</p>
 </div>
 <div id="averaging-and-fitting-data-3" class="section level3">
@@ -270,9 +295,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5</span></span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6</span></span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rowData names(8): Duration DrugName ... Gnumber_2 Concentration_2</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_NA_NA_NA_1 CL00012_NA_NA_NA_2 ...</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00015_NA_NA_NA_5 CL00018_NA_NA_NA_6</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(4): clid CellLineName Tissue ReferenceDivisionTime</span></span></code></pre></div>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_Synthetic cell line_NA_NA_1 CL00012_Synthetic cell</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   line_NA_NA_2 ... CL00015_Synthetic cell line_NA_NA_5</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00018_Synthetic cell line_NA_NA_6</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(4): clid CellLineName Tissue ReferenceDivisionTime</span></span></code></pre></div>
 </div>
 <div id="rundrugresponseprocessingpipeline" class="section level3">
 <h3>runDrugResponseProcessingPipeline</h3>
@@ -291,9 +317,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5</span></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6</span></span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; rowData names(8): Duration DrugName ... Gnumber_2 Concentration_2</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_NA_NA_NA_1 CL00012_NA_NA_NA_2 ...</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00015_NA_NA_NA_5 CL00018_NA_NA_NA_6</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(4): clid CellLineName Tissue ReferenceDivisionTime</span></span></code></pre></div>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colnames(6): CL00011_Synthetic cell line_NA_NA_1 CL00012_Synthetic cell</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   line_NA_NA_2 ... CL00015_Synthetic cell line_NA_NA_5</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   CL00018_Synthetic cell line_NA_NA_6</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; colData names(4): clid CellLineName Tissue ReferenceDivisionTime</span></span></code></pre></div>
 <p>Note that our final SummarizedExperiment object is made up of multiple assays, such as:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>SummarizedExperiment<span class="sc">::</span><span class="fu">assayNames</span>(se)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;RawTreated&quot;           &quot;Controls&quot;             &quot;Normalized&quot;          </span></span>
@@ -329,7 +356,7 @@ xc50
 x_max
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-c50
+ec50
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 x_inf
@@ -394,7 +421,7 @@ CellLineName
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 Tissue
 </th>
-<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 ReferenceDivisionTime
 </th>
 </tr>
@@ -405,7 +432,7 @@ ReferenceDivisionTime
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00011_NA_NA_NA_1
+CL00011_Synthetic cell line_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.1942553
@@ -483,12 +510,12 @@ G00011
 CL00011
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -497,7 +524,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00011_NA_NA_NA_1
+CL00011_Synthetic cell line_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.1060173
@@ -575,12 +602,12 @@ G00011
 CL00011
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -589,7 +616,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00012_NA_NA_NA_2
+CL00012_Synthetic cell line_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.0620985
@@ -667,12 +694,12 @@ G00011
 CL00012
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -681,7 +708,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00012_NA_NA_NA_2
+CL00012_Synthetic cell line_NA_NA_2
 </td>
 <td style="text-align:right;">
 -0.2340373
@@ -759,12 +786,12 @@ G00011
 CL00012
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -773,7 +800,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00013_NA_NA_NA_3
+CL00013_Synthetic cell line_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.1377834
@@ -851,12 +878,12 @@ G00011
 CL00013
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -865,7 +892,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00013_NA_NA_NA_3
+CL00013_Synthetic cell line_NA_NA_3
 </td>
 <td style="text-align:right;">
 -0.1339332
@@ -943,12 +970,12 @@ G00011
 CL00013
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -957,7 +984,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00014_NA_NA_NA_4
+CL00014_Synthetic cell line_NA_NA_4
 </td>
 <td style="text-align:right;">
 0.5024361
@@ -1035,12 +1062,12 @@ G00011
 CL00014
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -1049,7 +1076,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00014_NA_NA_NA_4
+CL00014_Synthetic cell line_NA_NA_4
 </td>
 <td style="text-align:right;">
 -0.9325014
@@ -1127,12 +1154,12 @@ G00011
 CL00014
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -1141,7 +1168,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00015_NA_NA_NA_5
+CL00015_Synthetic cell line_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.1739511
@@ -1219,12 +1246,12 @@ G00011
 CL00015
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -1233,7 +1260,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00015_NA_NA_NA_5
+CL00015_Synthetic cell line_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.0705376
@@ -1311,12 +1338,12 @@ G00011
 CL00015
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -1325,7 +1352,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00018_NA_NA_NA_6
+CL00018_Synthetic cell line_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.2498753
@@ -1403,12 +1430,12 @@ G00011
 CL00018
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -1417,7 +1444,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00002_G00011_0.149999910525364_2
 </td>
 <td style="text-align:left;">
-CL00018_NA_NA_NA_6
+CL00018_Synthetic cell line_NA_NA_6
 </td>
 <td style="text-align:right;">
 -0.0515717
@@ -1495,12 +1522,12 @@ G00011
 CL00018
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -1509,7 +1536,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00011_NA_NA_NA_1
+CL00011_Synthetic cell line_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.1358483
@@ -1587,12 +1614,12 @@ G00011
 CL00011
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -1601,7 +1628,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00011_NA_NA_NA_1
+CL00011_Synthetic cell line_NA_NA_1
 </td>
 <td style="text-align:right;">
 -0.0579227
@@ -1679,12 +1706,12 @@ G00011
 CL00011
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -1693,7 +1720,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00012_NA_NA_NA_2
+CL00012_Synthetic cell line_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.1132080
@@ -1771,12 +1798,12 @@ G00011
 CL00012
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -1785,7 +1812,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00012_NA_NA_NA_2
+CL00012_Synthetic cell line_NA_NA_2
 </td>
 <td style="text-align:right;">
 -0.0558422
@@ -1863,12 +1890,12 @@ G00011
 CL00012
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -1877,7 +1904,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00013_NA_NA_NA_3
+CL00013_Synthetic cell line_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.1787868
@@ -1955,12 +1982,12 @@ G00011
 CL00013
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -1969,7 +1996,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00013_NA_NA_NA_3
+CL00013_Synthetic cell line_NA_NA_3
 </td>
 <td style="text-align:right;">
 -0.0159833
@@ -2047,12 +2074,12 @@ G00011
 CL00013
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -2061,7 +2088,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00014_NA_NA_NA_4
+CL00014_Synthetic cell line_NA_NA_4
 </td>
 <td style="text-align:right;">
 0.5146361
@@ -2139,12 +2166,12 @@ G00011
 CL00014
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -2153,7 +2180,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00014_NA_NA_NA_4
+CL00014_Synthetic cell line_NA_NA_4
 </td>
 <td style="text-align:right;">
 -0.9268639
@@ -2231,12 +2258,12 @@ G00011
 CL00014
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -2245,7 +2272,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00015_NA_NA_NA_5
+CL00015_Synthetic cell line_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.2037594
@@ -2323,12 +2350,12 @@ G00011
 CL00015
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -2337,7 +2364,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00015_NA_NA_NA_5
+CL00015_Synthetic cell line_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.1334787
@@ -2415,12 +2442,12 @@ G00011
 CL00015
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -2429,7 +2456,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00018_NA_NA_NA_6
+CL00018_Synthetic cell line_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.4051480
@@ -2507,12 +2534,12 @@ G00011
 CL00018
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -2521,7 +2548,7 @@ NA
 168_Synthetic drug_Synthetic drug_Synthetic drug_Synthetic drug_G00004_G00011_0.149999910525364_3
 </td>
 <td style="text-align:left;">
-CL00018_NA_NA_NA_6
+CL00018_Synthetic cell line_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.2414209
@@ -2599,12 +2626,12 @@ G00011
 CL00018
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -2613,7 +2640,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00011_NA_NA_NA_1
+CL00011_Synthetic cell line_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.9157913
@@ -2691,12 +2718,12 @@ vehicle
 CL00011
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -2705,7 +2732,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00011_NA_NA_NA_1
+CL00011_Synthetic cell line_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.7420679
@@ -2783,12 +2810,12 @@ vehicle
 CL00011
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -2797,7 +2824,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00012_NA_NA_NA_2
+CL00012_Synthetic cell line_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.1763718
@@ -2875,12 +2902,12 @@ vehicle
 CL00012
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -2889,7 +2916,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00012_NA_NA_NA_2
+CL00012_Synthetic cell line_NA_NA_2
 </td>
 <td style="text-align:right;">
 -0.0904008
@@ -2967,12 +2994,12 @@ vehicle
 CL00012
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -2981,7 +3008,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00013_NA_NA_NA_3
+CL00013_Synthetic cell line_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.3758869
@@ -3059,12 +3086,12 @@ vehicle
 CL00013
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -3073,7 +3100,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00013_NA_NA_NA_3
+CL00013_Synthetic cell line_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.2018558
@@ -3151,12 +3178,12 @@ vehicle
 CL00013
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -3165,7 +3192,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00014_NA_NA_NA_4
+CL00014_Synthetic cell line_NA_NA_4
 </td>
 <td style="text-align:right;">
 1.0835556
@@ -3243,12 +3270,12 @@ vehicle
 CL00014
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -3257,7 +3284,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00014_NA_NA_NA_4
+CL00014_Synthetic cell line_NA_NA_4
 </td>
 <td style="text-align:right;">
 1.1000000
@@ -3335,12 +3362,12 @@ vehicle
 CL00014
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -3349,7 +3376,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00015_NA_NA_NA_5
+CL00015_Synthetic cell line_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.3006246
@@ -3427,12 +3454,12 @@ vehicle
 CL00015
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -3441,7 +3468,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00015_NA_NA_NA_5
+CL00015_Synthetic cell line_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.2062848
@@ -3519,12 +3546,12 @@ vehicle
 CL00015
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -3533,7 +3560,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00018_NA_NA_NA_6
+CL00018_Synthetic cell line_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.3964219
@@ -3611,12 +3638,12 @@ vehicle
 CL00018
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -3625,7 +3652,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00002_vehicle_0_4
 </td>
 <td style="text-align:left;">
-CL00018_NA_NA_NA_6
+CL00018_Synthetic cell line_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.1324605
@@ -3703,12 +3730,12 @@ vehicle
 CL00018
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -3717,7 +3744,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00011_NA_NA_NA_1
+CL00011_Synthetic cell line_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.6675856
@@ -3795,12 +3822,12 @@ vehicle
 CL00011
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -3809,7 +3836,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00011_NA_NA_NA_1
+CL00011_Synthetic cell line_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.5092443
@@ -3887,12 +3914,12 @@ vehicle
 CL00011
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -3901,7 +3928,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00012_NA_NA_NA_2
+CL00012_Synthetic cell line_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.5280236
@@ -3979,12 +4006,12 @@ vehicle
 CL00012
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -3993,7 +4020,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00012_NA_NA_NA_2
+CL00012_Synthetic cell line_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.3917856
@@ -4071,12 +4098,12 @@ vehicle
 CL00012
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -4085,7 +4112,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00013_NA_NA_NA_3
+CL00013_Synthetic cell line_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.6964541
@@ -4163,12 +4190,12 @@ vehicle
 CL00013
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -4177,7 +4204,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00013_NA_NA_NA_3
+CL00013_Synthetic cell line_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.6181384
@@ -4255,12 +4282,12 @@ vehicle
 CL00013
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -4269,7 +4296,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00014_NA_NA_NA_4
+CL00014_Synthetic cell line_NA_NA_4
 </td>
 <td style="text-align:right;">
 1.0930667
@@ -4347,12 +4374,12 @@ vehicle
 CL00014
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -4361,7 +4388,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00014_NA_NA_NA_4
+CL00014_Synthetic cell line_NA_NA_4
 </td>
 <td style="text-align:right;">
 1.1000000
@@ -4439,12 +4466,12 @@ vehicle
 CL00014
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -4453,7 +4480,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00015_NA_NA_NA_5
+CL00015_Synthetic cell line_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.6212296
@@ -4531,12 +4558,12 @@ vehicle
 CL00015
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -4545,7 +4572,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00015_NA_NA_NA_5
+CL00015_Synthetic cell line_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.5787348
@@ -4623,12 +4650,12 @@ vehicle
 CL00015
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -4637,7 +4664,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00018_NA_NA_NA_6
+CL00018_Synthetic cell line_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.7183950
@@ -4715,12 +4742,12 @@ vehicle
 CL00018
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -4729,7 +4756,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00004_vehicle_0_5
 </td>
 <td style="text-align:left;">
-CL00018_NA_NA_NA_6
+CL00018_Synthetic cell line_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.6327896
@@ -4807,12 +4834,12 @@ vehicle
 CL00018
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -4821,7 +4848,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00011_NA_NA_NA_1
+CL00011_Synthetic cell line_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.3225188
@@ -4899,12 +4926,12 @@ vehicle
 CL00011
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -4913,7 +4940,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00011_NA_NA_NA_1
+CL00011_Synthetic cell line_NA_NA_1
 </td>
 <td style="text-align:right;">
 0.2600750
@@ -4991,12 +5018,12 @@ vehicle
 CL00011
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -5005,7 +5032,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00012_NA_NA_NA_2
+CL00012_Synthetic cell line_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.2208375
@@ -5083,12 +5110,12 @@ vehicle
 CL00012
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -5097,7 +5124,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00012_NA_NA_NA_2
+CL00012_Synthetic cell line_NA_NA_2
 </td>
 <td style="text-align:right;">
 0.2097750
@@ -5175,12 +5202,12 @@ vehicle
 CL00012
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -5189,7 +5216,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00013_NA_NA_NA_3
+CL00013_Synthetic cell line_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.3258687
@@ -5267,12 +5294,12 @@ vehicle
 CL00013
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -5281,7 +5308,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00013_NA_NA_NA_3
+CL00013_Synthetic cell line_NA_NA_3
 </td>
 <td style="text-align:right;">
 0.2335688
@@ -5359,12 +5386,12 @@ vehicle
 CL00013
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -5373,7 +5400,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00014_NA_NA_NA_4
+CL00014_Synthetic cell line_NA_NA_4
 </td>
 <td style="text-align:right;">
 0.4415188
@@ -5451,12 +5478,12 @@ vehicle
 CL00014
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -5465,7 +5492,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00014_NA_NA_NA_4
+CL00014_Synthetic cell line_NA_NA_4
 </td>
 <td style="text-align:right;">
 -0.9948750
@@ -5543,12 +5570,12 @@ vehicle
 CL00014
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -5557,7 +5584,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00015_NA_NA_NA_5
+CL00015_Synthetic cell line_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.4100875
@@ -5635,12 +5662,12 @@ vehicle
 CL00015
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -5649,7 +5676,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00015_NA_NA_NA_5
+CL00015_Synthetic cell line_NA_NA_5
 </td>
 <td style="text-align:right;">
 0.4164125
@@ -5727,12 +5754,12 @@ vehicle
 CL00015
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -5741,7 +5768,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00018_NA_NA_NA_6
+CL00018_Synthetic cell line_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.5511625
@@ -5819,12 +5846,12 @@ vehicle
 CL00018
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
@@ -5833,7 +5860,7 @@ NA
 168_Synthetic drug_vehicle_Synthetic drug_vehicle_G00011_vehicle_0_6
 </td>
 <td style="text-align:left;">
-CL00018_NA_NA_NA_6
+CL00018_Synthetic cell line_NA_NA_6
 </td>
 <td style="text-align:right;">
 0.4447875
@@ -5911,12 +5938,12 @@ vehicle
 CL00018
 </td>
 <td style="text-align:left;">
-NA
+Synthetic cell line
 </td>
 <td style="text-align:left;">
 NA
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 NA
 </td>
 </tr>
