@@ -114,7 +114,7 @@ remotes::install_local("/mnt/vol/gDRimport")
 remotes::install_local("/mnt/vol/gDR")
 ```
 
-You've just successfully set up the environment for the gDR umbrella package. Please see [gDR vignette](gDR.html) for examples of usage.
+You've just successfully set up the environment for the gDR umbrella package. Please see [gDR vignette](vignettes/gDR.html) for examples of usage.
 
 
 ## How to contribute
