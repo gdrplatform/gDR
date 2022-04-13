@@ -30,7 +30,7 @@ Suggests:
     markdown
 VignetteBuilder: knitr
 ByteCompile: TRUE
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 SwitchrLibrary: gDR
 DeploySubPath: gDR
 Encoding: UTF-8
