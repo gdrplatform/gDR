@@ -30,7 +30,7 @@ pkgs:
     subdir: gDRcomponents
     source: GITHUB
   gDRimport:
-    ver: '>=0.0.11'
+    ver: '>=0.0.10'
     url: gdrplatform/gDRimport
     ref: main
     subdir: ~

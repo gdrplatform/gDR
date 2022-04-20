@@ -18,7 +18,7 @@ LazyLoad: yes
 Imports:
     BumpyMatrix,
     gDRcore (>= 1.1.35),
-    gDRimport (>= 0.0.11),
+    gDRimport (>= 0.0.10),
     gDRutils (>= 1.0.43),
     gDRtestData (>= 1.0.12),
     gDRcomponents (>= 1.1.56)
