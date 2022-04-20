@@ -21,19 +21,19 @@ pkgs:
     ver: '>=1.1.35'
     url: gdrplatform/gDRcore
     ref: master
-    subdir: gDRutils
+    subdir: gDRcore
     source: GITHUB
   gDRcomponents:
     ver: '>=1.0.56'
     url: gdrplatform/gDRcomponents
     ref: master
-    subdir: gDRutils
+    subdir: gDRcomponents
     source: GITHUB
   gDRimport:
     ver: '>=0.0.11'
     url: gdrplatform/gDRimport
     ref: master
-    subdir: gDRutils
+    subdir: ~
     source: GITHUB
   purrr:
     source: CRAN
