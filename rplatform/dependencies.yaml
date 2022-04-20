@@ -32,7 +32,7 @@ pkgs:
   gDRimport:
     ver: '>=0.0.11'
     url: gdrplatform/gDRimport
-    ref: master
+    ref: main
     subdir: ~
     source: GITHUB
   purrr:
