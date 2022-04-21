@@ -8,8 +8,7 @@ import_data(
   manifest_file,
   template_file,
   results_file,
-  instrument = "EnVision",
-  collapse_Drugs = TRUE
+  instrument = "EnVision"
 )
 }
 \arguments{
@@ -22,8 +21,6 @@ or character with file path of templates file(s)}
 or character with file path of results file(s)}
 
 \item{instrument}{character with type of instrument used}
-
-\item{collapse_Drugs}{}
 }
 \value{
 
