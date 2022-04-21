@@ -132,7 +132,7 @@ se
 ```
 
 ### runDrugResponseProcessingPipeline
-Steps (2) and (3) can be combined into a single step through a convenience function: `runDrugResponseProcessingPipeline`. This function also split the data based on its types -- single-agent, combo, etc. Moreover, the output is `MultiAssayExperiment` object with each experiments representing different data type.
+Steps (2) and (3) can be combined into a single step through a convenience function: `runDrugResponseProcessingPipeline`. This function also split the data based on its types -- single-agent, combo, etc. Moreover, the output is `MultiAssayExperiment` object with each experiment representing a different data type.
 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE}
 # Run gDR pipeline
