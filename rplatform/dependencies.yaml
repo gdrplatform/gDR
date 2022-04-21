@@ -24,7 +24,7 @@ pkgs:
     subdir: gDRcore
     source: GITHUB
   gDRcomponents:
-    ver: '>=1.0.56'
+    ver: '>=1.1.56'
     url: gdrplatform/gDRcomponents
     ref: master
     subdir: gDRcomponents

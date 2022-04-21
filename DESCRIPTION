@@ -17,22 +17,22 @@ License: file GNE_LICENSE
 LazyLoad: yes
 Imports:
     BumpyMatrix,
+    gDRcomponents (>= 1.1.56),
     gDRcore (>= 1.1.35),
     gDRimport (>= 0.0.10),
-    gDRutils (>= 1.0.43),
+    gDRstyle (>= 0.0.8),
     gDRtestData (>= 1.0.12),
-    gDRcomponents (>= 1.1.56)
+    gDRutils (>= 1.0.43)
 Suggests:
     futile.logger,
     knitr,
     kableExtra,
-    rmarkdown,
-    markdown
+    markdown,
+    purrr,
+    rmarkdown
 VignetteBuilder: knitr
 ByteCompile: TRUE
 RoxygenNote: 7.1.1
 SwitchrLibrary: gDR
 DeploySubPath: gDR
 Encoding: UTF-8
-Depends: 
-    R (>= 2.10)
