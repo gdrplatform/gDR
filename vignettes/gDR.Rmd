@@ -115,7 +115,7 @@ We can do so by setting the `untreated_tag` identifier like `set_env_identifier(
 and specifying the `nested_keys` argument within `create_and_normalize_SE`.
 
 ```{r}
-se <- create_and_normalize_SE(imported_data)
+se <- create_and_normalize_SE(imported_data, nested_confounders = "Barcode")
 se
 ```
 Note that this has created a SummarizedExperiment object with `rowData`, `colData`, `metadata` and 3 `assays`.
@@ -132,7 +132,7 @@ se
 ```
 
 ### runDrugResponseProcessingPipeline
-Steps (2) and (3) can be combined into a single step through a convenience function: `runDrugResponseProcessingPipeline`.
+Steps (2) and (3) can be combined into a single step through a convenience function: `runDrugResponseProcessingPipeline`. This function also split the data based on its types -- single-agent, combo, etc. Moreover, the output is `MultiAssayExperiment` object with each experiments representing different data type.
 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE}
 # Run gDR pipeline
