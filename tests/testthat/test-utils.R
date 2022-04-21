@@ -9,7 +9,7 @@ test_that("import_data", {
   manifest <- list.files(dataDir, pattern = "manifest", full.names = TRUE)
   template <- list.files(dataDir, pattern = "Template", full.names = TRUE)
   raw_data <- list.files(dataDir, pattern = "^RawData", full.names = TRUE)
-  expect_error(import_data(manifest, template, raw_data), "Template does not contain")
+  expect_s3_class(import_data(manifest, template, raw_data), "data.frame")
   })
 
 
