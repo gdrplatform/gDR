@@ -6,7 +6,7 @@ echo "Working directory: `pwd`"
 echo "Working directory contains: `ls | tr '\n' ' '`"
 
 # exit when any command fails (including any in pipes)
-set -euxo pipefail
+set -eo pipefail
 
 CORE_DIR=/mnt/vol
 echo ">>>>> OWNER OF THE REPOSITORY"
@@ -20,8 +20,8 @@ echo ">>>>> RUNNING UNIT TESTS"
 Rscript -e "testthat::test_local(path = '/mnt/vol', stop_on_failure = TRUE) "
 
 echo ">>>>> RUNNING CHECK"
-R CMD build /mnt/vol &&
-    R CMD check gDR_*.tar.gz --no-vignettes --no-examples --no-manual
+R CMD build /mnt/vol 
+R CMD check gDR_*.tar.gz --no-vignettes --no-examples --no-manual
 
 echo ">>>>>>>> RUNNING CHECK DEPENDENCIES"
 Rscript -e "gDRstyle::checkDependencies(desc_path='/mnt/vol/DESCRIPTION', dep_path='/mnt/vol/rplatform/dependencies.yaml')"
