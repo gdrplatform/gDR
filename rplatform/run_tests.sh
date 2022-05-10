@@ -20,6 +20,8 @@ echo ">>>>> RUNNING UNIT TESTS"
 Rscript -e "testthat::test_local(path = '/mnt/vol', stop_on_failure = TRUE) "
 
 echo ">>>>> RUNNING CHECK"
+# add _R_CHECK_FORCE_SUGGESTS_ as a FALSE, to prevend error in check
+export _R_CHECK_FORCE_SUGGESTS_=0
 R CMD build /mnt/vol 
 R CMD check gDR_*.tar.gz --no-vignettes --no-examples --no-manual
 
