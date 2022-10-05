@@ -10,7 +10,6 @@
 #' @return
 #' @export
 #'
-#' @examples
 import_data <- function(manifest_file,
                         template_file,
                         results_file,
@@ -23,3 +22,4 @@ import_data <- function(manifest_file,
              treatments = loaded_data$treatments,
              data = loaded_data$data)
 }
+
