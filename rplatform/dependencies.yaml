@@ -3,6 +3,7 @@ pkgs:
     source: CRAN
   BiocParallel:
     source: BIOC
+    NonDescription: TRUE
   kableExtra:
     source: CRAN
     NonDescription: TRUE
