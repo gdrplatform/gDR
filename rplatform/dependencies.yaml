@@ -3,6 +3,8 @@ pkgs:
     source: CRAN
   BiocParallel:
     source: BIOC
+  kableExtra:
+    source: CRAN
   gDRutils:
     ver: '>=1.0.43'
     url: gdrplatform/gDRutils
