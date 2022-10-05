@@ -18,9 +18,6 @@ gDRcore::runDrugResponseProcessingPipeline
 gDRcore::create_and_normalize_SE
 
 #' @export
-gDRcore::create_SE
-
-#' @export
 gDRcore::normalize_SE
 
 #' @export

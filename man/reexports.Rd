@@ -6,7 +6,6 @@
 \alias{merge_data}
 \alias{runDrugResponseProcessingPipeline}
 \alias{create_and_normalize_SE}
-\alias{create_SE}
 \alias{normalize_SE}
 \alias{average_SE}
 \alias{fit_SE}
@@ -30,10 +29,10 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{gDRcore}{\code{\link[gDRcore]{average_SE}}, \code{\link[gDRcore]{create_SE}}, \code{\link[gDRcore]{create_and_normalize_SE}}, \code{\link[gDRcore]{fit_SE}}, \code{\link[gDRcore]{merge_data}}, \code{\link[gDRcore]{normalize_SE}}, \code{\link[gDRcore]{runDrugResponseProcessingPipeline}}}
+  \item{gDRcore}{\code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{average_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{create_and_normalize_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{fit_SE}}, \code{\link[gDRcore]{merge_data}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{normalize_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{runDrugResponseProcessingPipeline}}}
 
   \item{gDRimport}{\code{\link[gDRimport]{load_data}}}
 
-  \item{gDRutils}{\code{\link[gDRutils]{convert_se_assay_to_dt}}, \code{\link[gDRutils]{fit_curves}}, \code{\link[gDRutils]{flatten}}, \code{\link[gDRutils]{get_SE_identifiers}}, \code{\link[gDRutils]{get_env_identifiers}}, \code{\link[gDRutils]{get_header}}, \code{\link[gDRutils]{logisticFit}}, \code{\link[gDRutils]{reset_env_identifiers}}, \code{\link[gDRutils]{set_SE_identifiers}}, \code{\link[gDRutils]{set_env_identifier}}, \code{\link[gDRutils]{split_SE_components}}, \code{\link[gDRutils]{validate_SE}}}
+  \item{gDRutils}{\code{\link[gDRutils]{convert_se_assay_to_dt}}, \code{\link[gDRutils]{fit_curves}}, \code{\link[gDRutils]{flatten}}, \code{\link[gDRutils:SE_metadata]{get_SE_identifiers}}, \code{\link[gDRutils:identifiers]{get_env_identifiers}}, \code{\link[gDRutils:headers]{get_header}}, \code{\link[gDRutils]{logisticFit}}, \code{\link[gDRutils:identifiers]{reset_env_identifiers}}, \code{\link[gDRutils:SE_metadata]{set_SE_identifiers}}, \code{\link[gDRutils:identifiers]{set_env_identifier}}, \code{\link[gDRutils]{split_SE_components}}, \code{\link[gDRutils]{validate_SE}}}
 }}
 
