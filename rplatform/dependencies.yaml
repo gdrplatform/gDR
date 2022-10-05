@@ -5,6 +5,7 @@ pkgs:
     source: BIOC
   kableExtra:
     source: CRAN
+    NonDescription: TRUE
   gDRutils:
     ver: '>=1.0.43'
     url: gdrplatform/gDRutils
