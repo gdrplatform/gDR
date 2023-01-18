@@ -7,7 +7,6 @@
 #' or character with file path of results file(s)
 #' @param instrument character with type of instrument used
 #'
-#' @return
 #' @export
 #'
 import_data <- function(manifest_file,

@@ -4,7 +4,7 @@
 #' and 10 cell lines
 #'
 #' @format A data frame with 3300 rows and 12 variables:
-#' \describe{
+#' \itemize{
 #'   \item{Barcode}
 #'   \item{clid}{cell line id}
 #'   \item{CellLineName}{cell line name}
@@ -26,7 +26,7 @@
 #' 2 co-drugs, and 2 cell lines
 #'
 #' @format A data frame with 3600 rows and 16 variables:
-#' \describe{
+#' \itemize{
 #'   \item{Barcode}
 #'   \item{clid}{cell line id}
 #'   \item{CellLineName}{cell line name}

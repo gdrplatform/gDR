@@ -6,7 +6,7 @@
 \title{Small data.frame with raw data used for processing via gDR}
 \format{
 A data frame with 3300 rows and 12 variables:
-\describe{
+\itemize{
   \item{Barcode}
   \item{clid}{cell line id}
   \item{CellLineName}{cell line name}

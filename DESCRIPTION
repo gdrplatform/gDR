@@ -13,23 +13,25 @@ Authors@R: c(person("Allison", "Vuong", role=c("aut", "cre"), email="vuong.allis
 Description: Re-exports commonly used processing functions and utilities from individual gDR packages
     for convenient use in an interactive R session.
     The vignettes walk through the full processing pipeline for drug response analyses that the gDR suite offers.
-License: file GNE_LICENSE
+License: file LICENSE
 LazyLoad: yes
 Imports:
-    BumpyMatrix,
     gDRcomponents (>= 1.1.56),
     gDRcore (>= 1.3.9),
     gDRimport (>= 0.0.10),
-    gDRstyle (>= 0.0.8),
-    gDRtestData (>= 1.0.12),
     gDRutils (>= 1.0.43)
 Suggests:
+    BumpyMatrix,
     futile.logger,
+    gDRstyle (>= 0.0.8),
+    gDRtestData (>= 1.0.12),
     knitr,
     kableExtra,
     markdown,
     purrr,
-    rmarkdown
+    rmarkdown,
+    SummarizedExperiment,
+    testthat
 VignetteBuilder: knitr
 ByteCompile: TRUE
 RoxygenNote: 7.1.2

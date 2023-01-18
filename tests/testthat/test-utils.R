@@ -9,7 +9,10 @@ test_that("import_data", {
   manifest <- list.files(dataDir, pattern = "manifest", full.names = TRUE)
   template <- list.files(dataDir, pattern = "Template", full.names = TRUE)
   raw_data <- list.files(dataDir, pattern = "^RawData", full.names = TRUE)
-  expect_s3_class(import_data(manifest, template, raw_data), "data.frame")
-  })
+  expect_warning(
+    expect_s3_class(import_data(manifest, template, raw_data), "data.frame"),
+    "NAs introduced by coercion"
+  )
+})
 
 
