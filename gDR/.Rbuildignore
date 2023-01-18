@@ -1,0 +1,8 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+.github
+Dockerfile 
+_config.yml 
+doc 
+extras
+rplatform

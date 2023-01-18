@@ -22,9 +22,6 @@ or character with file path of results file(s)}
 
 \item{instrument}{character with type of instrument used}
 }
-\value{
-
-}
 \description{
 Import raw data
 }
