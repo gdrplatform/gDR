@@ -3,7 +3,7 @@ repos <- c(
 CRAN = "https://cran.microsoft.com/snapshot/2021-08-25"
 )
 options(repos = repos)
-repo_path <- "/tmp/gDR"
+repo_path <- "/tmp/gDR/gDR"
 base_dir <- "/mnt/vol"
 
 # Use GitHub access_token if available
@@ -14,4 +14,4 @@ if (file.exists(gh_access_token_file)) {
   Sys.setenv(GITHUB_TOKEN = ac)
 }
 
-remotes::install_local(path = "/tmp/gDR")
+remotes::install_local(path = repo_path)
