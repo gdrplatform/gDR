@@ -17,7 +17,7 @@ pkgs:
     ver: '>=0.0.8'
     url: gdrplatform/gDRstyle
     ref: main
-    subdir: ~
+    subdir: gDRstyle
     source: GITHUB
   gDRtestData:
     ver: '>=1.0.12'
@@ -41,5 +41,5 @@ pkgs:
     ver: '>=0.0.10'
     url: gdrplatform/gDRimport
     ref: main
-    subdir: ~
+    subdir: gDRimport
     source: GITHUB
