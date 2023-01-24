@@ -95,18 +95,17 @@ cp .github_access_token.txt gDR/rplatform/
 Then build the Docker image.
 ```
 cd gDR
-bash extras/create_image.sh
+bash gDR/extras/create_image.sh
 ```
 
 5. 
 Create 'gdr_rstudio' container with RStudio IDE available at http://localhost:8787 (default credentials are rstudio/rstudio).
 ```
-bash extras/create_container.sh
-```
+bash gDR/extras/create_container.sh
 ```
 
 You've just successfully set up the environment for the gDR umbrella package. Please see [gDR vignette](doc/gDR.html) for examples of usage.
 
 
-## How to contribute
+# How to contribute
 We are eager to make this tool useful for the community. We welcome any suggestions via GitHub issues, or pull requests for bugfixes/new features. When making pull requests, please first have a look at the style conventions in [gDRstyle](https://gdrplatform.github.io/gDRstyle/style_guide.html).
