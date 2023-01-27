@@ -1,6 +1,6 @@
 # Settings
 repos <- c(
-CRAN = "https://cran.microsoft.com/snapshot/2021-08-25"
+  CRAN = "https://cran.microsoft.com/snapshot/2023-01-20"
 )
 options(repos = repos)
 essential_pkgs <- list(

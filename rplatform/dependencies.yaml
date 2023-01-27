@@ -1,12 +1,4 @@
 pkgs:
-  purrr:
-    source: CRAN
-  BiocParallel:
-    source: BIOC
-    NonDescription: TRUE
-  kableExtra:
-    source: CRAN
-    NonDescription: TRUE
   gDRutils:
     ver: '>=1.0.43'
     url: gdrplatform/gDRutils
