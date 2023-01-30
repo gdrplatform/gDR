@@ -19,3 +19,5 @@ services:
       - ..:/home/rstudio/projects:z
     ports:
       - ${LISTEN_PORT}:${RSTUDIO_PORT}
+    environment:
+      - PASSWORD=gdr
