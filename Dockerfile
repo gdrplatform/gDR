@@ -9,6 +9,7 @@ ARG GITHUB_TOKEN
 RUN mkdir -p /mnt/vol
 COPY rplatform/dependencies.yaml rplatform/.github_access_token.txt* /mnt/vol
 COPY rplatform/install_all_deps.R /mnt/vol/install_all_deps.R
+RUN echo "$GITHUB_TOKEN" >> /mnt/vol/.github_access_token.txt
 RUN R -f /mnt/vol/install_all_deps.R
 
 #================= Check & build package
