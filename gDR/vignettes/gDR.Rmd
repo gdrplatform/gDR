@@ -54,6 +54,7 @@ The gDR suite was designed in a modular manner, such that a user can jump into t
                                              |  2. Transforming the long table into a SummarizedExperiment object 
                                              |  with BumpyMatrix assays by specifying what columns belong on rows, 
                                              |  columns, and nested.
+                                             |
                                              V
                                SummarizedExperiment object
                                with raw and treated assays
@@ -99,7 +100,7 @@ Using the convenience function `import_data`, the long table is easily created:
 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE} 
 # Import data
-imported_data <- import_data(manifest, template, raw_data)
+imported_data <- gDR::import_data(manifest, template, raw_data)
 head(imported_data)
 ```
 
@@ -110,12 +111,16 @@ Next, we can transform the long table into our initial SummarizedExperiment obje
 To do so, we need to tell the software:
 - What should go on rows and columns versus be nested in the assay.
 - Which rows in our table to consider as "control" versus "treated" for normalization.
+- Which data type should be converted into SE.
 
 We can do so by setting the `untreated_tag` identifier like `set_env_identifier("untreated_tag" = c("MY_CONTROL_TERMINOLOGY_HERE"))`.
-and specifying the `nested_keys` argument within `create_and_normalize_SE`.
+specifying the `nested_keys` argument within `create_and_normalize_SE` and specifiying `data_type`.
 
 ```{r}
-se <- create_and_normalize_SE(imported_data, nested_confounders = "Barcode")
+inl <- gDRcore::prepare_input(imported_data)
+detected_data_types <- names(inl$exps)
+detected_data_types
+se <- create_and_normalize_SE(imported_data, data_type = "single-agent", nested_confounders = "Barcode")
 se
 ```
 Note that this has created a SummarizedExperiment object with `rowData`, `colData`, `metadata` and 3 `assays`.
@@ -124,38 +129,40 @@ Note that this has created a SummarizedExperiment object with `rowData`, `colDat
 ### Averaging and fitting data (3)
 Next, we can average and fit the data of interest. 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE}
-se <- average_SE(se)
-se <- fit_SE(se)
+se <- average_SE(se, data_type = "single-agent")
+se <- fit_SE(se, data_type = "single-agent")
 ```
 ```{r, echo=TRUE}
 se
 ```
 
 ### runDrugResponseProcessingPipeline
-Steps (2) and (3) can be combined into a single step through a convenience function: `runDrugResponseProcessingPipeline`. This function also split the data based on its types -- single-agent, combo, etc. Moreover, the output is `MultiAssayExperiment` object with each experiment representing a different data type.
+Steps (2) and (3) can be combined into a single step through a convenience function: `runDrugResponseProcessingPipeline`.  Moreover, the output is `MultiAssayExperiment` object with one experiment per each detected data type. Currently four data types are supported: 'single-agent', 'cotreatment', 'codilution' and 'matrix'. The first three data types are processed via the 'single-agent' model while the 'marix' data is processed via the 'combintation' model. 
 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE}
 # Run gDR pipeline
-pipeline_se <- runDrugResponseProcessingPipeline(imported_data)
+mae <- runDrugResponseProcessingPipeline(imported_data)
 ```
 ```{r, echo=TRUE}
-pipeline_se
+mae
 ```
 
-Note that our final SummarizedExperiment object is made up of multiple assays, such as:
+Note that our final MultiAssayExperiment object can be made up of multiple experiments with multiple assays:
 
 ```{r, echo=TRUE}
-SummarizedExperiment::assayNames(se)
+names(mae)
+SummarizedExperiment::assayNames(mae[[1]])
 ```
 
-that can be easily transformed to `data.table` format using `convert_se_assay_to_dt` function:
+Each assay from each experiment can be easily transformed to `data.table` format using `convert_se_assay_to_dt` function:
 
 ```{r, echo=TRUE, eval=FALSE}
-convert_se_assay_to_dt(se, "Metrics")
+convert_se_assay_to_dt(mae[["single-agent"]], "Metrics")
 ```
 
 ```{r, echo=FALSE}
 library(kableExtra)
+se <- mae[["single-agent"]]
 kbl(convert_se_assay_to_dt(se, "Metrics")) |>
   kable_paper() |>
   scroll_box(width = "700px", height = "300px")
