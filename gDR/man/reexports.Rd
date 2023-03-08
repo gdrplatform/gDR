@@ -4,7 +4,7 @@
 \docType{import}
 \name{reexports}
 \alias{reexports}
-\alias{prepare_config}
+\alias{save_config_template}
 \alias{load_config}
 \alias{add_project_to_metaproject}
 \alias{add_metaproject_to_metaprojects_list}
@@ -39,7 +39,7 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{gDRcomponents}{\code{\link[gDRcomponents]{add_metaproject_to_metaprojects_list}}, \code{\link[gDRcomponents]{add_project_to_metaproject}}, \code{\link[gDRcomponents]{add_project_to_projects_list}}, \code{\link[gDRcomponents]{getMetaProjects}}, \code{\link[gDRcomponents]{getProjects}}, \code{\link[gDRcomponents]{load_config}}, \code{\link[gDRcomponents]{prepare_config}}, \code{\link[gDRcomponents]{pullProjectSE}}, \code{\link[gDRcomponents]{save_MAE}}}
+  \item{gDRcomponents}{\code{\link[gDRcomponents]{add_metaproject_to_metaprojects_list}}, \code{\link[gDRcomponents]{add_project_to_metaproject}}, \code{\link[gDRcomponents]{add_project_to_projects_list}}, \code{\link[gDRcomponents]{getMetaProjects}}, \code{\link[gDRcomponents]{getProjects}}, \code{\link[gDRcomponents]{load_config}}, \code{\link[gDRcomponents]{pullProjectSE}}, \code{\link[gDRcomponents]{save_config_template}}, \code{\link[gDRcomponents]{save_MAE}}}
 
   \item{gDRcore}{\code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{average_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{create_and_normalize_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{fit_SE}}, \code{\link[gDRcore]{merge_data}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{normalize_SE}}, \code{\link[gDRcore:runDrugResponseProcessingPipelineFxns]{runDrugResponseProcessingPipeline}}}
 

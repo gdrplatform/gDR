@@ -1,5 +1,5 @@
 #' @export
-gDRcomponents::prepare_config
+gDRcomponents::save_config_template
   
 #' @export
 gDRcomponents::load_config

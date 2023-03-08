@@ -164,13 +164,14 @@ convert_se_assay_to_dt(mae[["single-agent"]], "Metrics")
 
 When we prepare MultiAssayExperiment we can prepare new project and add it to metaproject. Firstly we need to prepare new metaproject if we do not have any, or we can one of allready prepared. 
 
-Firstly we need to define config with information about storing data. We can prepare our own basing on template from gDRcomponets using functions `prepare_config` and `load_config`
+Firstly we need to define config with information about storing data. We can prepare our own basing on template from gDRcomponets using functions `save_config_template` and `load_config`
 
 ```{r, echo=TRUE}
 config_dir <- tempfile()
 dir.create(config_dir, recursive = TRUE)
 config_path <- file.path(config_dir, "config.yaml")
-prepare_config(config_path)
+save_config_template(config_path)
+# modify the config saved in the 'config_path' to fit your env requirements
 load_config(config_path)
 yaml::read_yaml(config_path)
 ```
