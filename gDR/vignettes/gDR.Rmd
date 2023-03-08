@@ -160,6 +160,61 @@ Each assay from each experiment can be easily transformed to `data.table` format
 convert_se_assay_to_dt(mae[["single-agent"]], "Metrics")
 ```
 
+# Saving project to local or AWS instance and add it to metaproject
+
+When we prepare MultiAssayExperiment we can prepare new project and add it to metaproject. Firstly we need to prepare new metaproject if we do not have any, or we can one of allready prepared. 
+
+Firstly we need to define config with information about storing data. We can prepare our own basing on template from gDRcomponets using functions `prepare_config` and `load_config`
+
+```{r, echo=TRUE}
+config_dir <- tempfile()
+dir.create(config_dir, recursive = TRUE)
+config_path <- file.path(config_dir, "config.yaml")
+prepare_config(config_path)
+load_config(config_path)
+yaml::read_yaml(config_path)
+```
+
+To prepare metaproject we need to have metadata of its. We define the as named list, with `Project name` and `Description`. Note that if we do not have any mataproject already, we will get warning about it, and function will prepare new list of metaprojects, with only our new prepared 
+
+```{r, echo=TRUE}
+metaproject_matadata <- list(`Project name` = "Testing metaproject", Description = "Metaproject containing testing data")
+
+add_metaproject_to_metaprojects_list("local", metaproject_matadata)
+```
+
+Now we can add project to proejct list and assign to metaproject
+
+```{r, echo=TRUE}
+project_id <- 1
+
+add_project_to_projects_list("local", mae, projectId = project_id)
+add_project_to_metaproject(source = "local", metaprojectId = 1, projectId = project_id)
+```
+
+The last step will be save our project 
+
+```{r, echo=TRUE}
+save_MAE(source = "local", mae = mae, project_id = project_id) 
+```
+
+We can check list of projects and metaprojects using functions `getProjects` and `getMetaProjects`
+
+```{r, echo=TRUE}
+getProjects("local")
+```
+```{r, echo=TRUE}
+getMetaProjects("local")
+```
+
+To load project we can use function `pullProjectSE`
+
+```{r, echo=TRUE}
+pullProjectSE(source = "local", project_id = project_id)
+```
+
+######
+
 ```{r, echo=FALSE}
 library(kableExtra)
 se <- mae[["single-agent"]]
