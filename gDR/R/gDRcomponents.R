@@ -24,3 +24,6 @@ gDRcomponents::getMetaProjects
 
 #' @export
 gDRcomponents::pullProjectSE
+
+#' @export
+gDRcomponents::pushProject
