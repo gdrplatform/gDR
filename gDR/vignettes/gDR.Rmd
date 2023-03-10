@@ -162,9 +162,9 @@ convert_se_assay_to_dt(mae[["single-agent"]], "Metrics")
 
 # Saving project to local or AWS instance and add it to metaproject
 
-When we prepare MultiAssayExperiment we can prepare new project and add it to metaproject. Firstly we need to prepare new metaproject if we do not have any, or we can one of allready prepared. 
+One can use the project and metaproject concepts to facilitate managing the datasets. Each dataset can be pushed as a project belonging to the given metaproject.
 
-Firstly we need to define config with information about storing data. We can prepare our own basing on template from gDRcomponets using functions `save_config_template` and `load_config`
+In the first step, one has to define configuration data specific to his/her environment. The simplest way for this is to create a config from the template with `save_config_template`, modify it as needed, and load with `load_config`.
 
 ```{r, echo=TRUE}
 config_dir <- tempfile()
@@ -176,7 +176,9 @@ load_config(config_path)
 yaml::read_yaml(config_path)
 ```
 
-To prepare metaproject we need to have metadata of its. We define the as named list, with `Project name` and `Description`. Note that if we do not have any mataproject already, we will get warning about it, and function will prepare new list of metaprojects, with only our new prepared 
+In the second step, one has to specify the meta-project to which project with the new dataset will be added. One can create the new meta-project by defining the named list, with `Project name` and `Description` and using `add_metaproject_to_metaprojects_list`. Alternatively one can use `getMetaProjects` function to find the `metaprojectId` of interest.
+
+If there are no mata-projects already, the proper warning will be triggered, and a new list of meta-projects will be created.
 
 ```{r, echo=TRUE}
 metaproject_matadata <- list(`Project name` = "Testing metaproject", Description = "Metaproject containing testing data")
@@ -184,19 +186,17 @@ metaproject_matadata <- list(`Project name` = "Testing metaproject", Description
 add_metaproject_to_metaprojects_list("local", metaproject_matadata)
 ```
 
-Now we can add project to proejct list and assign to metaproject
+Now we can push project using `pushProject` function, as output we will get id of new project
 
 ```{r, echo=TRUE}
-project_id <- 1
-
-add_project_to_projects_list("local", mae, projectId = project_id)
-add_project_to_metaproject(source = "local", metaprojectId = 1, projectId = project_id)
+project_id <- pushProject(source = "local", mae = mae, metaprojectId = 1, description = "new project")
+project_id
 ```
 
-The last step will be save our project 
+If necessary, we can edit the added project, to add new MAE for existing project we can use function `save_MAE`
 
 ```{r, echo=TRUE}
-save_MAE(source = "local", mae = mae, project_id = project_id) 
+save_MAE(source = "local", mae = mae, projectId = project_id)
 ```
 
 We can check list of projects and metaprojects using functions `getProjects` and `getMetaProjects`
