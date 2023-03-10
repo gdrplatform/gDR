@@ -1,8 +1,8 @@
 Package: gDR
 Type: Package
 Title: Umbrella package for R packages in the gDR suite 
-Version: 1.3.4
-Date: 2023-02-28
+Version: 1.3.5
+Date: 2023-03-08
 Authors@R: c(person("Allison", "Vuong", role=c("aut", "cre"), email="vuong.allison@gene.com"), 
              person("Bartosz", "Czech", role=c("aut")),
              person("Arkadiusz", "Gladki", role=c("aut")),
@@ -33,10 +33,11 @@ Suggests:
     purrr,
     rmarkdown,
     SummarizedExperiment,
-    testthat
+    testthat,
+    yaml
 VignetteBuilder: knitr
 ByteCompile: TRUE
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 SwitchrLibrary: gDR
 DeploySubPath: gDR
 Encoding: UTF-8

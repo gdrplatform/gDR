@@ -4,5 +4,7 @@
 #' @importFrom gDRcore merge_data runDrugResponseProcessingPipeline normalize_SE average_SE 
 #' @importFrom gDRcore fit_SE create_and_normalize_SE
 #' @importFrom gDRimport load_data
-#' @importFrom gDRcomponents getDrugs getCellLines getProjects getMetaProjects pullProjectSE
+#' @importFrom gDRcomponents getDrugs getCellLines getProjects getMetaProjects pullProjectSE load_config pushProject
+#' @importFrom gDRcomponents add_project_to_metaproject add_metaproject_to_metaprojects_list save_MAE getProjects
+#' @importFrom gDRcomponents add_project_to_projects_list getMetaProjects pullProjectSE save_config_template
 NULL
