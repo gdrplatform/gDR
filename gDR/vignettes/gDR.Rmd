@@ -172,8 +172,14 @@ dir.create(config_dir, recursive = TRUE)
 config_path <- file.path(config_dir, "config.yaml")
 save_config_template(config_path)
 # modify the config saved in the 'config_path' to fit your env requirements
+# here: path to shared dir has been updated
+cfg <- yaml::read_yaml(config_path)
+cfg$SHARED_DIR <- config_dir
+yaml::write_yaml(cfg, config_path)
+
 load_config(config_path)
 yaml::read_yaml(config_path)
+
 ```
 
 In the second step, one has to specify the meta-project to which project with the new dataset will be added. One can create the new meta-project by defining the named list, with `Project name` and `Description` and using `add_metaproject_to_metaprojects_list`. Alternatively one can use `getMetaProjects` function to find the `metaprojectId` of interest.
