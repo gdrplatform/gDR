@@ -25,7 +25,7 @@ A data frame with 3300 rows and 12 variables:
 small_data
 }
 \description{
-A dataset containing the ReadoutValues for single-agent experiments made-up of 10 drugs
-and 10 cell lines
+A dataset containing the ReadoutValues for single-agent experiments 
+made-up of 10 drugs and 10 cell lines
 }
 \keyword{datasets}

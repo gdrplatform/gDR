@@ -1,7 +1,7 @@
 context("utils")
 
 test_that("import_data", {
-
+  
   # Define path for data stored in gDR package
   dataDir <- system.file("extdata", "data1", package = "gDRimport")
   
@@ -9,7 +9,9 @@ test_that("import_data", {
   manifest <- list.files(dataDir, pattern = "manifest", full.names = TRUE)
   template <- list.files(dataDir, pattern = "Template", full.names = TRUE)
   raw_data <- list.files(dataDir, pattern = "^RawData", full.names = TRUE)
-  suppressWarnings(expect_s3_class(import_data(manifest, template, raw_data), "data.frame"))
+  suppressWarnings(
+    expect_s3_class(import_data(manifest, template, raw_data), "data.frame")
+  )
 })
 
 
