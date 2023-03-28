@@ -6,6 +6,8 @@
 #' @param results_file data.frame, with datapaths and names of results file(s)
 #' or character with file path of results file(s)
 #' @param instrument character with type of instrument used
+#' 
+#' @return a `data.frame`
 #'
 #' @export
 #'

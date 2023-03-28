@@ -22,6 +22,9 @@ or character with file path of results file(s)}
 
 \item{instrument}{character with type of instrument used}
 }
+\value{
+a `data.frame`
+}
 \description{
 Import raw data
 }
