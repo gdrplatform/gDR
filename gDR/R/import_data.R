@@ -7,7 +7,7 @@
 #' or character with file path of results file(s)
 #' @param instrument character with type of instrument used
 #' 
-#' @return a `data.frame`
+#' @return a \code{data.frame}
 #'
 #' @export
 #'
