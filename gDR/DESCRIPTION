@@ -19,14 +19,14 @@ Depends:
     R (>= 2.10)
 Imports:
     gDRcomponents (>= 1.1.56),
-    gDRcore (>= 1.3.9),
+    gDRcore (>= 0.99.0),
     gDRimport (>= 0.0.10),
-    gDRutils (>= 1.0.43)
+    gDRutils (>= 0.99.0)
 Suggests:
     BumpyMatrix,
     futile.logger,
-    gDRstyle (>= 0.0.8),
-    gDRtestData (>= 1.0.12),
+    gDRstyle (>= 0.99.0),
+    gDRtestData (>= 0.99.0),
     knitr,
     kableExtra,
     markdown,
