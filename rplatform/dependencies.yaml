@@ -23,12 +23,6 @@ pkgs:
     ref: master
     subdir: gDRcore
     source: GITHUB
-  gDRcomponents:
-    ver: '>=1.1.56'
-    url: gdrplatform/gDRcomponents
-    ref: master
-    subdir: gDRcomponents
-    source: GITHUB
   gDRimport:
     ver: '>=0.99.0'
     url: gdrplatform/gDRimport
