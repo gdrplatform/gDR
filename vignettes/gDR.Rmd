@@ -169,3 +169,9 @@ kbl(convert_se_assay_to_dt(se, "Metrics")) |>
 
 # Appendix
 Once the data is stored in the database, there are multiple ways to visualize the data depending on the scientific needs. The primary method to do is through our RShiny visualization tool 'gDRviz'. Here, users can search and select experiments present in the database, and use downstream visualization modules to look at dose response curves, heatmaps, etc.
+
+# SessionInfo {-}
+
+```{r sessionInfo}
+sessionInfo()
+```
