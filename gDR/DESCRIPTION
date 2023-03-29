@@ -27,8 +27,8 @@ Imports:
 Suggests:
     BumpyMatrix,
     futile.logger,
-    gDRstyle (>= 0.0.8),
-    gDRtestData (>= 1.0.12),
+    gDRstyle (>= 0.99.0),
+    gDRtestData (>= 0.99.0),
     kableExtra,
     knitr,
     markdown,
