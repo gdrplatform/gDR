@@ -13,14 +13,12 @@ Authors@R: c(
     person("Dariusz", "Scigocki", role = "aut"),
     person("Sergiu", "Mocanu", role = "aut")
   )
-Description: Package is a part of the gDR suite. It re-exports commonly used 
-    processing functions and utilities from individual gDR packages 
-    for convenient use in an interactive R session. The vignettes walk through
+Description: Package is a part of the gDR suite. It provides info about processing functions 
+    and utilities from individual gDR packages. The vignette walks through 
     the full processing pipeline for drug response analyses that the gDR suite offers.
 License: file LICENSE
 Depends:
-    R (>= 4.2)
-Imports:
+    R (>= 4.2),
     gDRcore (>= 0.99.0),
     gDRimport (>= 0.99.0),
     gDRutils (>= 0.99.0)

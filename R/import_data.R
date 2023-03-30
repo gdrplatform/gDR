@@ -7,6 +7,10 @@
 #' or character with file path of results file(s)
 #' @param instrument character with type of instrument used
 #' 
+#' @examples
+#' td <- get_test_data()
+#' i_df <- import_data(td$m_file, td$t_files, td$r_files)
+#' 
 #' @return a \code{data.frame}
 #'
 #' @export
