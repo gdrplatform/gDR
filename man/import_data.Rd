@@ -29,7 +29,7 @@ a \code{data.frame}
 Import raw data
 }
 \examples{
-td <- gDRimport::get_test_data()
+td <- get_test_data()
 i_df <- import_data(td$m_file, td$t_files, td$r_files)
 
 }

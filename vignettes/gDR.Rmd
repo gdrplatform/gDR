@@ -80,9 +80,10 @@ To support a common use case, we provide a convenience function that takes three
 Exemplary data can be found here:
 
 ```{r, echo=TRUE, results='asis'}
+library(gDR)
 # get test data from gDRimport package
 # i.e. paths to manifest, templates and results files
-td <- gDRimport::get_test_data()
+td <- get_test_data()
 td$m_file
 td$t_files
 td$r_files
@@ -92,11 +93,11 @@ Using the convenience function `import_data`, the long table is easily created:
 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE} 
 # Import data
-imported_data <- gDR::import_data(td$m_file, td$t_files, td$r_files)
+imported_data <- import_data(td$m_file, td$t_files, td$r_files)
 head(imported_data)
 ```
 
-This function will expect certain "identifiers" that tell the processing functions which columns in the long table map to certain expected fields, so that each column is interpreted correctly. For more details regarding these identifiers, see the "Details" section of `?identifiers`. Use `gDRutils::set_env_identifier` or `gDRutils::set_SE_identifiers` to set up the correct mappings between the expected fields and your long table column names.
+This function will expect certain "identifiers" that tell the processing functions which columns in the long table map to certain expected fields, so that each column is interpreted correctly. For more details regarding these identifiers, see the "Details" section of `?identifiers`. Use `set_env_identifier` or `set_SE_identifiers` to set up the correct mappings between the expected fields and your long table column names.
 
 ### Transforming data into a SummarizedExperiment (2)
 Next, we can transform the long table into our initial SummarizedExperiment object.
@@ -105,14 +106,14 @@ To do so, we need to tell the software:
 - Which rows in our table to consider as "control" versus "treated" for normalization.
 - Which data type should be converted into SE.
 
-We can do so by setting the `untreated_tag` identifier like `gDRutils::set_env_identifier("untreated_tag" = c("MY_CONTROL_TERMINOLOGY_HERE"))`.
-specifying the `nested_keys` argument within `gDRcore::create_and_normalize_SE` and specifiying `data_type`.
+We can do so by setting the `untreated_tag` identifier like `set_env_identifier("untreated_tag" = c("MY_CONTROL_TERMINOLOGY_HERE"))`.
+specifying the `nested_keys` argument within `create_and_normalize_SE` and specifiying `data_type`.
 
 ```{r}
-inl <- gDRcore::prepare_input(imported_data)
+inl <- prepare_input(imported_data)
 detected_data_types <- names(inl$exps)
 detected_data_types
-se <- gDRcore::create_and_normalize_SE(
+se <- create_and_normalize_SE(
   imported_data, 
   data_type = "single-agent",
   nested_confounders = "Barcode")
@@ -124,19 +125,19 @@ Note that this has created a SummarizedExperiment object with `rowData`, `colDat
 ### Averaging and fitting data (3)
 Next, we can average and fit the data of interest. 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE}
-se <- gDRcore::average_SE(se, data_type = "single-agent")
-se <- gDRcore::fit_SE(se, data_type = "single-agent")
+se <- average_SE(se, data_type = "single-agent")
+se <- fit_SE(se, data_type = "single-agent")
 ```
 ```{r, echo=TRUE}
 se
 ```
 
 ### runDrugResponseProcessingPipeline
-Steps (2) and (3) can be combined into a single step through a convenience function: `gDRcore::runDrugResponseProcessingPipeline`.  Moreover, the output is `MultiAssayExperiment` object with one experiment per each detected data type. Currently four data types are supported: 'single-agent', 'cotreatment', 'codilution' and 'matrix'. The first three data types are processed via the 'single-agent' model while the 'marix' data is processed via the 'combintation' model. 
+Steps (2) and (3) can be combined into a single step through a convenience function: `runDrugResponseProcessingPipeline`.  Moreover, the output is `MultiAssayExperiment` object with one experiment per each detected data type. Currently four data types are supported: 'single-agent', 'cotreatment', 'codilution' and 'matrix'. The first three data types are processed via the 'single-agent' model while the 'marix' data is processed via the 'combintation' model. 
 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE}
 # Run gDR pipeline
-mae <- gDRcore::runDrugResponseProcessingPipeline(imported_data)
+mae <- runDrugResponseProcessingPipeline(imported_data)
 ```
 ```{r, echo=TRUE}
 mae
@@ -149,12 +150,12 @@ names(mae)
 SummarizedExperiment::assayNames(mae[[1]])
 ```
 
-Each assay from each experiment can be easily transformed to `data.table` format using `gDRutils::convert_se_assay_to_dt` function:
+Each assay from each experiment can be easily transformed to `data.table` format using `convert_se_assay_to_dt` function:
 
 ```{r, echo=FALSE}
 library(kableExtra)
 se <- mae[["single-agent"]]
-kbl(gDRutils::convert_se_assay_to_dt(se, "Metrics")) |>
+kbl(convert_se_assay_to_dt(se, "Metrics")) |>
   kable_paper() |>
   scroll_box(width = "700px", height = "300px")
 ```
