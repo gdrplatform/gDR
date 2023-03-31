@@ -9,13 +9,13 @@ pkgs:
     ver: '>=0.99.0'
     url: gdrplatform/gDRstyle
     ref: main
-    subdir: gDRstyle
+    subdir: ~
     source: GITHUB
   gDRtestData:
     ver: '>=0.99.0'
     url: gdrplatform/gDRtestData
     ref: master
-    subdir: gDRtestData
+    subdir: ~
     source: GITHUB
   gDRcore:
     ver: '>=0.99.0'
@@ -23,15 +23,9 @@ pkgs:
     ref: master
     subdir: gDRcore
     source: GITHUB
-  gDRcomponents:
-    ver: '>=1.1.56'
-    url: gdrplatform/gDRcomponents
-    ref: master
-    subdir: gDRcomponents
-    source: GITHUB
   gDRimport:
-    ver: '>=0.0.10'
+    ver: '>=0.99.0'
     url: gdrplatform/gDRimport
-    ref: main
-    subdir: gDRimport
+    ref: GDR-1896
+    subdir: ~
     source: GITHUB

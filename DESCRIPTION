@@ -1,0 +1,46 @@
+Type: Package
+Package: gDR
+Title: Umbrella package for R packages in the gDR suite
+Version: 0.99.0
+Date: 2023-03-23
+Authors@R: c(
+    person("Support", "gDR", , "gdr-support-d@gene.com", role = "cre",
+           comment = c(ORCID = "0009-0006-9310-1135")),
+    person("Allison", "Vuong", , "vuong.allison@gene.com", role = "aut"),
+    person("Bartosz", "Czech", role = "aut"),
+    person("Arkadiusz", "Gladki", role = "aut"),
+    person("Marc", "Hafner", role = "aut"),
+    person("Dariusz", "Scigocki", role = "aut"),
+    person("Sergiu", "Mocanu", role = "aut")
+  )
+Description: Package is a part of the gDR suite. It provides info about processing functions 
+    and utilities from individual gDR packages. The vignette walks through 
+    the full processing pipeline for drug response analyses that the gDR suite offers.
+License: file LICENSE
+Depends:
+    R (>= 4.2),
+    gDRcore (>= 0.99.0),
+    gDRimport (>= 0.99.0),
+    gDRutils (>= 0.99.0)
+Suggests:
+    BumpyMatrix,
+    futile.logger,
+    gDRstyle (>= 0.99.0),
+    gDRtestData (>= 0.99.0),
+    kableExtra,
+    knitr,
+    markdown,
+    purrr,
+    rmarkdown,
+    SummarizedExperiment,
+    testthat,
+    yaml
+VignetteBuilder: 
+    knitr
+biocViews: Software, DataImport
+ByteCompile: TRUE
+DeploySubPath: gDR
+Encoding: UTF-8
+LazyLoad: yes
+RoxygenNote: 7.2.3
+SwitchrLibrary: gDR

@@ -34,7 +34,6 @@ We are happy to share with you our packages for importing, processing and managi
 - gDRcore
 - gDRutils
 - gDRtestData
-- gDRcomponents
 
 ## Data structures 
 The gDR data model is based on the SummarizedExperiment and BumpyMatrix. If readers are unfamiliar with these data models, we recommend first reading [SummarizedExperiment vignettes](https://bioconductor.org/packages/release/bioc/vignettes/SummarizedExperiment/inst/doc/SummarizedExperiment.html), followed by the [BumpyMatrix vignettes](https://www.bioconductor.org/packages/devel/bioc/vignettes/BumpyMatrix/inst/doc/BumpyMatrix.html). The SummarizedExperiment data structure enables ease of subsetting within the SummarizedExperiment object, but also provides ease when trying to correlate drug response data with genomic data, as these data may jointly stored in a MultiAssayExperiment. The BumpyMatrix allows for storage of multi-dimensional data while retaining a matrix abstraction.
@@ -82,25 +81,19 @@ Exemplary data can be found here:
 
 ```{r, echo=TRUE, results='asis'}
 library(gDR)
-
-# Define path for data stored in gDR package
-dataDir <- system.file("extdata", "data1", package = "gDRimport")
-
-# Extract path for example raw_data
-manifest <- list.files(dataDir, pattern = "manifest", full.names = TRUE)
-template <- list.files(dataDir, pattern = "Template", full.names = TRUE)
-raw_data <- list.files(dataDir, pattern = "^RawData", full.names = TRUE)
-
-manifest
-template
-raw_data
+# get test data from gDRimport package
+# i.e. paths to manifest, templates and results files
+td <- get_test_data()
+td$m_file
+td$t_files
+td$r_files
 ```
 
 Using the convenience function `import_data`, the long table is easily created: 
 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE} 
 # Import data
-imported_data <- gDR::import_data(manifest, template, raw_data)
+imported_data <- import_data(td$m_file, td$t_files, td$r_files)
 head(imported_data)
 ```
 
@@ -117,10 +110,13 @@ We can do so by setting the `untreated_tag` identifier like `set_env_identifier(
 specifying the `nested_keys` argument within `create_and_normalize_SE` and specifiying `data_type`.
 
 ```{r}
-inl <- gDRcore::prepare_input(imported_data)
+inl <- prepare_input(imported_data)
 detected_data_types <- names(inl$exps)
 detected_data_types
-se <- create_and_normalize_SE(imported_data, data_type = "single-agent", nested_confounders = "Barcode")
+se <- create_and_normalize_SE(
+  imported_data, 
+  data_type = "single-agent",
+  nested_confounders = "Barcode")
 se
 ```
 Note that this has created a SummarizedExperiment object with `rowData`, `colData`, `metadata` and 3 `assays`.
@@ -166,3 +162,9 @@ kbl(convert_se_assay_to_dt(se, "Metrics")) |>
 
 # Appendix
 Once the data is stored in the database, there are multiple ways to visualize the data depending on the scientific needs. The primary method to do is through our RShiny visualization tool 'gDRviz'. Here, users can search and select experiments present in the database, and use downstream visualization modules to look at dose response curves, heatmaps, etc.
+
+# SessionInfo {-}
+
+```{r sessionInfo}
+sessionInfo()
+```

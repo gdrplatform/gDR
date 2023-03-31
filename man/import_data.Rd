@@ -22,6 +22,14 @@ or character with file path of results file(s)}
 
 \item{instrument}{character with type of instrument used}
 }
+\value{
+a \code{data.frame}
+}
 \description{
 Import raw data
+}
+\examples{
+td <- get_test_data()
+i_df <- import_data(td$m_file, td$t_files, td$r_files)
+
 }
