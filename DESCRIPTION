@@ -1,14 +1,12 @@
 Type: Package
 Package: gDR
 Title: Umbrella package for R packages in the gDR suite
-Version: 0.99.1
-Date: 2023-04-04
+Version: 0.99.2
+Date: 2023-04-07
 Authors@R: c(
-    person("Support", "gDR", , "gdr-support-d@gene.com", role = "cre",
-           comment = c(ORCID = "0009-0006-9310-1135")),
     person("Allison", "Vuong", , "vuong.allison@gene.com", role = "aut"),
     person("Bartosz", "Czech", role = "aut"),
-    person("Arkadiusz", "Gladki", role = "aut"),
+    person("Arkadiusz", "Gladki", role=c("cre", "aut"), email="gladki.arkadiusz@gmail.com"),
     person("Marc", "Hafner", role = "aut"),
     person("Dariusz", "Scigocki", role = "aut"),
     person("Sergiu", "Mocanu", role = "aut")
@@ -19,14 +17,14 @@ Description: Package is a part of the gDR suite. It provides info about processi
 License: file LICENSE
 Depends:
     R (>= 4.2),
-    gDRcore (>= 0.99.1),
-    gDRimport (>= 0.99.0),
-    gDRutils (>= 0.99.0)
+    gDRcore (>= 0.99.2),
+    gDRimport (>= 0.99.1),
+    gDRutils (>= 0.99.1)
 Suggests:
     BumpyMatrix,
     futile.logger,
-    gDRstyle (>= 0.99.1),
-    gDRtestData (>= 0.99.0),
+    gDRstyle (>= 0.99.7),
+    gDRtestData (>= 0.99.1),
     kableExtra,
     knitr,
     markdown,
