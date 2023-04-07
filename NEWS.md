@@ -1,3 +1,6 @@
+# gDR 0.99.2
+* update maintainer
+
 # gDR 0.99.1
 * update requirements (gDRcore)
 
