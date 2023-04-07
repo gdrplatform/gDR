@@ -18,7 +18,7 @@ pkgs:
     subdir: ~
     source: GITHUB
   gDRcore:
-    ver: '>=0.99.7'
+    ver: '>=0.99.2'
     url: gdrplatform/gDRcore
     ref: master
     subdir: gDRcore

@@ -23,7 +23,7 @@ Depends:
 Suggests:
     BumpyMatrix,
     futile.logger,
-    gDRstyle (>= 0.99.1),
+    gDRstyle (>= 0.99.7),
     gDRtestData (>= 0.99.1),
     kableExtra,
     knitr,
