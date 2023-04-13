@@ -7,25 +7,25 @@
 \format{
 A data frame with 3300 rows and 12 variables:
 \itemize{
-  \item{Barcode}
-  \item{clid}{cell line id}
-  \item{CellLineName}{cell line name}
-  \item{Tissue}{cell line tissue}
-  \item{ReferenceDivisionTime}{cell line division time}
-  \item{Gnumber}{drug id}
-  \item{DrugName}{drug name}
-  \item{drug_moa}{drug mode of action}
-  \item{Concentration}{drug concentration}
-  \item{ReadoutValue}{readout value}
-  \item{BackgroundValue}{backgroud value}
-  \item{Duration}{duration}
+\item{Barcode}
+\item{clid}{cell line id}
+\item{CellLineName}{cell line name}
+\item{Tissue}{cell line tissue}
+\item{ReferenceDivisionTime}{cell line division time}
+\item{Gnumber}{drug id}
+\item{DrugName}{drug name}
+\item{drug_moa}{drug mode of action}
+\item{Concentration}{drug concentration}
+\item{ReadoutValue}{readout value}
+\item{BackgroundValue}{backgroud value}
+\item{Duration}{duration}
 }
 }
 \usage{
 small_data
 }
 \description{
-A dataset containing the ReadoutValues for single-agent experiments 
+A dataset containing the ReadoutValues for single-agent experiments
 made-up of 10 drugs and 10 cell lines
 }
 \keyword{datasets}
