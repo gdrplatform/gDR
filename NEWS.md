@@ -1,3 +1,6 @@
+# gDR 0.99.3
+* update documentation (Bioc-compatibility)
+
 # gDR 0.99.2
 * update maintainer
 

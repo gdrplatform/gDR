@@ -5,17 +5,19 @@
 \alias{gDR}
 \alias{gDR-package}
 \title{gDR: Umbrella package for R packages in the gDR suite}
+\value{
+package help page
+}
 \description{
 Package is a part of the gDR suite. It provides info about processing functions and utilities from individual gDR packages. The vignette walks through the full processing pipeline for drug response analyses that the gDR suite offers.
 }
 \author{
-\strong{Maintainer}: Support gDR \email{gdr-support-d@gene.com} (\href{https://orcid.org/0009-0006-9310-1135}{ORCID})
+\strong{Maintainer}: Arkadiusz Gladki \email{gladki.arkadiusz@gmail.com}
 
 Authors:
 \itemize{
   \item Allison Vuong \email{vuong.allison@gene.com}
   \item Bartosz Czech
-  \item Arkadiusz Gladki
   \item Marc Hafner
   \item Dariusz Scigocki
   \item Sergiu Mocanu

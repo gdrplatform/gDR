@@ -20,7 +20,9 @@ or character with file path of templates file(s)}
 \item{results_file}{data.frame, with datapaths and names of results file(s)
 or character with file path of results file(s)}
 
-\item{instrument}{character with type of instrument used}
+\item{instrument}{character with type of instrument used
+
+# fix for the NOTE in R CMD CHECK}
 }
 \value{
 a \code{data.frame}

@@ -18,6 +18,7 @@
 #'   \item{BackgroundValue}{backgroud value}
 #'   \item{Duration}{duration}
 #' }
+#' @return data.frame
 "small_data"
 
 #' Small data.frame with raw combo data used for processing via gDR
@@ -44,4 +45,5 @@
 #'   \item{BackgroundValue}{backgroud value}
 #'   \item{Duration}{duration}
 #' }
+#' @return data.frame
 "small_combo_data"
