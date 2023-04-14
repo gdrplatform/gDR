@@ -5,5 +5,6 @@
 #' @importFrom gDRutils fit_curves
 
 #' @keywords internal
+#' @return package help page
 "_PACKAGE"
 NULL
