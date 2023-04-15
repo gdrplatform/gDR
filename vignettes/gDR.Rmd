@@ -114,9 +114,9 @@ inl <- prepare_input(imported_data)
 detected_data_types <- names(inl$exps)
 detected_data_types
 se <- create_and_normalize_SE(
-  imported_data, 
+  inl$df_list[["single-agent"]],
   data_type = "single-agent",
-  nested_confounders = "Barcode")
+  nested_confounders = inl$nested_confounders)
 se
 ```
 Note that this has created a SummarizedExperiment object with `rowData`, `colData`, `metadata` and 3 `assays`.
