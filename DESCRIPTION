@@ -24,7 +24,7 @@ Suggests:
     BumpyMatrix,
     futile.logger,
     gDRstyle (>= 0.99.8),
-    gDRtestData (>= 0.99.6),
+    gDRtestData (>= 0.99.3),
     kableExtra,
     knitr,
     markdown,
