@@ -17,14 +17,14 @@ Description: Package is a part of the gDR suite. It provides info about processi
 License: file LICENSE
 Depends:
     R (>= 4.2),
-    gDRcore (>= 0.99.3),
-    gDRimport (>= 0.99.3),
-    gDRutils (>= 0.99.4)
+    gDRcore (>= 0.99.7),
+    gDRimport (>= 0.99.5),
+    gDRutils (>= 0.99.5)
 Suggests:
     BumpyMatrix,
     futile.logger,
-    gDRstyle (>= 0.99.8),
-    gDRtestData (>= 0.99.3),
+    gDRstyle (>= 0.99.11),
+    gDRtestData (>= 0.99.7),
     kableExtra,
     knitr,
     markdown,
