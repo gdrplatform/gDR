@@ -19,7 +19,7 @@ Depends:
     R (>= 4.2),
     gDRcore (>= 0.99.7),
     gDRimport (>= 0.99.6),
-    gDRutils (>= 0.99.4)
+    gDRutils (>= 0.99.5)
 Suggests:
     BumpyMatrix,
     futile.logger,
