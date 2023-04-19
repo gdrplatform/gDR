@@ -20,9 +20,7 @@ or character with file path of templates file(s)}
 \item{results_file}{data.frame, with datapaths and names of results file(s)
 or character with file path of results file(s)}
 
-\item{instrument}{character with type of instrument used
-
-# fix for the NOTE in R CMD CHECK}
+\item{instrument}{character with type of instrument used}
 }
 \value{
 a \code{data.frame}
@@ -32,6 +30,6 @@ Import raw data
 }
 \examples{
 td <- get_test_data()
-i_df <- import_data(td$m_file, td$t_files, td$r_files)
+i_df <- import_data(manifest_path(td), template_path(td), result_path(td))
 
 }

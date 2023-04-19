@@ -9,7 +9,7 @@
 #' 
 #' @examples
 #' td <- get_test_data()
-#' i_df <- import_data(td$m_file, td$t_files, td$r_files)
+#' i_df <- import_data(manifest_path(td), template_path(td), result_path(td))
 #' 
 #' @return a \code{data.frame}
 #'

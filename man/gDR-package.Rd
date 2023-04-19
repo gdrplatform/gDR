@@ -7,6 +7,8 @@
 \title{gDR: Umbrella package for R packages in the gDR suite}
 \value{
 package help page
+
+package help page
 }
 \description{
 Package is a part of the gDR suite. It provides info about processing functions and utilities from individual gDR packages. The vignette walks through the full processing pipeline for drug response analyses that the gDR suite offers.

@@ -24,7 +24,7 @@ pkgs:
     subdir: gDRcore
     source: GITHUB
   gDRimport:
-    ver: '>=0.99.5'
+    ver: '>=0.99.6'
     url: gdrplatform/gDRimport
     ref: main
     subdir: ~
