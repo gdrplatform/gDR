@@ -6,25 +6,25 @@ pkgs:
     subdir: gDRutils
     source: GITHUB
   gDRstyle:
-    ver: '>=0.99.8'
+    ver: '>=0.99.11'
     url: gdrplatform/gDRstyle
     ref: main
     subdir: ~
     source: GITHUB
   gDRtestData:
-    ver: '>=0.99.3'
+    ver: '>=0.99.7'
     url: gdrplatform/gDRtestData
     ref: master
     subdir: ~
     source: GITHUB
   gDRcore:
-    ver: '>=0.99.3'
+    ver: '>=0.99.7'
     url: gdrplatform/gDRcore
     ref: master
     subdir: gDRcore
     source: GITHUB
   gDRimport:
-    ver: '>=0.99.3'
+    ver: '>=0.99.6'
     url: gdrplatform/gDRimport
     ref: main
     subdir: ~
