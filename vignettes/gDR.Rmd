@@ -84,16 +84,16 @@ library(gDR)
 # get test data from gDRimport package
 # i.e. paths to manifest, templates and results files
 td <- get_test_data()
-td$m_file
-td$t_files
-td$r_files
+manifest_path(td)
+template_path(td)
+result_path(td)
 ```
 
 Using the convenience function `import_data`, the long table is easily created: 
 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE} 
 # Import data
-imported_data <- import_data(td$m_file, td$t_files, td$r_files)
+imported_data <- import_data(manifest_path(td), template_path(td), result_path(td))
 head(imported_data)
 ```
 

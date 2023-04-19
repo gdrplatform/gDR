@@ -22,7 +22,7 @@ A data frame with 3300 rows and 12 variables:
 }
 }
 \usage{
-small_data
+data(small_data)
 }
 \value{
 data.frame

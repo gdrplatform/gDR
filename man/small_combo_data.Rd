@@ -26,7 +26,7 @@ A data frame with 3600 rows and 16 variables:
 }
 }
 \usage{
-small_combo_data
+data(small_combo_data)
 }
 \value{
 data.frame

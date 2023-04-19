@@ -18,6 +18,9 @@
 #'   \item{BackgroundValue}{backgroud value}
 #'   \item{Duration}{duration}
 #' }
+#' 
+#' @usage data(small_data)
+#' 
 #' @return data.frame
 "small_data"
 
@@ -45,5 +48,8 @@
 #'   \item{BackgroundValue}{backgroud value}
 #'   \item{Duration}{duration}
 #' }
+#' 
+#' @usage data(small_combo_data)
+#' 
 #' @return data.frame
 "small_combo_data"

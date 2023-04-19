@@ -18,7 +18,7 @@ License: file LICENSE
 Depends:
     R (>= 4.2),
     gDRcore (>= 0.99.3),
-    gDRimport (>= 0.99.3),
+    gDRimport (>= 0.99.5),
     gDRutils (>= 0.99.4)
 Suggests:
     BumpyMatrix,
