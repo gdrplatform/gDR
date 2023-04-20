@@ -1,8 +1,8 @@
 Type: Package
 Package: gDR
 Title: Umbrella package for R packages in the gDR suite
-Version: 0.99.3
-Date: 2023-04-13
+Version: 0.99.4
+Date: 2023-04-20
 Authors@R: c(
     person("Allison", "Vuong", , "vuong.allison@gene.com", role = "aut"),
     person("Bartosz", "Czech", role = "aut"),
@@ -14,7 +14,7 @@ Authors@R: c(
 Description: Package is a part of the gDR suite. It provides info about processing functions 
     and utilities from individual gDR packages. The vignette walks through 
     the full processing pipeline for drug response analyses that the gDR suite offers.
-License: file LICENSE
+License: Artistic-2.0
 Depends:
     R (>= 4.2),
     gDRcore (>= 0.99.7),
