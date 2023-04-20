@@ -1,3 +1,6 @@
+# gDR 0.99.4
+* switch to OSI license
+
 # gDR 0.99.3
 * update documentation (Bioc-compatibility)
 
