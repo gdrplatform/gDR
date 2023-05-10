@@ -1,3 +1,6 @@
+# gDR 0.99.5
+* fix related with data.table
+
 # gDR 0.99.4
 * switch to OSI license
 
