@@ -1,3 +1,6 @@
+# gDR 0.99.5
+- format the vignette with BiocStyle
+
 # gDR 0.99.4
 * switch to OSI license
 
