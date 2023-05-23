@@ -3,7 +3,7 @@
 \docType{data}
 \name{small_data}
 \alias{small_data}
-\title{Small data.frame with raw data used for processing via gDR}
+\title{Small data.table with raw data used for processing via gDR}
 \format{
 A data frame with 3300 rows and 12 variables:
 \itemize{
@@ -25,7 +25,7 @@ A data frame with 3300 rows and 12 variables:
 data(small_data)
 }
 \value{
-data.frame
+data.table
 }
 \description{
 A dataset containing the ReadoutValues for single-agent experiments

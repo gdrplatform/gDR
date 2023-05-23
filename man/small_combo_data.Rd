@@ -3,7 +3,7 @@
 \docType{data}
 \name{small_combo_data}
 \alias{small_combo_data}
-\title{Small data.frame with raw combo data used for processing via gDR}
+\title{Small data.table with raw combo data used for processing via gDR}
 \format{
 A data frame with 3600 rows and 16 variables:
 \itemize{
@@ -29,7 +29,7 @@ A data frame with 3600 rows and 16 variables:
 data(small_combo_data)
 }
 \value{
-data.frame
+data.table
 }
 \description{
 A dataset containing the ReadoutValues for combo experiments made-up of

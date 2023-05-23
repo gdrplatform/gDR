@@ -10,8 +10,6 @@ test_that("import_data", {
   template <- list.files(dataDir, pattern = "Template", full.names = TRUE)
   raw_data <- list.files(dataDir, pattern = "^RawData", full.names = TRUE)
   suppressWarnings(
-    expect_s3_class(import_data(manifest, template, raw_data), "data.frame")
+    checkmate::expect_data_table(import_data(manifest, template, raw_data))
   )
 })
-
-
