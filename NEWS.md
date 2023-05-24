@@ -1,3 +1,6 @@
+# gDR 0.99.6
+- format the vignette with BiocStyle
+
 # gDR 0.99.5
 * fix related with data.table
 

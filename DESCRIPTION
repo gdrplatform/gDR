@@ -1,8 +1,8 @@
 Type: Package
 Package: gDR
 Title: Umbrella package for R packages in the gDR suite
-Version: 0.99.5
-Date: 2023-05-11
+Version: 0.99.6
+Date: 2023-05-22
 Authors@R: c(
     person("Allison", "Vuong", , "vuong.allison@gene.com", role = "aut"),
     person("Bartosz", "Czech", role = "aut"),
@@ -21,6 +21,7 @@ Depends:
     gDRimport (>= 0.99.10),
     gDRutils (>= 0.99.13)
 Suggests:
+    BiocStyle,
     BumpyMatrix,
     futile.logger,
     gDRstyle (>= 0.99.11),
@@ -33,13 +34,12 @@ Suggests:
     SummarizedExperiment,
     testthat,
     yaml
-VignetteBuilder: 
-    knitr
 biocViews: Software, DataImport
+VignetteBuilder: knitr
 ByteCompile: TRUE
-DeploySubPath: gDR
-Encoding: UTF-8
 LazyLoad: yes
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 SwitchrLibrary: gDR
+DeploySubPath: gDR
+Encoding: UTF-8
