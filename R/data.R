@@ -1,4 +1,4 @@
-#' Small data.frame with raw data used for processing via gDR
+#' Small data.table with raw data used for processing via gDR
 #'
 #' A dataset containing the ReadoutValues for single-agent experiments 
 #' made-up of 10 drugs and 10 cell lines
@@ -21,10 +21,10 @@
 #' 
 #' @usage data(small_data)
 #' 
-#' @return data.frame
+#' @return data.table
 "small_data"
 
-#' Small data.frame with raw combo data used for processing via gDR
+#' Small data.table with raw combo data used for processing via gDR
 #'
 #' A dataset containing the ReadoutValues for combo experiments made-up of 
 #' 3 drugs, 2 co-drugs, and 2 cell lines
@@ -51,5 +51,5 @@
 #' 
 #' @usage data(small_combo_data)
 #' 
-#' @return data.frame
+#' @return data.table
 "small_combo_data"

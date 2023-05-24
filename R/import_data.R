@@ -1,17 +1,17 @@
 #' Import raw data
 #'
 #' @param manifest_file character, file path(s) to manifest(s)
-#' @param template_file data.frame, with datapaths and names of results file(s)
+#' @param template_file character, with datapaths and names of results file(s)
 #' or character with file path of templates file(s)
-#' @param results_file data.frame, with datapaths and names of results file(s)
+#' @param results_file character, with datapaths and names of results file(s)
 #' or character with file path of results file(s)
-#' @param instrument character with type of instrument used
+#' @param instrument string with type of instrument used
 #' 
 #' @examples
 #' td <- get_test_data()
 #' i_df <- import_data(manifest_path(td), template_path(td), result_path(td))
 #' 
-#' @return a \code{data.frame}
+#' @return a \code{data.table}
 #'
 #' @export
 #'
