@@ -109,3 +109,35 @@ You've just successfully set up the environment for the gDR umbrella package. Pl
 
 # How to contribute
 We are eager to make this tool useful for the community. We welcome any suggestions via GitHub issues, or pull requests for bugfixes/new features. When making pull requests, please first have a look at the style conventions in [gDRstyle](https://gdrplatform.github.io/gDRstyle/style_guide.html).
+
+# Preparing your machine to run gDR images
+1. How to install Docker.
+
+Install Docker on MacOS 
+
+https://docs.docker.com/desktop/install/mac-install/
+
+Install Docker on Windows
+
+https://docs.docker.com/desktop/install/windows-install/
+
+Install Docker on Linux
+
+https://docs.docker.com/desktop/install/linux-install/
+
+2. MacOS troubleshooting (M1/M2)
+```
+Could not connect to the R session on RStudio Server
+Unable to connect to service (1)
+```
+To solve above problem please execute below steps:
+```
+Go to Settings
+```
+```
+Click Features in development
+```
+```
+Select checkbox: Use Rossetta for x86/amd64 emulation on Apple Silicon 
+```
+
