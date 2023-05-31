@@ -130,7 +130,7 @@ https://docs.docker.com/desktop/install/linux-install/
 Could not connect to the R session on RStudio Server
 Unable to connect to service (1)
 ```
-To solve above problem please execute below steps:
+To solve the above problem, please execute the steps below:
 ```
 Go to Settings
 ```
