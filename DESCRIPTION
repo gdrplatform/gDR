@@ -34,7 +34,7 @@ Suggests:
     SummarizedExperiment,
     testthat,
     yaml
-biocViews: Software, DataImport
+biocViews: Software, DataImport, ShinyApps
 VignetteBuilder: knitr
 ByteCompile: TRUE
 LazyLoad: yes
