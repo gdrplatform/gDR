@@ -31,43 +31,12 @@ The gDR suite offers a full stack solution for storing, processing, and visualiz
                                                      SummarizedExperiment object
                                                       with BumpyMatrix assays
 
-							   :  gDRwrapper::fetch_SE() 
-                                                           :
-                                                    +--------------+                      +--------+
-                                                    | gDRwrapper   | -------------------- | gDRviz |
-                                                    +--------------+  visualize data      +--------+
-                                                           ^    
-                                                           |
-                                                           | Fetch and push 
-                                                           v data to database
-						     --------------
-						    ( gDR REST API )
-						     --------------
-                                                           ^
- -----------------------------                             |                    -------------------
-( cell line metadata REST API )                            |                    | go.gene.com/gDR |
- -----------------------------    \                        V                    -------------------
-                                    \                 (-----------)                  +--------+ 
-                                      --------------  | gDR MySQL | ---------------- | gDRviz | 
- ----------------------------       /  populate       | database  |  visualize drug  +--------+
-( compound metadata REST API )    /    cell and drug   -----------  response curves         
- ----------------------------          metadata                      and metrics
-
 
 Key:
 
 +------------+
 | R packages |
 +---------- -+
- ----------
-( REST API )
- ----------
-----------------------------
-| Graphical User Interface |
-----------------------------
-(-----------)
-| database  |       
--------------
 ```
 
 # Installation
