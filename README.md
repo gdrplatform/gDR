@@ -66,7 +66,7 @@ Then build the Docker image.
 bash extras/create_image.sh
 ```
 
-5. Create 'gdr_rstudio' container with RStudio IDE available at http://localhost:8787 (default credentials are rstudio/rstudio).
+5. Create 'gdr_rstudio' container with RStudio IDE available at http://localhost:8787 (default credentials are login: `rstudio` and password: `gdr`).
 ```
 bash extras/create_container.sh
 ```
