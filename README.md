@@ -73,7 +73,7 @@ Create 'gdr_rstudio' container with RStudio IDE available at http://localhost:87
 bash gDR/extras/create_container.sh
 ```
 
-You've just successfully set up the environment for the gDR umbrella package. Please see [gDR vignette](doc/gDR.html) for examples of usage.
+You've just successfully set up the environment for the gDR umbrella package. Please see [gDR vignette](vignettes/gDR.Rmd) for examples of usage.
 
 
 # How to contribute
