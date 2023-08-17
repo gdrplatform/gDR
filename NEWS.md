@@ -1,3 +1,8 @@
+# gDR 0.99.7
+- clean-up
+- update documentation
+- simplify Docker-based installation
+
 # gDR 0.99.6
 - format the vignette with BiocStyle
 
