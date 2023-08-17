@@ -53,24 +53,23 @@ Then, clone the gDR repository via https (not ssh). Please use the personal toke
 git clone https://github.com/gdrplatform/gDR.git
 ```
 
-3. Save access token into .github_access_token.txt file
-Write your access token as a single line in the file: `gDR/rplatform/.github_access_token.txt`. 
+3. [Optional] Save access token into .github_access_token.txt file
+Write your access token as a single line in the file: `rplatform/.github_access_token.txt`. 
 
 ```
-cp .github_access_token.txt gDR/rplatform/
+cp .github_access_token.txt rplatform/
 ```
 
 4. Docker build 
 Then build the Docker image.
 ```
-cd gDR
-bash gDR/extras/create_image.sh
+bash extras/create_image.sh
 ```
 
 5. 
 Create 'gdr_rstudio' container with RStudio IDE available at http://localhost:8787 (default credentials are rstudio/rstudio).
 ```
-bash gDR/extras/create_container.sh
+bash extras/create_container.sh
 ```
 
 You've just successfully set up the environment for the gDR umbrella package. Please see [gDR vignette](vignettes/gDR.Rmd) for examples of usage.
