@@ -1,3 +1,6 @@
+# gDR 0.99.8
+- update README 
+
 # gDR 0.99.7
 - clean-up
 - update documentation
