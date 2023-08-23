@@ -19,17 +19,21 @@ The gDR suite offers a full stack solution for storing, processing, and visualiz
 			| BumpyMatrix |			                       ---------------------
 			+-------------+   \           +----------+                +-----------+
 		+----------------------+    --------  | gDRcore  | <------------- | gDRimport | 
-		| MultiAssayExperiment |  /           +----------+   load raw     +-----------+
-		+----------------------+                   :        files for analysis
+		| MultiAssayExperiment |   /          +----------+   load raw     +-----------+
+		+----------------------+  |                :        files for analysis
+                +----------------------+  |                :
+                | SummarizedExperiment | /                 :
+                +----------------------+                   :
                                                            :
-				      perform              :   gDR::runDrugResponseProcessingPipeline()
+				      perform              :     runDrugResponseProcessingPipeline()
 				      normalization, 	   :   
 				      averaging, 	   :   
 				      curve fitting	   : 
                                                            :
 
                                                      MultiAssayExperiment object
-                                                      with BumpyMatrix assays
+                                               containing SummarizedExperiment objects
+                                                      of BumpyMatrix assays
                                                            :
                                                            :
                                                            :
