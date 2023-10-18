@@ -1,14 +1,15 @@
 Type: Package
 Package: gDR
 Title: Umbrella package for R packages in the gDR suite
-Version: 0.99.8
-Date: 2023-08-17
+Version: 0.99.9
+Date: 2023-10-18
 Authors@R: c(
     person("Allison", "Vuong", , "vuong.allison@gene.com", role = "aut"),
     person("Bartosz", "Czech", role = "aut"),
     person("Arkadiusz", "Gladki", role=c("cre", "aut"), email="gladki.arkadiusz@gmail.com"),
     person("Marc", "Hafner", role = "aut"),
     person("Dariusz", "Scigocki", role = "aut"),
+    person("Janina", "Smola", role = "aut"),
     person("Sergiu", "Mocanu", role = "aut")
   )
 Description: Package is a part of the gDR suite. It reexports functions from other packages
