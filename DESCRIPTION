@@ -36,6 +36,8 @@ Suggests:
     SummarizedExperiment,
     testthat,
     yaml
+URL: https://github.com/gdrplatform/gDR
+BugReports: https://github.com/gdrplatform/gDR/issues
 biocViews: Software, DataImport, ShinyApps
 VignetteBuilder: knitr
 ByteCompile: TRUE
