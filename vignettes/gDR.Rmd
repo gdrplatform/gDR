@@ -42,28 +42,33 @@ This data structure is the core data structure that all downstream processing fu
 ## Overview
 The gDR suite was designed in a modular manner, such that a user can jump into the "standard" end-to-end gDR processing pipeline at several entry points as is suitable for his or her needs. The full pipeline involves:
 
+```              
+      manifest, template(s), raw data
+                        |
+                        |  1. Aggregating all raw data and metadata
+                        |  into a single long table. 
+                        |
+                        V
+              single, long table
+                        |
+                        |  2. Transforming the long table into 
+                        |  a SummarizedExperiment object with BumpyMatrix assays 
+                        |  by specifying what columns belong on rows, 
+                        |  columns, and nested.
+                        |
+                        V
+          SummarizedExperiment object
+          with raw and treated assays
+                        |
+                        |  3. Normalizing, averaging, and fitting data.
+                        |
+                        V
+          SummarizedExperiment object
+          with raw, treated, normalized,
+           averaged, and metric assays, 
+   ready for use by downstream visualization
               
-                           manifest, template(s), raw data
-                                             |
-                                             |  1. Aggregating all raw data and metadata into a single long table.
-                                             V
-                                   single, long table
-                                             |
-                                             |  2. Transforming the long table into a SummarizedExperiment object 
-                                             |  with BumpyMatrix assays by specifying what columns belong on rows, 
-                                             |  columns, and nested.
-                                             |
-                                             V
-                               SummarizedExperiment object
-                               with raw and treated assays
-                                             |
-                                             |  3. Normalizing, averaging, and fitting data.
-                                             |
-                                             V
-                               SummarizedExperiment object
-                               with raw, treated, normalized,
-                                averaged, and metric assays, 
-                        ready for use by downstream visualization
+ ```
  
 A user should be able to enter any part of this pipeline as long as they are able to create the intermediate object
 (i.e., the individual manifest, template, and raw data files, or a single, long table, or a SummarizedExperiment object with Bumpy assays).
@@ -92,7 +97,8 @@ Using the convenience function `import_data`, the long table is easily created:
 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE} 
 # Import data
-imported_data <- import_data(manifest_path(td), template_path(td), result_path(td))
+imported_data <- 
+  import_data(manifest_path(td), template_path(td), result_path(td))
 head(imported_data)
 ```
 
