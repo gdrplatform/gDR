@@ -1,5 +1,8 @@
-## 1.1.2 (2024-01-22)
+## 1.1.3 (2024-01-22)
 - add new description fields
+
+## 1.1.2 (2024-01-19)
+- update package vignette
 
 ## 1.1.1 (2023-11-22)
 - sync main with devel branch
