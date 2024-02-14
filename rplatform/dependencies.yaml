@@ -1,0 +1,31 @@
+pkgs:
+  gDRstyle:
+    ver: '>=1.1.1'
+    url: gdrplatform/gDRstyle
+    ref: main
+    subdir: ~
+    source: GITHUB
+  gDRtestData:
+    ver: '>=1.1.1'
+    url: gdrplatform/gDRtestData
+    ref: ~
+    subdir: ~
+    source: GITHUB
+  gDRutils:
+    ver: '>=1.1.1'
+    url: gdrplatform/gDRutils
+    ref: master
+    subdir: ~
+    source: GITHUB
+  gDRimport:
+    ver: '>=1.1.1'
+    url: gdrplatform/gDRimport
+    ref: main
+    subdir: ~
+    source: GITHUB
+  gDRcore:
+    ver: '>=1.1.1'
+    url: gdrplatform/gDRcore
+    ref: master
+    subdir: ~
+    source: GITHUB

@@ -1,9 +1,20 @@
-ARG BASE_IMAGE=bioconductor/bioconductor_docker:devel
+ARG BASE_IMAGE=marcinkam/gdrshiny:1.0
 FROM ${BASE_IMAGE}
 
+# temporary fix
+# GitHub token for downloading private dependencies
+# Need to be defined after FROM as it flushes ARGs
+ARG GITHUB_TOKEN
 
-#================= Install gdrplatform packages
+#================= Install dependencies
 RUN mkdir -p /mnt/vol
-COPY rplatform/.github_access_token.txt* /mnt/vol
-RUN Rscript -e 'BiocManager::install(c("gDRstyle", "gDRtestData", "gDRutils", "gDRimport", "gDRcore", "gDR"))'
-RUN sudo rm -rf /mnt/vol/*
+COPY rplatform/dependencies.yaml rplatform/.github_access_token.txt* /mnt/vol
+RUN echo "$GITHUB_TOKEN" >> /mnt/vol/.github_access_token.txt
+RUN Rscript -e "gDRstyle::installAllDeps()"
+
+#================= Check & build package
+COPY ./ /tmp/gDR/
+RUN Rscript -e "gDRstyle::installLocalPackage('/tmp/gDR')"
+
+#================= Clean up
+RUN sudo rm -rf /mnt/vol/* /tmp/gDR/
