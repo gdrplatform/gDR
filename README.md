@@ -1,69 +1,10 @@
 # gDR
 Umbrella package for the gDR programmatic R interface
 
-The gDR suite offers a full stack solution for storing, processing, and visualizing drug response data. This enables a range of users across computational savvy, (i.e. lab scientists and computational scientists alike) to access the same, standardized data. The suite is made up of several core R packages, a database, and a shiny visualization app. 
+The gDR suite offers a full stack solution for processing drug response data. This enables a range of users across computational savvy, (i.e. lab scientists and computational scientists alike) to access the same, standardized data. The suite is made up of several core R packages.
 
+![Figure 1. The overview of R packages that are available via gDR umbrella package.](https://raw.githubusercontent.com/gdrplatform/gDR/test_ci_pkgdown/inst/images/overview.png)
 
-```       
-
-                                                     +-----+
-                                                     | gDR |
-                                                     +-----+
-                                                        |
-          +---------------------------------------------------------------------------------------------------+
-          |                                                                                                   |
-          |                                                                                                   |
-   
-                                                                               ---------------------
-			+-------------+                                        | go.gene.com/gDRin |
-			| BumpyMatrix |			                       ---------------------
-			+-------------+   \           +----------+                +-----------+
-		+----------------------+    --------  | gDRcore  | <------------- | gDRimport | 
-		| MultiAssayExperiment |   /          +----------+   load raw     +-----------+
-		+----------------------+  |                :        files for analysis
-                +----------------------+  |                :
-                | SummarizedExperiment | /                 :
-                +----------------------+                   :
-                                                           :
-				      perform              :     runDrugResponseProcessingPipeline()
-				      normalization, 	   :   
-				      averaging, 	   :   
-				      curve fitting	   : 
-                                                           :
-
-                                                     MultiAssayExperiment object
-                                               containing SummarizedExperiment objects
-                                                      of BumpyMatrix assays
-                                                           :
-                                                           :
-                                                           :
-                                                           :
-                                                     (----------)
-                                                     |    DB    |
-                                                     (----------)
-
-                                                           :
-                                                           :
-
-                                                 +-----------------+
-                                                 |  gDRcomponents  |
-                                                 +-----------------+
-                                                     ------------
-                                                     |  gDRviz  | (coming soon)
-                                                     ------------
-
-Key:
-
-+------------+
-| R packages |
-+---------- -+
-(----------)
-|    DB    |
-(----------)
---------
-| GUIs |
---------
-```
 
 # Installation
 
