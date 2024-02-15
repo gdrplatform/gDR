@@ -2,7 +2,6 @@
 % Please edit documentation in R/gDR-package.R, R/package.R
 \docType{package}
 \name{gDR-package}
-\alias{gDR}
 \alias{gDR-package}
 \title{gDR: Umbrella package for R packages in the gDR suite}
 \value{
@@ -11,12 +10,29 @@ package help page
 package help page
 }
 \description{
-Package is a part of the gDR suite. It provides info about processing functions and utilities from individual gDR packages. The vignette walks through the full processing pipeline for drug response analyses that the gDR suite offers.
+Package is a part of the gDR suite. It reexports functions from other packages in the gDR suite that contain critical processing functions and utilities. The vignette walks through the full processing pipeline for drug response analyses that the gDR suite offers.
 
-Package is a part of the gDR suite. It provides info about processing functions and utilities from individual gDR packages. The vignette walks through the full processing pipeline for drug response analyses that the gDR suite offers.
+Package is a part of the gDR suite. It reexports functions from other packages in the gDR suite that contain critical processing functions and utilities. The vignette walks through the full processing pipeline for drug response analyses that the gDR suite offers.
 }
 \note{
 To learn more about functions start with \code{help(package = "gDR")}
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/gdrplatform/gDR}
+  \item \url{https://gdrplatform.github.io/gDR/}
+  \item Report bugs at \url{https://github.com/gdrplatform/gDR/issues}
+}
+
+
+Useful links:
+\itemize{
+  \item \url{https://github.com/gdrplatform/gDR}
+  \item \url{https://gdrplatform.github.io/gDR/}
+  \item Report bugs at \url{https://github.com/gdrplatform/gDR/issues}
+}
+
 }
 \author{
 \strong{Maintainer}: Arkadiusz Gladki \email{gladki.arkadiusz@gmail.com}
@@ -27,6 +43,7 @@ Authors:
   \item Bartosz Czech
   \item Marc Hafner
   \item Dariusz Scigocki
+  \item Janina Smola
   \item Sergiu Mocanu
 }
 
