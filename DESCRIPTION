@@ -19,15 +19,15 @@ Description: Package is a part of the gDR suite. It reexports functions from oth
 License: Artistic-2.0
 Depends:
     R (>= 4.2),
-    gDRcore (>= 0.99.12),
-    gDRimport (>= 0.99.10),
-    gDRutils (>= 0.99.13)
+    gDRcore (>= 1.1.11),
+    gDRimport (>= 1.1.4),
+    gDRutils (>= 1.1.5)
 Suggests:
     BiocStyle,
     BumpyMatrix,
     futile.logger,
-    gDRstyle (>= 0.99.11),
-    gDRtestData (>= 0.99.11),
+    gDRstyle (>= 1.1.3),
+    gDRtestData (>= 1.1.7),
     kableExtra,
     knitr,
     markdown,
