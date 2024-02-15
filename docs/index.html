@@ -73,65 +73,10 @@
 <div class="page-header"><h1 id="gdr">gDR<a class="anchor" aria-label="anchor" href="#gdr"></a>
 </h1></div>
 <p>Umbrella package for the gDR programmatic R interface</p>
-<p>The gDR suite offers a full stack solution for storing, processing, and visualizing drug response data. This enables a range of users across computational savvy, (i.e. lab scientists and computational scientists alike) to access the same, standardized data. The suite is made up of several core R packages, a database, and a shiny visualization app.</p>
-<pre><code>
-                                                     +-----+
-                                                     | gDR |
-                                                     +-----+
-                                                        |
-          +---------------------------------------------------------------------------------------------------+
-          |                                                                                                   |
-          |                                                                                                   |
-   
-                                                                               ---------------------
-            +-------------+                                        | go.gene.com/gDRin |
-            | BumpyMatrix |                                ---------------------
-            +-------------+   \           +----------+                +-----------+
-        +----------------------+    --------  | gDRcore  | &lt;------------- | gDRimport | 
-        | MultiAssayExperiment |   /          +----------+   load raw     +-----------+
-        +----------------------+  |                :        files for analysis
-                +----------------------+  |                :
-                | SummarizedExperiment | /                 :
-                +----------------------+                   :
-                                                           :
-                      perform              :     runDrugResponseProcessingPipeline()
-                      normalization,       :   
-                      averaging,       :   
-                      curve fitting    : 
-                                                           :
-
-                                                     MultiAssayExperiment object
-                                               containing SummarizedExperiment objects
-                                                      of BumpyMatrix assays
-                                                           :
-                                                           :
-                                                           :
-                                                           :
-                                                     (----------)
-                                                     |    DB    |
-                                                     (----------)
-
-                                                           :
-                                                           :
-
-                                                 +-----------------+
-                                                 |  gDRcomponents  |
-                                                 +-----------------+
-                                                     ------------
-                                                     |  gDRviz  | (coming soon)
-                                                     ------------
-
-Key:
-
-+------------+
-| R packages |
-+---------- -+
-(----------)
-|    DB    |
-(----------)
---------
-| GUIs |
---------</code></pre>
+<p>The gDR suite offers a full stack solution for processing drug response data. This enables a range of users across computational savvy, (i.e. lab scientists and computational scientists alike) to access the same, standardized data. The suite is made up of several core R packages.</p>
+<div class="float">
+<img src="https://raw.githubusercontent.com/gdrplatform/gDR/test_ci_pkgdown/inst/images/overview.png" alt="Figure 1. The overview of R packages that are available via gDR umbrella package."><div class="figcaption">Figure 1. The overview of R packages that are available via gDR umbrella package.</div>
+</div>
 </div>
 <div class="section level1">
 <h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
