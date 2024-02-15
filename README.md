@@ -1,9 +1,9 @@
-# gDR
-Umbrella package for the gDR programmatic R interface
+# gDR overview
+gDR is an umbrella package for the gDR programmatic R interface.
 
 The gDR suite offers a full stack solution for processing drug response data. This enables a range of users across computational savvy, (i.e. lab scientists and computational scientists alike) to access the same, standardized data. The suite is made up of several core R packages.
 
-![Figure 1. The overview of R packages that are available via gDR umbrella package.](https://raw.githubusercontent.com/gdrplatform/gDR/test_ci_pkgdown/inst/images/overview.png)
+![Figure 1. The overview of R packages that are available via gDR umbrella package.](https://raw.githubusercontent.com/gdrplatform/gDR/test_ci_pkgdown/inst/images/overview.png)  
 
 
 # Installation
