@@ -1,6 +1,9 @@
+^\.github$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-.github
 Dockerfile 
 _config.yml 
 doc 

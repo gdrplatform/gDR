@@ -1,3 +1,6 @@
+## 1.1.4 (2024-02-12)
+- make documentation compatible with pkdgdown
+
 ## 1.1.3 (2024-01-22)
 - add new description fields
 

@@ -1,0 +1,34 @@
+@startuml
+set namespaceSeparator none
+skinparam linetype polyline
+skinparam backgroundcolor transparent
+
+Entity "MultiAssayExperiment" as MAE {
+  single-agent SE
+  matrix SE
+}
+
+Entity "gDRcore" {}
+
+Entity "gDRimport CLI" as CLI {}
+Entity "gDRutils"
+
+gDRutils --> gDRcore
+gDRutils --> CLI
+
+gDRcore --> MAE: " gDRcore::runDrugResponseProcessingPipeline"
+CLI --> gDRcore
+
+note top of gDRutils
+utility functions for munging and analyzing drug reponse data
+end note
+
+note top on link
+import/upload raw files
+end note
+
+note top of MAE
+object containing SummarizedExperiment objects
+of BumpyMatrix assays 
+end note
+@enduml
