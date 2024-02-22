@@ -14,7 +14,7 @@ pkgs:
   gDRutils:
     ver: '>=1.1.5'
     url: gdrplatform/gDRutils
-    ref: master
+    ref: main
     subdir: ~
     source: GITHUB
   gDRimport:
@@ -26,6 +26,6 @@ pkgs:
   gDRcore:
     ver: '>=1.1.11'
     url: gdrplatform/gDRcore
-    ref: master
+    ref: main
     subdir: ~
     source: GITHUB
