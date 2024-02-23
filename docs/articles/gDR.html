@@ -189,18 +189,18 @@ or a scanner.</p>
 <span><span class="co">#&gt; Loading required package: gDRutils</span></span>
 <span><span class="co"># get test data from gDRimport package</span></span>
 <span><span class="co"># i.e. paths to manifest, templates and results files</span></span>
-<span><span class="va">td</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/gDRimport/man/get_test_data.html" class="external-link">get_test_data</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/gDRimport/man/manifest_path-method.html" class="external-link">manifest_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">td</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/get_test_data.html">get_test_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/manifest_path-method.html">manifest_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span></span></code></pre></div>
 <p>[1]
 “/usr/local/lib/R/site-library/gDRimport/extdata/data1/manifest.xlsx”</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/gDRimport/man/template_path-method.html" class="external-link">template_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/template_path-method.html">template_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span></span></code></pre></div>
 <p>[1]
 “/usr/local/lib/R/site-library/gDRimport/extdata/data1/Template_7daytreated.xlsx”
 [2]
 “/usr/local/lib/R/site-library/gDRimport/extdata/data1/Template_Untreated.xlsx”</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/gDRimport/man/result_path-method.html" class="external-link">result_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/result_path-method.html">result_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span></span></code></pre></div>
 <p>[1]
 “/usr/local/lib/R/site-library/gDRimport/extdata/data1/RawData_day0.xlsx”
 [2]
@@ -210,7 +210,7 @@ table is easily created:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Import data</span></span>
 <span><span class="va">imported_data</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="../reference/import_data.html">import_data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/gDRimport/man/manifest_path-method.html" class="external-link">manifest_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/gDRimport/man/template_path-method.html" class="external-link">template_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/gDRimport/man/result_path-method.html" class="external-link">result_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/import_data.html">import_data</a></span><span class="op">(</span><span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/manifest_path-method.html">manifest_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span>, <span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/template_path-method.html">template_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span>, <span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/result_path-method.html">result_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">imported_data</span><span class="op">)</span></span></code></pre></div>
 <p>This function will expect certain “identifiers” that tell the
 processing functions which columns in the long table map to certain
@@ -245,8 +245,8 @@ specifying the <code>nested_keys</code> argument within
 <span>  <span class="va">inl</span><span class="op">$</span><span class="va">df_list</span><span class="op">[[</span><span class="st">"single-agent"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>  data_type <span class="op">=</span> <span class="st">"single-agent"</span>,</span>
 <span>  nested_confounders <span class="op">=</span> <span class="va">inl</span><span class="op">$</span><span class="va">nested_confounders</span><span class="op">)</span></span>
-<span><span class="co">#&gt; INFO [2024-02-15 13:13:11] </span></span>
-<span><span class="co">#&gt; INFO [2024-02-15 13:13:11]</span></span>
+<span><span class="co">#&gt; INFO [2024-02-23 12:09:47] </span></span>
+<span><span class="co">#&gt; INFO [2024-02-23 12:09:47]</span></span>
 <span><span class="va">se</span></span>
 <span><span class="co">#&gt; class: SummarizedExperiment </span></span>
 <span><span class="co">#&gt; dim: 3 6 </span></span>
@@ -419,8 +419,8 @@ heatmaps, etc.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] kableExtra_1.3.4 gDR_1.1.4        gDRutils_1.1.5   gDRimport_1.1.4 </span></span>
-<span><span class="co">#&gt; [5] gDRcore_1.1.11   BiocStyle_2.30.0</span></span>
+<span><span class="co">#&gt; [1] kableExtra_1.4.0 gDR_1.1.4        gDRutils_1.1.5   gDRimport_1.1.5 </span></span>
+<span><span class="co">#&gt; [5] gDRcore_1.1.12   BiocStyle_2.30.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;   [1] viridisLite_0.4.2           bitops_1.0-7               </span></span>
@@ -445,36 +445,34 @@ heatmaps, etc.</p>
 <span><span class="co">#&gt;  [39] SummarizedExperiment_1.32.0 cli_3.6.2                  </span></span>
 <span><span class="co">#&gt;  [41] mvtnorm_1.2-4               rmarkdown_2.25             </span></span>
 <span><span class="co">#&gt;  [43] crayon_1.5.2                ragg_1.2.7                 </span></span>
-<span><span class="co">#&gt;  [45] rstudioapi_0.15.0           httr_1.4.7                 </span></span>
-<span><span class="co">#&gt;  [47] readxl_1.4.3                cachem_1.0.8               </span></span>
-<span><span class="co">#&gt;  [49] stringr_1.5.1               zlibbioc_1.48.0            </span></span>
-<span><span class="co">#&gt;  [51] splines_4.3.0               rvest_1.0.3                </span></span>
-<span><span class="co">#&gt;  [53] assertthat_0.2.1            parallel_4.3.0             </span></span>
-<span><span class="co">#&gt;  [55] BiocManager_1.30.22         formatR_1.14               </span></span>
-<span><span class="co">#&gt;  [57] cellranger_1.1.0            XVector_0.42.0             </span></span>
-<span><span class="co">#&gt;  [59] matrixStats_1.2.0           vctrs_0.6.5                </span></span>
-<span><span class="co">#&gt;  [61] webshot_0.5.5               Matrix_1.6-5               </span></span>
-<span><span class="co">#&gt;  [63] sandwich_3.1-0              jsonlite_1.8.8             </span></span>
-<span><span class="co">#&gt;  [65] carData_3.0-5               bookdown_0.37              </span></span>
-<span><span class="co">#&gt;  [67] car_3.1-2                   IRanges_2.36.0             </span></span>
-<span><span class="co">#&gt;  [69] S4Vectors_0.40.2            systemfonts_1.0.5          </span></span>
-<span><span class="co">#&gt;  [71] testthat_3.2.1              jquerylib_0.1.4            </span></span>
-<span><span class="co">#&gt;  [73] rematch_2.0.0               glue_1.7.0                 </span></span>
-<span><span class="co">#&gt;  [75] pkgdown_2.0.7               codetools_0.2-19           </span></span>
-<span><span class="co">#&gt;  [77] stringi_1.8.3               futile.logger_1.4.3        </span></span>
-<span><span class="co">#&gt;  [79] GenomeInfoDb_1.38.6         GenomicRanges_1.54.1       </span></span>
-<span><span class="co">#&gt;  [81] munsell_0.5.0               tibble_3.2.1               </span></span>
-<span><span class="co">#&gt;  [83] pillar_1.9.0                htmltools_0.5.7            </span></span>
-<span><span class="co">#&gt;  [85] brio_1.1.4                  GenomeInfoDbData_1.2.11    </span></span>
-<span><span class="co">#&gt;  [87] R6_2.5.1                    textshaping_0.3.7          </span></span>
-<span><span class="co">#&gt;  [89] evaluate_0.23               lattice_0.21-8             </span></span>
-<span><span class="co">#&gt;  [91] Biobase_2.62.0              futile.options_1.0.1       </span></span>
-<span><span class="co">#&gt;  [93] backports_1.4.1             memoise_2.0.1              </span></span>
-<span><span class="co">#&gt;  [95] bslib_0.6.1                 svglite_2.1.3              </span></span>
-<span><span class="co">#&gt;  [97] SparseArray_1.2.4           checkmate_2.3.1            </span></span>
-<span><span class="co">#&gt;  [99] xfun_0.42                   fs_1.6.3                   </span></span>
-<span><span class="co">#&gt; [101] MatrixGenerics_1.14.0       zoo_1.8-12                 </span></span>
-<span><span class="co">#&gt; [103] pkgconfig_2.0.3</span></span></code></pre></div>
+<span><span class="co">#&gt;  [45] rstudioapi_0.15.0           readxl_1.4.3               </span></span>
+<span><span class="co">#&gt;  [47] cachem_1.0.8                stringr_1.5.1              </span></span>
+<span><span class="co">#&gt;  [49] zlibbioc_1.48.0             splines_4.3.0              </span></span>
+<span><span class="co">#&gt;  [51] assertthat_0.2.1            parallel_4.3.0             </span></span>
+<span><span class="co">#&gt;  [53] BiocManager_1.30.22         formatR_1.14               </span></span>
+<span><span class="co">#&gt;  [55] cellranger_1.1.0            XVector_0.42.0             </span></span>
+<span><span class="co">#&gt;  [57] matrixStats_1.2.0           vctrs_0.6.5                </span></span>
+<span><span class="co">#&gt;  [59] Matrix_1.6-5                sandwich_3.1-0             </span></span>
+<span><span class="co">#&gt;  [61] jsonlite_1.8.8              carData_3.0-5              </span></span>
+<span><span class="co">#&gt;  [63] bookdown_0.37               car_3.1-2                  </span></span>
+<span><span class="co">#&gt;  [65] IRanges_2.36.0              S4Vectors_0.40.2           </span></span>
+<span><span class="co">#&gt;  [67] systemfonts_1.0.5           testthat_3.2.1             </span></span>
+<span><span class="co">#&gt;  [69] jquerylib_0.1.4             rematch_2.0.0              </span></span>
+<span><span class="co">#&gt;  [71] glue_1.7.0                  pkgdown_2.0.7              </span></span>
+<span><span class="co">#&gt;  [73] codetools_0.2-19            stringi_1.8.3              </span></span>
+<span><span class="co">#&gt;  [75] futile.logger_1.4.3         GenomeInfoDb_1.38.6        </span></span>
+<span><span class="co">#&gt;  [77] GenomicRanges_1.54.1        munsell_0.5.0              </span></span>
+<span><span class="co">#&gt;  [79] tibble_3.2.1                pillar_1.9.0               </span></span>
+<span><span class="co">#&gt;  [81] htmltools_0.5.7             brio_1.1.4                 </span></span>
+<span><span class="co">#&gt;  [83] GenomeInfoDbData_1.2.11     R6_2.5.1                   </span></span>
+<span><span class="co">#&gt;  [85] textshaping_0.3.7           evaluate_0.23              </span></span>
+<span><span class="co">#&gt;  [87] lattice_0.21-8              Biobase_2.62.0             </span></span>
+<span><span class="co">#&gt;  [89] futile.options_1.0.1        backports_1.4.1            </span></span>
+<span><span class="co">#&gt;  [91] memoise_2.0.1               bslib_0.6.1                </span></span>
+<span><span class="co">#&gt;  [93] svglite_2.1.3               SparseArray_1.2.4          </span></span>
+<span><span class="co">#&gt;  [95] checkmate_2.3.1             xfun_0.42                  </span></span>
+<span><span class="co">#&gt;  [97] fs_1.6.3                    MatrixGenerics_1.14.0      </span></span>
+<span><span class="co">#&gt;  [99] zoo_1.8-12                  pkgconfig_2.0.3</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
