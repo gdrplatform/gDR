@@ -21,6 +21,7 @@
 #' 
 #' @usage data(small_data)
 #' 
+#' @keywords data
 #' @return data.table
 "small_data"
 
@@ -51,5 +52,6 @@
 #' 
 #' @usage data(small_combo_data)
 #' 
+#' @keywords data
 #' @return data.table
 "small_combo_data"
