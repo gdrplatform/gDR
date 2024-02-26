@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">gDR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -189,18 +189,18 @@ or a scanner.</p>
 <span><span class="co">#&gt; Loading required package: gDRutils</span></span>
 <span><span class="co"># get test data from gDRimport package</span></span>
 <span><span class="co"># i.e. paths to manifest, templates and results files</span></span>
-<span><span class="va">td</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/get_test_data.html">get_test_data</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/manifest_path-method.html">manifest_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">td</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://gdrplatform.github.io/gDRimport/reference/get_test_data.html">get_test_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://gdrplatform.github.io/gDRimport/reference/manifest_path-method.html">manifest_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span></span></code></pre></div>
 <p>[1]
 “/usr/local/lib/R/site-library/gDRimport/extdata/data1/manifest.xlsx”</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/template_path-method.html">template_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://gdrplatform.github.io/gDRimport/reference/template_path-method.html">template_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span></span></code></pre></div>
 <p>[1]
 “/usr/local/lib/R/site-library/gDRimport/extdata/data1/Template_7daytreated.xlsx”
 [2]
 “/usr/local/lib/R/site-library/gDRimport/extdata/data1/Template_Untreated.xlsx”</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/result_path-method.html">result_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://gdrplatform.github.io/gDRimport/reference/result_path-method.html">result_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span></span></code></pre></div>
 <p>[1]
 “/usr/local/lib/R/site-library/gDRimport/extdata/data1/RawData_day0.xlsx”
 [2]
@@ -210,13 +210,13 @@ table is easily created:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Import data</span></span>
 <span><span class="va">imported_data</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="../reference/import_data.html">import_data</a></span><span class="op">(</span><span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/manifest_path-method.html">manifest_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span>, <span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/template_path-method.html">template_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span>, <span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/result_path-method.html">result_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/import_data.html">import_data</a></span><span class="op">(</span><span class="fu"><a href="https://gdrplatform.github.io/gDRimport/reference/manifest_path-method.html">manifest_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span>, <span class="fu"><a href="https://gdrplatform.github.io/gDRimport/reference/template_path-method.html">template_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span>, <span class="fu"><a href="https://gdrplatform.github.io/gDRimport/reference/result_path-method.html">result_path</a></span><span class="op">(</span><span class="va">td</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">imported_data</span><span class="op">)</span></span></code></pre></div>
 <p>This function will expect certain “identifiers” that tell the
 processing functions which columns in the long table map to certain
 expected fields, so that each column is interpreted correctly. For more
 details regarding these identifiers, see the “Details” section of
-<code><a href="https://gdrplatform.github.io/gDRutils/reference/identifiers.html">?identifiers</a></code>. Use <code>set_env_identifier</code> or
+<code><a href="https://gdrplatform.github.io/gDRstyle/reference/identifiers.html">?identifiers</a></code>. Use <code>set_env_identifier</code> or
 <code>set_SE_identifiers</code> to set up the correct mappings between
 the expected fields and your long table column names.</p>
 </div>
@@ -245,8 +245,8 @@ specifying the <code>nested_keys</code> argument within
 <span>  <span class="va">inl</span><span class="op">$</span><span class="va">df_list</span><span class="op">[[</span><span class="st">"single-agent"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>  data_type <span class="op">=</span> <span class="st">"single-agent"</span>,</span>
 <span>  nested_confounders <span class="op">=</span> <span class="va">inl</span><span class="op">$</span><span class="va">nested_confounders</span><span class="op">)</span></span>
-<span><span class="co">#&gt; INFO [2024-02-23 12:09:47] </span></span>
-<span><span class="co">#&gt; INFO [2024-02-23 12:09:47]</span></span>
+<span><span class="co">#&gt; INFO [2024-02-26 09:41:31] </span></span>
+<span><span class="co">#&gt; INFO [2024-02-26 09:41:31]</span></span>
 <span><span class="va">se</span></span>
 <span><span class="co">#&gt; class: SummarizedExperiment </span></span>
 <span><span class="co">#&gt; dim: 3 6 </span></span>
@@ -330,7 +330,7 @@ function:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span>
 <span><span class="va">se</span> <span class="op">&lt;-</span> <span class="va">mae</span><span class="op">[[</span><span class="st">"single-agent"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://gdrplatform.github.io/gDRutils/reference/convert_se_assay_to_dt.html">convert_se_assay_to_dt</a></span><span class="op">(</span><span class="va">se</span>, <span class="st">"Metrics"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://gdrplatform.github.io/gDRstyle/reference/convert_se_assay_to_dt.html">convert_se_assay_to_dt</a></span><span class="op">(</span><span class="va">se</span>, <span class="st">"Metrics"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                          rId                                               cId</span></span>
 <span><span class="co">#&gt;                       &lt;char&gt;                                            &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1: G00002_drug_002_moa_A_168 CL00011_cellline_BA_breast_cellline_BA_unknown_26</span></span>
@@ -419,7 +419,7 @@ heatmaps, etc.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] kableExtra_1.4.0 gDR_1.1.4        gDRutils_1.1.5   gDRimport_1.1.5 </span></span>
+<span><span class="co">#&gt; [1] kableExtra_1.4.0 gDR_1.1.5        gDRutils_1.1.6   gDRimport_1.1.5 </span></span>
 <span><span class="co">#&gt; [5] gDRcore_1.1.12   BiocStyle_2.30.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
