@@ -13,6 +13,7 @@
 #' 
 #' @return a \code{data.table}
 #'
+#' @keywords import
 #' @export
 #'
 import_data <- function(manifest_file,

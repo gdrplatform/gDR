@@ -33,3 +33,4 @@ td <- get_test_data()
 i_df <- import_data(manifest_path(td), template_path(td), result_path(td))
 
 }
+\keyword{import}

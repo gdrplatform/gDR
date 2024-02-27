@@ -2,3 +2,10 @@ url: https://gdrplatform.github.io/gDR/
 template:
   bootstrap: 5
 
+reference:
+- title: Import
+- contents:
+  - has_keyword("import")
+- title: Data
+- contents:
+  - has_keyword("data")

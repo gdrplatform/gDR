@@ -35,4 +35,4 @@ data.table
 A dataset containing the ReadoutValues for combo experiments made-up of
 3 drugs, 2 co-drugs, and 2 cell lines
 }
-\keyword{datasets}
+\keyword{data}
