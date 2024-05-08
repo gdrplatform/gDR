@@ -20,7 +20,7 @@ gDRcore --> MAE: " gDRcore::runDrugResponseProcessingPipeline"
 CLI --> gDRcore
 
 note top of gDRutils
-utility functions for munging and analyzing drug reponse data
+utility functions for munging and analyzing drug response data
 end note
 
 note top on link
