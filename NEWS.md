@@ -1,3 +1,6 @@
+## gDR 1.1.6 - 2024-05-08
+* fix typo
+
 ## gDR 1.1.5 - 2024-02-26
 * improve pkgdown site
   * improved references
