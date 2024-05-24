@@ -6,8 +6,8 @@
 \title{Small data.table with raw combo data used for processing via gDR}
 \format{
 A data frame with 3600 rows and 16 variables:
-\itemize{
-\item{Barcode}
+\describe{
+\item{Barcode}{barcode}
 \item{clid}{cell line id}
 \item{CellLineName}{cell line name}
 \item{Tissue}{cell line tissue}
