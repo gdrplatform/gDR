@@ -4,8 +4,8 @@
 #' made-up of 10 drugs and 10 cell lines
 #'
 #' @format A data frame with 3300 rows and 12 variables:
-#' \itemize{
-#'   \item{Barcode}
+#' \describe{
+#'   \item{Barcode}{barcode}
 #'   \item{clid}{cell line id}
 #'   \item{CellLineName}{cell line name}
 #'   \item{Tissue}{cell line tissue}
@@ -31,8 +31,8 @@
 #' 3 drugs, 2 co-drugs, and 2 cell lines
 #'
 #' @format A data frame with 3600 rows and 16 variables:
-#' \itemize{
-#'   \item{Barcode}
+#' \describe{
+#'   \item{Barcode}{barcode}
 #'   \item{clid}{cell line id}
 #'   \item{CellLineName}{cell line name}
 #'   \item{Tissue}{cell line tissue}
