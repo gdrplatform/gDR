@@ -2,7 +2,7 @@
 
 export(import_data)
 export(is_null_or_empty)
-export(run_gDR_with_report)
+export(run_gDRpipeline_with_report)
 importFrom(gDRcore,merge_data)
 importFrom(gDRimport,load_data)
 importFrom(gDRutils,fit_curves)

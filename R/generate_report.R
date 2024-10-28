@@ -23,23 +23,23 @@
 #' @examples
 #' 
 #' \dontrun{
-#' run_gDR_with_report("AS-42656", "~/test_report")
-#' run_gDR_with_report(mae = "path/to/mae.qs", output_dir = "~/test_report")
+#' run_gDRpipeline_with_report("AS-42656", "~/test_report")
+#' run_gDRpipeline_with_report(mae = "path/to/mae.qs", output_dir = "~/test_report")
 #' }
-run_gDR_with_report <- function(qcs_id = NULL,
-                                manifest = NULL,
-                                treatment = NULL,
-                                raw_data = NULL,
-                                prism_data_path = NULL,
-                                cell_line_data_path = NULL,
-                                treatment_data_path = NULL,
-                                output_dir = getwd(),
-                                viz_format = "svg",
-                                push_to_DSDB = FALSE,
-                                rmd_template_path = system.file("report_templates", package = "gDR"),
-                                steps = seq_len(3),
-                                mae = NULL,
-                                special_sections = NULL) {
+run_gDRpipeline_with_report <- function(qcs_id = NULL,
+                                        manifest = NULL,
+                                        treatment = NULL,
+                                        raw_data = NULL,
+                                        prism_data_path = NULL,
+                                        cell_line_data_path = NULL,
+                                        treatment_data_path = NULL,
+                                        output_dir = getwd(),
+                                        viz_format = "svg",
+                                        push_to_DSDB = FALSE,
+                                        rmd_template_path = system.file("report_templates", package = "gDR"),
+                                        steps = seq_len(3),
+                                        mae = NULL,
+                                        special_sections = NULL) {
   
   dir.create(output_dir, showWarnings = FALSE)
   
