@@ -31,6 +31,7 @@ Suggests:
     futile.logger,
     gDRstyle (>= 1.1.5),
     gDRtestData (>= 1.1.10),
+    gDRplots (>= 0.0.40),
     kableExtra,
     knitr,
     markdown,
@@ -38,6 +39,9 @@ Suggests:
     rmarkdown,
     SummarizedExperiment,
     testthat,
+    checkmate,
+    qs,
+    whisker,
     yaml
 URL: https://github.com/gdrplatform/gDR, https://gdrplatform.github.io/gDR/
 BugReports: https://github.com/gdrplatform/gDR/issues
@@ -46,7 +50,7 @@ VignetteBuilder: knitr
 ByteCompile: TRUE
 LazyLoad: yes
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 SwitchrLibrary: gDR
 DeploySubPath: gDR
 Encoding: UTF-8
