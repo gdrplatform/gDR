@@ -1,3 +1,6 @@
+## gDR 1.3.2 - 2024-10-28
+* move gDRreports into gDR package
+
 ## gDR 1.3.1 - 2024-05-27
 * synchronize Bioconductor and GitHub versioning
 
