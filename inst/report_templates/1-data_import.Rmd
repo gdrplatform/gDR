@@ -1,0 +1,274 @@
+---
+title: 1. Import drug screen data
+author: 
+- name: gDR team
+  email: gdr-support-d@gene.come
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    toc_float: yes
+    titlecaps: false 
+    code_folding: hide
+  md_document:
+    preserve_yaml: yes
+compilation:
+  ncpu: 1
+  memory: 20000
+  time: 120
+  module: R/devel
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE,
+                      dev = "png", dev.args = list(type = "cairo-png"))
+```
+
+```{css, echo=FALSE}
+body {
+  max-width: 100%;
+}
+div.main-container {
+  max-width: 1500px;
+}
+```
+
+```{r get_wd}
+# get working directory path
+wd <- "{{output_dir}}"
+```
+
+{{#GCSI}}
+# Import data from GeneDataScreeneR
+
+In this step, we will utilize the GeneDataScreenR package to extract raw and condensed drug response data stored in the GeneData Screener database. This package acts as a wrapper around the GeneData Screener services, including the Java API and REST.
+
+The extraction of data from GeneData Screener is crucial for conducting analysis and gaining insights into drug response patterns. By accessing this data, researchers can explore various aspects of experiments conducted within the GeneData Screener platform, facilitating further research in functional genomics and drug discovery.
+
+Utilize the functions provided by the GeneDataScreenR package to retrieve data from GeneData Screener. These functions are designed to handle the complexities of accessing data stored in GeneData Screener's database.
+
+```{r import_GDS_data}
+library(GeneDataScreenR)
+library(qs)
+qcs_id <- "{{qcs_id}}"
+qcs <- QCSession(qcs_id, layer.name = qcsLayers(qcs_id))
+qsave(qcs, file.path(wd, "raw_data", "QCSession.qs"))
+qcs
+```
+
+
+# Import Raw Data into gDR and Do Manual Cleanup
+
+This step involves transforming the data extracted from GeneData Screener (GDS) into a format that is compatible with the gDR (Genentech Drug Response) pipeline. The transformation process ensures that the data aligns with the required fields for input into the gDR pipeline and incorporates annotations essential for comprehensive analysis.
+
+Converting GDS data into a gDR-friendly format is essential to seamlessly integrate it with the gDR pipeline, enabling efficient analysis of drug response data. By adding annotations such as cell line information, drug details, and subtype classifications, researchers can enhance the interpretability and utility of the data for downstream analysis.
+
+## Minimum Required Fields
+
+For single-agent data, the following fields are essential for the gDR pipeline input:
+
+- **Gnumber**: Unique identifier for the experiment.
+- **CLID**: Cell line identifier.
+- **ReadoutValue**: Measurement value obtained.
+- **Duration**: Duration of the experiment.
+
+## Additional Annotations
+
+In addition to the minimum required fields, the data undergoes a transformation process where annotations are added. These annotations enhance the contextual understanding of the data and include:
+
+- **For Cell Lines**: Information such as cell line name, primary tissue, doubling time, parental identifier, and subtype.
+- **For Drugs**: Details about the drug, including its name and mechanism of action.
+
+## Annotation Guidelines
+
+The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
+
+```{r load_data}
+library(gDRinternal)
+library(gDRcore)
+data_imported <- prepare_input_data_for_gDR(qcs)
+```
+{{/GCSI}}
+{{#gDRimport}}
+# Import Raw Data into gDR and Do Manual Cleanup
+
+The process involves merging information from three sources: the manifest (which contains details about experiments), the template (which provides information about wells), and the raw data (extracted directly from the machine). The resultant data serves as the raw input for the gDR pipeline.
+
+## Minimum Required Fields
+
+For single-agent data, the following fields are essential for the gDR pipeline input:
+
+- **Gnumber**: Unique identifier for the experiment.
+- **CLID**: Cell line identifier.
+- **ReadoutValue**: Measurement value obtained.
+- **Duration**: Duration of the experiment.
+
+## Additional Annotations
+
+In addition to the minimum required fields, the data undergoes a transformation process where annotations are added. These annotations enhance the contextual understanding of the data and include:
+
+- **For Cell Lines**: Information such as cell line name, primary tissue, doubling time, parental identifier, and subtype.
+- **For Drugs**: Details about the drug, including its name and mechanism of action.
+
+## Annotation Guidelines
+
+The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
+
+```{r load_data}
+library(gDR)
+library(gDRcore)
+library(gDRimport)
+library(qs)
+#import data
+manifest <- "{{manifest}}"
+treatment <- unlist(strsplit("{{treatment}}", ","))
+raw_data <- unlist(strsplit("{{raw_data}}", ","))
+
+
+# copy files to raw_data
+for (file_path in c(manifest, treatment, raw_data)) {
+  file_name <- basename(file_path)  # Extract the filename from the path
+  file.copy(file_path, file.path(wd, "raw_data", file_name))
+}
+
+data_imported <- import_data(manifest,
+                             treatment,
+                             raw_data,
+                             instrument = detect_file_format(raw_data[1]))
+```
+{{/gDRimport}}
+
+
+
+{{#PRISM_level5}}
+# Import PRISM data
+
+This step involves transforming the data extracted from PRISM into a format that is compatible with the gDR (Genentech Drug Response) pipeline. The transformation process ensures that the data aligns with the required fields for input into the gDR pipeline and incorporates annotations essential for comprehensive analysis.
+
+Converting GDS data into a gDR-friendly format is essential to seamlessly integrate it with the gDR pipeline, enabling efficient analysis of drug response data. By adding annotations such as cell line information, drug details, and subtype classifications, researchers can enhance the interpretability and utility of the data for downstream analysis.
+
+## Minimum Required Fields
+
+For single-agent data, the following fields are essential for the gDR pipeline input:
+
+- **Gnumber**: Unique identifier for the experiment.
+- **CLID**: Cell line identifier.
+- **ReadoutValue**: Measurement value obtained.
+- **Duration**: Duration of the experiment.
+
+## Additional Annotations
+
+In addition to the minimum required fields, the data undergoes a transformation process where annotations are added. These annotations enhance the contextual understanding of the data and include:
+
+- **For Cell Lines**: Information such as cell line name, primary tissue, doubling time, parental identifier, and subtype.
+- **For Drugs**: Details about the drug, including its name and mechanism of action.
+
+## Annotation Guidelines
+
+The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
+
+
+```{r load_data}
+library(gDR)
+library(gDRcore)
+library(gDRimport)
+library(qs)
+#import data
+data_imported <- convert_LEVEL5_prism_to_gDR_input(prism_data_path = "{{prism_data_path}}")
+data_imported <- cleanup_metadata(data_imported)
+```
+{{/PRISM_level5}}
+
+
+{{#PRISM_level6}}
+# Import PRISM data
+
+This step involves transforming the data extracted from PRISM into a format that is compatible with the gDR (Genentech Drug Response) pipeline. The transformation process ensures that the data aligns with the required fields for input into the gDR pipeline and incorporates annotations essential for comprehensive analysis.
+
+Converting GDS data into a gDR-friendly format is essential to seamlessly integrate it with the gDR pipeline, enabling efficient analysis of drug response data. By adding annotations such as cell line information, drug details, and subtype classifications, researchers can enhance the interpretability and utility of the data for downstream analysis.
+
+## Minimum Required Fields
+
+For single-agent data, the following fields are essential for the gDR pipeline input:
+
+- **Gnumber**: Unique identifier for the experiment.
+- **CLID**: Cell line identifier.
+- **ReadoutValue**: Measurement value obtained.
+- **Duration**: Duration of the experiment.
+
+## Additional Annotations
+
+In addition to the minimum required fields, the data undergoes a transformation process where annotations are added. These annotations enhance the contextual understanding of the data and include:
+
+- **For Cell Lines**: Information such as cell line name, primary tissue, doubling time, parental identifier, and subtype.
+- **For Drugs**: Details about the drug, including its name and mechanism of action.
+
+## Annotation Guidelines
+
+The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
+
+
+```{r load_data}
+library(gDR)
+library(gDRcore)
+library(gDRimport)
+library(qs)
+#import data
+data_imported <- convert_LEVEL6_prism_to_gDR_input(prism_data_path = "{{prism_data_path}}",
+                                                   cell_line_data_path = "{{cell_line_data_path}}",
+                                                   treatment_data_path = "{{treatment_data_path}}")
+data_imported <- cleanup_metadata(data_imported)
+```
+{{/PRISM_level6}}
+
+
+
+
+Before executing the pipeline, there exists a provision for manual alterations within the raw data. This allows for the manual modification of certain annotations and the correction of data as needed.
+
+```{r cleanup_data}
+library(gDRutils)
+library(qs)
+library(data.table)
+
+# preview the annotation used in the preprocessing
+drug_annotation <- get_drug_annotation_from_dt(data_imported)
+drug_annotation
+
+cell_line_annotation <- get_cellline_annotation_from_dt(data_imported)
+cell_line_annotation
+
+# Reannotate data
+# data_imported <- add_Drug_annotation(data_imported,
+#                                      external_source = drug_annotation)
+# data_imported <- add_CellLine_annotation(data_imported,
+#                                          external_source = cell_line_annotation)
+
+qsave(data_imported, file.path(wd, "gDR_data", "gDR_input.qs"))
+```
+
+# Summary of imported data
+
+```{r, summary}
+library(summarytools)
+print(dfSummary(data_imported,
+                varnumbers = FALSE,
+                valid.col = FALSE,
+                graph.magnif = 0.8,
+                max.distinct.values	= 50,
+                max.string.width = 50,
+                display.labels = FALSE),
+      method = "render")
+```
+
+
+This completes the process of preparing input data for gDR pipeline.
+
+# gDR session info
+
+```{r, plot_packages}
+pkg_list <- as.data.frame(installed.packages(), stringsAsFactors = FALSE)
+gDR_packages <- pkg_list[grepl("gDR", pkg_list$Package),]
+print(paste(gDR_packages$Package, gDR_packages$Version, sep = ": "))
+```

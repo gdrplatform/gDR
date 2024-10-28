@@ -1,0 +1,573 @@
+---
+title: 2. Data processing using gDR pipeline.
+author: 
+- name: gDR team
+  email: gdr-support-d@gene.come
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    toc_float: yes
+    titlecaps: false
+    code_folding: hide
+    fig_height: 6
+    fig_width: 8
+  md_document:
+    preserve_yaml: yes
+compilation:
+  ncpu: 1
+  memory: 20000
+  time: 120
+  module: R/devel
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE,
+                      dev = "png", dev.args = list(type = "cairo-png"))
+```
+
+```{css, echo=FALSE}
+body {
+  max-width: 100%;
+}
+div.main-container {
+  max-width: 1500px;
+}
+.fullwidth p {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.fullwidth p > img {
+  max-width: 100%;
+  display: block;
+  padding: 0px 0px 0px 0px;
+}
+```
+
+# Read the input data
+
+```{r drug_dose_layout}
+library(qs)
+wd <- "{{output_dir}}"
+data_imported <- qread(file.path(wd, "gDR_data", "gDR_input.qs"))
+```
+
+# Split Data Based on Type (e.g. single-agent or combination)
+
+This step facilitates the identification of experiment types within the dataset, including single-agent, combination, or co-dilution experiments. It partitions the data into distinct categories, creating a list where each element represents a different experiment type.
+
+```{r, split_types}
+library(gDRcore)
+library(gDRutils)
+library(MultiAssayExperiment)
+dt_ <- identify_data_type(data_imported)
+dt_list <- split_raw_data(dt_)
+
+# names of identified data types
+names(dt_list)
+```
+
+# Split data based on the available experiment types
+
+This step involves extracting identified data into separate variables, enabling computations to be conducted independently for each data type.
+
+```{r, extract_data_sa}
+sa_name <- get_supported_experiments("sa")
+dt_sa <- dt_list[[sa_name]]
+```
+
+{{#has_combo}}
+```{r, extract_data_combo}
+combo_name <- get_supported_experiments("combo")
+dt_combo <- dt_list[[combo_name]]
+```
+{{/has_combo}}
+
+# Create SummarizedExperiment Object.
+Additionaly this step matches treatments with controls.
+
+**Created assays:** RawTreated, Controls
+
+More information about this and the following steps related to the gDR pipeline can be found in the [Data processing](https://docs.google.com/document/d/10SwVs3gSMJce0TqTZTjJJAQ_YYUQ-4yGweEDgfpwnJk/edit#heading=h.f9g2z53z3gl) subsection of our documentation.
+
+```{r, create_SE_sa}
+se_sa <- create_SE(dt_sa, data_type = sa_name)
+rowData(se_sa)
+colData(se_sa)
+```
+
+{{#has_combo}}
+```{r, create_SE_combo}
+se_combo <- create_SE(dt_combo, data_type = combo_name)
+rowData(se_combo)
+colData(se_combo)
+```
+{{/has_combo}}
+
+## Quality controls of mapping controls to treated - Single-Agent Data
+
+```{r, create_SE_sa_qc, warning=FALSE, fig.show="hide"}
+library(gDRplots)
+treat <- convert_se_assay_to_dt(se_sa, "RawTreated")
+controls <- convert_se_assay_to_dt(se_sa, "Controls")
+
+# Calculate the frequency & create a heatmap
+p <- heatmap_control_mapping_qc(dt_treat = treat, dt_controls = controls)
+```
+
+::: {.fullwidth}
+```{r sa_controls, echo=FALSE}
+print(p)
+```
+:::
+
+```{r sa_controls_save, echo=FALSE}
+library(ggplot2)
+save_plot(plt = p, path = file.path(wd, "plots", "sa_map_controls_to_treated"), format = "{{viz_format}}")
+```
+
+{{#has_combo}}
+## Quality controls of mapping controls to treated - Combo Data
+```{r, create_SE_combo_qc, warning=FALSE, fig.show="hide"}
+library(gDRplots)
+treat <- convert_se_assay_to_dt(se_combo, "RawTreated")
+controls <- convert_se_assay_to_dt(se_combo, "Controls")
+
+# Calculate the frequency & create a heatmap
+p <- heatmap_control_mapping_qc(dt_treat = treat, dt_controls = controls)
+```
+
+::: {.fullwidth}
+```{r combo_controls, echo=FALSE}
+print(p)
+```
+:::
+
+```{r combo_controls_save, echo=FALSE}
+save_plot(plt = p, path = file.path(wd, "plots", "combo_map_controls_to_treated"), format = "{{viz_format}}")
+```
+{{/has_combo}}
+
+# Normalize the Data
+**Created assay:** Normalized
+
+```{r normalize_data_sa, warning=FALSE}
+se_sa <- normalize_SE(se_sa, data_type = sa_name)
+```
+{{#has_combo}}
+```{r normalize_data_combo, warning=FALSE}
+se_combo <- normalize_SE(se_combo, data_type = combo_name)
+```
+{{/has_combo}}
+
+## Quality Control of degree of errors in normalization - Single-Agent Data  {.tabset .tabset-fade .tabset-pills}
+
+```{r sa_norm_data_viz, warning=FALSE, fig.show="hide"}
+library(purrr)
+norm_data_sa <- convert_se_assay_to_dt(se = se_sa, assay_name = "Normalized")
+ls_cl <- sort(unique(norm_data_sa[["CellLineName"]]))
+ls_cl_names <- vapply(ls_cl, function(i) escape_special_characters(i), 
+                      FUN.VALUE = character(1))
+
+ls_plt_RV <- pmap(list(cl_name = ls_cl), plot_var_distribution_qc, 
+                  dt_assay = norm_data_sa, normalization_type = "RV")
+names(ls_plt_RV) <- ls_cl_names
+
+if (plot_GR_values) {
+  ls_plt_GR <- pmap(list(cl_name = ls_cl), plot_var_distribution_qc, 
+                    dt_assay = norm_data_sa, normalization_type = "GR")
+  names(ls_plt_GR) <- ls_cl_names
+}
+```
+
+::: {.fullwidth}
+### Relative Viability {.tabset .tabset-dropdown}
+
+```{r sa_norm_data_tab_RV, warning=FALSE, echo=FALSE}
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV, chunk_name = "sa_norm_tab_RV", header_level = 4)
+walk(seq_along(ls_plt_RV), function(x) {
+  save_plot(plt = ls_plt_RV[[x]],
+            path = file.path(wd, "plots", paste0("sa_norm_RV__", neutralize_spaces(names(ls_plt_RV)[x]))),
+            format = "{{viz_format}}")
+})
+```
+
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+### GR Value {.tabset .tabset-dropdown}
+
+```{r sa_norm_data_tab_GR, warning=FALSE, echo=FALSE, eval=plot_GR_values}
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR, chunk_name = "sa_norm_tab_GR", header_level = 4)
+walk(seq_along(ls_plt_GR), function(x) {
+  save_plot(plt = ls_plt_GR[[x]],
+            path = file.path(wd, "plots", paste0("sa_norm_GR__", neutralize_spaces(names(ls_plt_GR)[x]))),
+            format = "{{viz_format}}")
+})
+```
+
+`r if (plot_GR_values) knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+
+{{#has_combo}}
+## Quality Control of degree of errors in normalization - Combo Data {.tabset .tabset-fade .tabset-pills}
+
+```{r combo_norm_data_viz, warning=FALSE, fig.show="hide"}
+norm_data_combo <- convert_se_assay_to_dt(se = se_combo, assay_name = "Normalized")
+ls_cl <- sort(unique(norm_data_combo[["CellLineName"]]))
+ls_cl_names <- vapply(ls_cl, function(i) escape_special_characters(i), 
+                      FUN.VALUE = character(1))
+
+ls_plt_RV <- pmap(list(cl_name = ls_cl), plot_var_distribution_qc, 
+                  dt_assay = norm_data_combo, normalization_type = "RV")
+names(ls_plt_RV) <- ls_cl_names
+
+if (plot_GR_values) {
+  ls_plt_GR <- pmap(list(cl_name = ls_cl), plot_var_distribution_qc, 
+                    dt_assay = norm_data_combo, normalization_type = "GR")
+  names(ls_plt_GR) <- ls_cl_names
+}
+```
+
+::: {.fullwidth}
+### Relative Viability {.tabset .tabset-dropdown}
+
+```{r combo_norm_data_tab_RV, warning=FALSE, echo=FALSE}
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV, chunk_name = "combo_norm_tab_RV", header_level = 4)
+walk(seq_along(ls_plt_RV), function(x) {
+  save_plot(plt = ls_plt_RV[[x]],
+            path = file.path(wd, "plots", paste0("combo_norm_RV__", neutralize_spaces(names(ls_plt_RV)[x]))),
+            format = "{{viz_format}}")
+})
+```
+
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+### GR Value {.tabset .tabset-dropdown}
+
+```{r norm_data_tab_GR, warning=FALSE, echo=FALSE, eval=plot_GR_values}
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR, chunk_name = "combo_norm_tab_GR", header_level = 4)
+walk(seq_along(ls_plt_GR), function(x) {
+  save_plot(plt = ls_plt_GR[[x]],
+            path = file.path(wd, "plots", paste0("combo_norm_GR__", neutralize_spaces(names(ls_plt_GR)[x]))),
+            format = "{{viz_format}}")
+})
+```
+
+`r if (plot_GR_values) knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+{{/has_combo}}
+
+# Average the Data
+**Created assay:** Averaged
+
+```{r, average_data_sa}
+se_sa <- average_SE(se_sa, data_type = sa_name)
+```
+{{#has_combo}}
+```{r average_data_combo}
+se_combo <- average_SE(se_combo, data_type = combo_name)
+```
+{{/has_combo}}
+
+## Quality Control for Averaged - Single-Agent Data {.tabset .tabset-fade .tabset-pills}
+
+```{r average_data_viz, warning=FALSE, fig.show="hide"}
+library(data.table)
+response_data_sa <- convert_se_assay_to_dt(se = se_sa, assay_name = "Averaged")
+# metrics
+metrics <- data.table(metric = c("x", "x_std"))
+
+metrics$hm_title <- paste("RV", c("value", "variance"))
+ls_plt_RV <- pmap(metrics, pheatmap_qc,
+                  dt_average = response_data_sa, normalization_type = "RV",
+                  lbl_by_CellLineName = TRUE, lbl_by_DrugName = TRUE)
+names(ls_plt_RV) <- metrics$hm_title
+
+if (plot_GR_values) {
+  metrics$hm_title <- paste("GR", c("value", "variance"))
+  ls_plt_GR <- pmap(metrics, pheatmap_qc, 
+                    dt_average = response_data_sa, normalization_type = "GR",
+                    lbl_by_CellLineName = TRUE, lbl_by_DrugName = TRUE)
+  names(ls_plt_GR) <- metrics$hm_title
+}
+```
+
+### Relative Viability {.tabset}
+
+```{r average_data_tab_RV, warning=FALSE, echo=FALSE}
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV, chunk_name = "average_tab_RV", header_level = 4)
+walk(seq_along(ls_plt_RV), function(x) {
+    save_plot(plt = ls_plt_RV[[x]],
+              path = file.path(wd, "plots", paste0("sa_avg_RV__", neutralize_spaces(names(ls_plt_RV)[x]))),
+              format = "{{viz_format}}")
+})
+```
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+
+### GR Value {.tabset}
+
+```{r average_data_tab_GR, warning=FALSE, echo=FALSE, eval=plot_GR_values}
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR, chunk_name = "average_tab_GR", header_level = 4)
+walk(seq_along(ls_plt_GR), function(x) {
+  save_plot(plt = ls_plt_GR[[x]],
+            path = file.path(wd, "plots", paste0("sa_avg_GR__", neutralize_spaces(names(ls_plt_GR)[x]))),
+            format = "{{viz_format}}")
+})
+```
+::: {.fullwidth}
+`r if (plot_GR_values) knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+
+{{#has_combo}}
+## Quality Control for Averaged - Combo Data {.tabset .tabset-fade .tabset-pills}
+
+```{r average_data_combo_viz, warning=FALSE, fig.show="hide", include = !is.null(dt_combo)}
+response_data_combo <- convert_se_assay_to_dt(se = se_combo, assay_name = "Averaged")
+
+metrics$hm_title <- paste("RV", c("value", "variance"))
+ls_plt_RV <- pmap(metrics, pheatmap_qc, 
+                  dt_average = response_data_combo, normalization_type = "RV",
+                  lbl_by_CellLineName = TRUE, lbl_by_DrugName = TRUE)
+names(ls_plt_RV) <- metrics$hm_title
+
+if (plot_GR_values) {
+  metrics$hm_title <- paste("GR", c("value", "variance"))
+  ls_plt_GR <- pmap(metrics, pheatmap_qc, 
+                    dt_average = response_data_combo, normalization_type = "GR",
+                    lbl_by_CellLineName = TRUE, lbl_by_DrugName = TRUE)
+  names(ls_plt_GR) <- metrics$hm_title
+}
+```
+
+### Relative Viability {.tabset}
+
+```{r average_data_combo_tab_RV, warning=FALSE, echo=FALSE}
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV, chunk_name = "average_combo_tab_RV", header_level = 4)
+walk(seq_along(ls_plt_RV), function(x) {
+  save_plot(plt = ls_plt_RV[[x]],
+            path = file.path(wd, "plots", paste0("combo_avg_RV__", neutralize_spaces(names(ls_plt_RV)[x]))),
+            format = "{{viz_format}}")
+})
+```
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+
+### GR Value {.tabset}
+
+```{r average_data_combo_tab_GR, warning=FALSE, echo=FALSE, eval=plot_GR_values}
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR, chunk_name = "average_combo_tab_GR", header_level = 4)
+walk(seq_along(ls_plt_GR), function(x) {
+  save_plot(plt = ls_plt_GR[[x]],
+            path = file.path(wd, "plots", paste0("combo_avg_GR__", neutralize_spaces(names(ls_plt_GR)[x]))),
+            format = "{{viz_format}}")
+})
+```
+::: {.fullwidth}
+`r if (plot_GR_values) knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+{{/has_combo}}
+
+# Fit Metrics to the Data
+**Created assay for single-agent data:** Metrics
+
+```{r fit_data_sa, warning=FALSE}
+se_sa <- fit_SE(se_sa, data_type = sa_name)
+```
+
+{{#has_combo}}
+**Created assays for combination data:** Metrics, excess, all_iso_points, isobolograms, score
+
+```{r fit_data_combo, warning=FALSE}
+se_combo <- fit_SE.combinations(se_combo, data_type = combo_name)
+```
+{{/has_combo}}
+
+## Quality Control - Accuarcy of Fitting Dose-response Curves - Single-Agent Data  {.tabset .tabset-fade .tabset-pills}
+
+```{r fit_data_curv_panel, warning=FALSE, fig.show="hide"}
+response_metrics_sa <- convert_se_assay_to_dt(se = se_sa, assay_name = "Metrics")
+ls_cl <- sort(unique(response_metrics_sa[["CellLineName"]]))
+ls_cl_names <- vapply(ls_cl, function(i) escape_special_characters(i), 
+                      FUN.VALUE = character(1))
+
+ls_panel_RV <- pmap(list(cl_name = ls_cl), plot_dose_response_sa_qc_panel,
+                    dt_metrics = response_metrics_sa,
+                    dt_average = response_data_sa,
+                    normalization_type = "RV")
+names(ls_panel_RV) <- ls_cl_names
+
+if (plot_GR_values) {
+  ls_panel_GR <- pmap(list(cl_name = ls_cl),
+                      plot_dose_response_sa_qc_panel,
+                      dt_metrics = response_metrics_sa,
+                      dt_average = response_data_sa,
+                      normalization_type = "GR")
+  names(ls_panel_GR) <- ls_cl_names
+}
+```
+
+::: {.fullwidth}
+### Relative Viability {.tabset .tabset-dropdown}
+
+```{r fit_data_panel_tab_RV, warning=FALSE, echo=FALSE}
+plts_RV <- prep_plot_chunk(plt_list = ls_panel_RV, chunk_name = "fit_panel_tab_RV", header_level = 4)
+walk(seq_along(ls_panel_RV), function(x) {
+  save_plot(plt = ls_panel_RV[[x]], 
+            path = file.path(wd, "plots", paste0("sa_fit_curve_panel_RV__", neutralize_spaces(names(ls_panel_RV)[x]))),
+            format = "{{viz_format}}")
+})
+```
+
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+### GR Value {.tabset .tabset-dropdown}
+
+```{r fit_data_panel_tab_GR, warning=FALSE, echo=FALSE, eval=plot_GR_values}
+plts_GR <- prep_plot_chunk(plt_list = ls_panel_GR, chunk_name = "fit_panel_tab_GR", header_level = 4)
+walk(seq_along(ls_panel_GR), function(x) {
+  save_plot(plt = ls_panel_GR[[x]], 
+            path = file.path(wd, "plots", paste0("sa_fit_curve_panel_GR__", neutralize_spaces(names(ls_panel_GR)[x]))),
+            format = "{{viz_format}}")
+})
+```
+
+`r if (plot_GR_values) knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+
+## Quality Control - Fitting Precision - Single-Agent Data  {.tabset .tabset-fade .tabset-pills}
+
+```{r fit_data_prec_viz, warning=FALSE, fig.show="hide"}
+ls_cl <- sort(unique(response_metrics_sa[["CellLineName"]]))
+ls_cl_names <- vapply(ls_cl, function(i) escape_special_characters(i), 
+                      FUN.VALUE = character(1))
+
+ls_plt_RV <- pmap(list(cl_name = ls_cl), plot_fitting_acc,
+                  dt_assay = response_metrics_sa,
+                  normalization_type = "RV")
+names(ls_plt_RV) <- ls_cl_names
+
+if (plot_GR_values) {
+  ls_plt_GR <- pmap(list(cl_name = ls_cl), plot_fitting_acc,
+                    dt_assay = response_metrics_sa,
+                    normalization_type = "GR")
+  names(ls_plt_GR) <- ls_cl_names
+}
+```
+
+::: {.fullwidth}
+### Relative Viability {.tabset .tabset-dropdown}
+
+```{r fit_data_prec_tab_RV, warning=FALSE, echo=FALSE}
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV, chunk_name = "fit_prec_tab_RV", header_level = 4)
+walk(seq_along(ls_plt_RV), function(x) {
+  save_plot(plt = ls_plt_RV[[x]], 
+            path = file.path(wd, "plots", paste0("sa_fit_prec_RV__", neutralize_spaces(names(ls_plt_RV)[x]))),
+            format = "{{viz_format}}")
+})
+```
+
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+### GR Value {.tabset .tabset-dropdown}
+
+```{r fit_data_prec_tab_GR, warning=FALSE, echo=FALSE, eval=plot_GR_values}
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR, chunk_name = "fit_prec_tab_GR", header_level = 4)
+walk(seq_along(ls_plt_GR), function(x) {
+  save_plot(plt = ls_plt_GR[[x]], 
+            path = file.path(wd, "plots", paste0("sa_fit_prec_GR__", neutralize_spaces(names(ls_plt_GR)[x]))),
+            format = "{{viz_format}}")
+})
+```
+
+`r if (plot_GR_values) knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+
+# Create and save MAE Object
+
+```{r create_mae}
+mae <- if (exists("se_combo") && !is.null(se_combo)) {
+  MultiAssayExperiment(experiments = setNames(list(se_sa, se_combo), c(sa_name, combo_name)))
+} else {
+  MultiAssayExperiment(experiments = setNames(list(se_sa), c(sa_name)))
+}
+mae <- standardize_mae(mae)
+qsave(mae, file.path(wd, "gDR_data", "gDR_mae.qs"))
+```
+
+Please note: Steps 5 through 9 can be automatically executed using the runDrugResponseProcessingPipeline function, which handles all stages of the pipeline for all identified data types."
+
+{{#GCSI}}
+# Add metadata and GDS metrics
+
+```{r add_metadata}
+library(gDRinternal)
+# read QCSession object
+qcs <- qread(file.path(wd, "raw_data", "QCSession.qs"))
+
+# Add GDS metrics
+if (!is.null(qcs) && !(is(qcs, "MatrixQCSession") || is(qcs, "CGSQCSession"))) {
+  se <- add_GDS_metrics(mae[[sa_name]], qcs)
+  mae[[sa_name]] <- se
+}
+
+experiments <- names(mae)
+for (experiment in experiments) {
+  mae[[experiment]] <- add_qcs_metadata_to_SE(mae[[experiment]], qcs)
+}
+```
+
+# Push data into DSDB
+
+```{r push_data}
+push_to_DSDB <- {{push_to_DSDB}}
+
+if (push_to_DSDB)
+{
+  library(gDRinternal)
+  library(dsassembly)
+  mae <- annotate_DSDB_MAE(mae = mae)
+  qsave(mae, file.path(wd, "gDR_data", "gDR_mae.qs"))
+  dsdb_id <- saveDataset(mae, owners = c(Sys.info()[["user"]], "gdr-support-d@gene.com"))
+  
+  dsdb_id
+  # To update the existing dataset in DSDB, please use `updateDataset` function
+}
+```
+{{/GCSI}}
+
+
+This completes the process of processing drug-dose response data using the gDRcore package.
+
+# gDR session info
+
+```{r, plot_packages}
+pkg_list <- as.data.frame(installed.packages(), stringsAsFactors = FALSE)
+gDR_packages <- pkg_list[grepl("gDR", pkg_list$Package),]
+print(paste(gDR_packages$Package, gDR_packages$Version, sep = ": "))
+```
