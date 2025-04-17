@@ -1,8 +1,8 @@
 Type: Package
 Package: gDR
 Title: Umbrella package for R packages in the gDR suite
-Version: 1.5.1
-Date: 2024-11-05
+Version: 1.7.1
+Date: 2025-04-16
 Authors@R: c(
     person("Allison", "Vuong", , "vuong.allison@gene.com", role = "aut"),
     person("Bartosz", "Czech", role = "aut",
@@ -22,15 +22,15 @@ Description: Package is a part of the gDR suite. It reexports functions from oth
 License: Artistic-2.0
 Depends:
     R (>= 4.2),
-    gDRcore (>= 1.1.19),
-    gDRimport (>= 1.1.9),
-    gDRutils (>= 1.1.12)
+    gDRcore (>= 1.7.1),
+    gDRimport (>= 1.7.1),
+    gDRutils (>= 1.7.1)
 Suggests:
     BiocStyle,
     BumpyMatrix,
     futile.logger,
-    gDRstyle (>= 1.1.5),
-    gDRtestData (>= 1.1.10),
+    gDRstyle (>= 1.7.1),
+    gDRtestData (>= 1.7.1),
     kableExtra,
     knitr,
     markdown,
