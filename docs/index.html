@@ -32,7 +32,7 @@
     
     <a class="navbar-brand me-2" href="index.html">gDR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.7.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.7.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,59 +79,23 @@
 </div>
 </div>
 <div class="section level1">
-<h1 id="website">Website<a class="anchor" aria-label="anchor" href="#website"></a>
-</h1>
-<p>A package website is available under <a href="https://gdrplatform.github.io/gDR/">this link</a>.</p>
-</div>
-<div class="section level1">
 <h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h1>
-<p>The easiest way to use functions from gDR package is by using the Docker image. Here is one of the ways to do that.</p>
+<p>The easiest way to use functions from gDR package is by using the Bioconductor.</p>
 <ol style="list-style-type: decimal">
-<li><p>Generate new personal token Firstly, generate new personal token if you don’t have one (go to <a href="https://github.com/settings/tokens/new" class="external-link uri">https://github.com/settings/tokens/new</a>).</p></li>
-<li><p>Clone the gDR repository Then, clone the gDR repository via https (not ssh). Please use the personal token when asked for the password.</p></li>
+<li>Install BiocManager</li>
 </ol>
-<pre><code>git clone https://github.com/gdrplatform/gDR.git</code></pre>
-<ol start="3" style="list-style-type: decimal">
-<li>[Optional] Save access token into .github_access_token.txt file Write your access token as a single line in the file: <code>rplatform/.github_access_token.txt</code>.</li>
+<pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span></code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Install gDR packages</li>
 </ol>
-<pre><code>cp .github_access_token.txt rplatform/</code></pre>
-<ol start="4" style="list-style-type: decimal">
-<li>Docker build Then build the Docker image.</li>
-</ol>
-<pre><code>bash extras/create_image.sh</code></pre>
-<ol start="5" style="list-style-type: decimal">
-<li>Create ‘gdr_rstudio’ container with RStudio IDE available at <a href="http://localhost:8787" class="external-link uri">http://localhost:8787</a> (default credentials are login: <code>rstudio</code> and password: <code>gdr</code>).</li>
-</ol>
-<pre><code>bash extras/create_container.sh</code></pre>
-<p>You’ve just successfully set up the environment for the gDR umbrella package. Please see <a href="vignettes/gDR.Rmd">gDR vignette</a> for examples of usage.</p>
+<pre><code><span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gDRstyle"</span>, <span class="st">"gDRtestData"</span>, <span class="st">"gDR"</span><span class="op">)</span>, version <span class="op">=</span> <span class="st">"devel"</span><span class="op">)</span></span></code></pre>
+<p>You’ve just successfully set up the environment for the gDR umbrella package. Please see <a href="https://gdrplatform.github.io/gDR/articles/gDR.html">gDR vignette</a> for examples of usage.</p>
 </div>
 <div class="section level1">
 <h1 id="how-to-contribute">How to contribute<a class="anchor" aria-label="anchor" href="#how-to-contribute"></a>
 </h1>
 <p>We are eager to make this tool useful for the community. We welcome any suggestions via GitHub issues, or pull requests for bugfixes/new features. When making pull requests, please first have a look at the style conventions in <a href="https://gdrplatform.github.io/gDRstyle/style_guide.html">gDRstyle</a>.</p>
-</div>
-<div class="section level1">
-<h1 id="preparing-your-machine-to-run-gdr-images">Preparing your machine to run gDR images<a class="anchor" aria-label="anchor" href="#preparing-your-machine-to-run-gdr-images"></a>
-</h1>
-<ol style="list-style-type: decimal">
-<li>How to install Docker.</li>
-</ol>
-<p>Install Docker on MacOS</p>
-<p><a href="https://docs.docker.com/desktop/install/mac-install/" class="external-link uri">https://docs.docker.com/desktop/install/mac-install/</a></p>
-<p>Install Docker on Windows</p>
-<p><a href="https://docs.docker.com/desktop/install/windows-install/" class="external-link uri">https://docs.docker.com/desktop/install/windows-install/</a></p>
-<p>Install Docker on Linux</p>
-<p><a href="https://docs.docker.com/desktop/install/linux-install/" class="external-link uri">https://docs.docker.com/desktop/install/linux-install/</a></p>
-<ol start="2" style="list-style-type: decimal">
-<li>MacOS troubleshooting (M1/M2)</li>
-</ol>
-<pre><code>Could not connect to the R session on RStudio Server
-Unable to connect to service (1)</code></pre>
-<p>To solve the above problem, please execute the steps below:</p>
-<pre><code>Go to Settings</code></pre>
-<pre><code>Click Features in development</code></pre>
-<pre><code>Select checkbox: Use Rossetta for x86/amd64 emulation on Apple Silicon </code></pre>
 </div>
 
   </main><aside class="col-md-3"><div class="links">
