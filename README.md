@@ -5,9 +5,6 @@ The gDR suite offers a full stack solution for processing drug response data. Th
 
 ![Figure 1. The overview of R packages that are available via gDR umbrella package.  ](https://raw.githubusercontent.com/gdrplatform/gDR/main/inst/images/overview.png)  
 
-# Website
-A package website is available under [this link](https://gdrplatform.github.io/gDR/).
-
 # Installation
 
 The easiest way to use functions from gDR package is by using the Bioconductor.
@@ -24,7 +21,7 @@ install.packages("BiocManager")
 BiocManager::install(c("gDRstyle", "gDRtestData", "gDR"), version = "devel")
 ```
 
-You've just successfully set up the environment for the gDR umbrella package. Please see [gDR vignette](vignettes/gDR.Rmd) for examples of usage.
+You've just successfully set up the environment for the gDR umbrella package. Please see [gDR vignette](https://gdrplatform.github.io/gDR/articles/gDR.html) for examples of usage.
 
 
 # How to contribute
