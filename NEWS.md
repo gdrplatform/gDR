@@ -1,3 +1,6 @@
+## gDR 1.9.1 - 2025-10-30
+* synchronize Bioconductor and GitHub versioning
+
 ## gDR 1.7.2 - 2025-06-11
 * update installation instructions
 
