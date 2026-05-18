@@ -34,7 +34,7 @@ We are happy to share with you our packages for importing, processing and managi
 - gDRutils
 - gDRtestData
 
-## Data structures 
+## Data structures
 The gDR data model is based on the SummarizedExperiment and BumpyMatrix. If readers are unfamiliar with these data models, we recommend first reading [SummarizedExperiment vignettes](https://bioconductor.org/packages/release/bioc/vignettes/SummarizedExperiment/inst/doc/SummarizedExperiment.html), followed by the [BumpyMatrix vignettes](https://www.bioconductor.org/packages/devel/bioc/vignettes/BumpyMatrix/inst/doc/BumpyMatrix.html). The SummarizedExperiment data structure enables ease of subsetting within the SummarizedExperiment object, but also provides ease when trying to correlate drug response data with genomic data, as these data may jointly stored in a MultiAssayExperiment. The BumpyMatrix allows for storage of multi-dimensional data while retaining a matrix abstraction.
 
 This data structure is the core data structure that all downstream processing functions as well as visualization tools operate off of.
@@ -42,18 +42,18 @@ This data structure is the core data structure that all downstream processing fu
 ## Overview
 The gDR suite was designed in a modular manner, such that a user can jump into the "standard" end-to-end gDR processing pipeline at several entry points as is suitable for his or her needs. The full pipeline involves:
 
-```              
+```
       manifest, template(s), raw data
                         |
                         |  1. Aggregating all raw data and metadata
-                        |  into a single long table. 
+                        |  into a single long table.
                         |
                         V
               single, long table
                         |
-                        |  2. Transforming the long table into 
-                        |  a SummarizedExperiment object with BumpyMatrix assays 
-                        |  by specifying what columns belong on rows, 
+                        |  2. Transforming the long table into
+                        |  a SummarizedExperiment object with BumpyMatrix assays
+                        |  by specifying what columns belong on rows,
                         |  columns, and nested.
                         |
                         V
@@ -65,11 +65,11 @@ The gDR suite was designed in a modular manner, such that a user can jump into t
                         V
           SummarizedExperiment object
           with raw, treated, normalized,
-           averaged, and metric assays, 
+           averaged, and metric assays,
    ready for use by downstream visualization
-              
+
  ```
- 
+
 A user should be able to enter any part of this pipeline as long as they are able to create the intermediate object
 (i.e., the individual manifest, template, and raw data files, or a single, long table, or a SummarizedExperiment object with Bumpy assays).
 
@@ -93,11 +93,11 @@ template_path(td)
 result_path(td)
 ```
 
-Using the convenience function `import_data`, the long table is easily created: 
+Using the convenience function `import_data`, the long table is easily created:
 
-```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE} 
+```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE}
 # Import data
-imported_data <- 
+imported_data <-
   import_data(manifest_path(td), template_path(td), result_path(td))
 head(imported_data)
 ```
@@ -128,7 +128,7 @@ Note that this has created a SummarizedExperiment object with `rowData`, `colDat
 
 
 ## Averaging and fitting data (3)
-Next, we can average and fit the data of interest. 
+Next, we can average and fit the data of interest.
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE}
 se <- average_SE(se, data_type = "single-agent")
 se <- fit_SE(se, data_type = "single-agent")
@@ -138,7 +138,7 @@ se
 ```
 
 ## runDrugResponseProcessingPipeline
-Steps (2) and (3) can be combined into a single step through a convenience function: `runDrugResponseProcessingPipeline`.  Moreover, the output is `MultiAssayExperiment` object with one experiment per each detected data type. Currently four data types are supported: 'single-agent', 'cotreatment', 'codilution' and 'matrix'. The first three data types are processed via the 'single-agent' model while the 'marix' data is processed via the 'combintation' model. 
+Steps (2) and (3) can be combined into a single step through a convenience function: `runDrugResponseProcessingPipeline`.  Moreover, the output is `MultiAssayExperiment` object with one experiment per each detected data type. Currently four data types are supported: 'single-agent', 'cotreatment', 'codilution' and 'matrix'. The first three data types are processed via the 'single-agent' model while the 'marix' data is processed via the 'combintation' model.
 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE}
 # Run gDR pipeline

@@ -1,6 +1,6 @@
 #' Small data.table with raw data used for processing via gDR
 #'
-#' A dataset containing the ReadoutValues for single-agent experiments 
+#' A dataset containing the ReadoutValues for single-agent experiments
 #' made-up of 10 drugs and 10 cell lines
 #'
 #' @format A data frame with 3300 rows and 12 variables:
@@ -18,16 +18,16 @@
 #'   \item{BackgroundValue}{backgroud value}
 #'   \item{Duration}{duration}
 #' }
-#' 
+#'
 #' @usage data(small_data)
-#' 
+#'
 #' @keywords data
 #' @return data.table
 "small_data"
 
 #' Small data.table with raw combo data used for processing via gDR
 #'
-#' A dataset containing the ReadoutValues for combo experiments made-up of 
+#' A dataset containing the ReadoutValues for combo experiments made-up of
 #' 3 drugs, 2 co-drugs, and 2 cell lines
 #'
 #' @format A data frame with 3600 rows and 16 variables:
@@ -49,9 +49,9 @@
 #'   \item{BackgroundValue}{backgroud value}
 #'   \item{Duration}{duration}
 #' }
-#' 
+#'
 #' @usage data(small_combo_data)
-#' 
+#'
 #' @keywords data
 #' @return data.table
 "small_combo_data"
