@@ -1,3 +1,6 @@
+## gDR 1.11.2 - 2026-05-26
+* fix linting violations from updated gDRstyle rules
+
 ## gDR 1.11.1 - 2026-04-29
 * synchronize Bioconductor and GitHub versioning
 
