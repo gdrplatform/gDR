@@ -138,7 +138,7 @@ se
 ```
 
 ## runDrugResponseProcessingPipeline
-Steps (2) and (3) can be combined into a single step through a convenience function: `runDrugResponseProcessingPipeline`.  Moreover, the output is `MultiAssayExperiment` object with one experiment per each detected data type. Currently four data types are supported: 'single-agent', 'cotreatment', 'codilution' and 'matrix'. The first three data types are processed via the 'single-agent' model while the 'marix' data is processed via the 'combintation' model.
+Steps (2) and (3) can be combined into a single step through a convenience function: `runDrugResponseProcessingPipeline`.  Moreover, the output is `MultiAssayExperiment` object with one experiment per each detected data type. Currently four data types are supported: 'single-agent', 'cotreatment', 'codilution' and 'matrix'. The first three data types are processed via the 'single-agent' model while the 'matrix' data is processed via the 'combination' model.
 
 ```{r, echo=TRUE, results='asis', warning=FALSE, results='hide', message=FALSE}
 # Run gDR pipeline
