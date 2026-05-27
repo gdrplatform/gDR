@@ -29,6 +29,6 @@ data.table
 }
 \description{
 A dataset containing the ReadoutValues for single-agent experiments
-made-up of 10 drugs and 10 cell lines
+made up of 10 drugs and 10 cell lines
 }
 \keyword{data}
