@@ -1,3 +1,6 @@
+## gDR 1.11.2 - 2026-05-26
+* apply updated gDRstyle rules
+
 ## gDR 1.11.1 - 2026-04-29
 * synchronize Bioconductor and GitHub versioning
 
@@ -74,7 +77,7 @@
 ## gDR 0.99.0 - 2023-03-23
 * switch to Bioc compatible versioning
 
-## gDR 0.1.3.7 - 2023-03-23
+## gDR 0.1.37 - 2023-03-23
 * drop gDRcomponents dependency
 
 ## gDR 0.1.3.6 - 2023-03-13

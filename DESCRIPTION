@@ -1,8 +1,8 @@
 Type: Package
 Package: gDR
 Title: Umbrella package for R packages in the gDR suite
-Version: 1.11.1
-Date: 2026-04-29
+Version: 1.11.2
+Date: 2026-05-26
 Authors@R: c(
     person("Allison", "Vuong", , "vuong.allison@gene.com", role = "aut"),
     person("Bartosz", "Czech", role = "aut",
@@ -46,7 +46,7 @@ VignetteBuilder: knitr
 ByteCompile: TRUE
 LazyLoad: yes
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
 SwitchrLibrary: gDR
 DeploySubPath: gDR
 Encoding: UTF-8

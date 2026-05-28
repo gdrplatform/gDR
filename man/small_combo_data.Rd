@@ -32,7 +32,7 @@ data(small_combo_data)
 data.table
 }
 \description{
-A dataset containing the ReadoutValues for combo experiments made-up of
+A dataset containing the ReadoutValues for combo experiments made up of
 3 drugs, 2 co-drugs, and 2 cell lines
 }
 \keyword{data}

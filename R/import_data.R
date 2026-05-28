@@ -6,11 +6,11 @@
 #' @param results_file character, with datapaths and names of results file(s)
 #' or character with file path of results file(s)
 #' @param instrument string with type of instrument used
-#' 
+#'
 #' @examples
 #' td <- get_test_data()
 #' i_df <- import_data(manifest_path(td), template_path(td), result_path(td))
-#' 
+#'
 #' @return a \code{data.table}
 #'
 #' @keywords import
