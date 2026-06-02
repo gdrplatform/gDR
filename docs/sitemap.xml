@@ -1,39 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://gdrplatform.github.io/gDR/404.html</loc>
-  </url>
-  <url>
-    <loc>https://gdrplatform.github.io/gDR/PULL_REQUEST_TEMPLATE.html</loc>
-  </url>
-  <url>
-    <loc>https://gdrplatform.github.io/gDR/articles/gDR.html</loc>
-  </url>
-  <url>
-    <loc>https://gdrplatform.github.io/gDR/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://gdrplatform.github.io/gDR/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://gdrplatform.github.io/gDR/index.html</loc>
-  </url>
-  <url>
-    <loc>https://gdrplatform.github.io/gDR/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://gdrplatform.github.io/gDR/reference/gDR-package.html</loc>
-  </url>
-  <url>
-    <loc>https://gdrplatform.github.io/gDR/reference/import_data.html</loc>
-  </url>
-  <url>
-    <loc>https://gdrplatform.github.io/gDR/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://gdrplatform.github.io/gDR/reference/small_combo_data.html</loc>
-  </url>
-  <url>
-    <loc>https://gdrplatform.github.io/gDR/reference/small_data.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://gdrplatform.github.io/gDR/404.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/PULL_REQUEST_TEMPLATE.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/articles/gDR.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/articles/index.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/authors.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/index.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/news/index.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/reference/gDR-package.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/reference/import_data.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/reference/index.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/reference/small_combo_data.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/reference/small_data.html</loc></url>
 </urlset>
+

@@ -1,0 +1,66 @@
+# gDR overview
+
+gDR is an umbrella package for the gDR programmatic R interface.
+
+The gDR suite offers a full stack solution for processing drug response
+data. This enables a range of users across computational savvy,
+(i.e. lab scientists and computational scientists alike) to access the
+same, standardized data. The suite is made up of several core R
+packages.
+
+![Figure 1. The overview of R packages that are available via gDR
+umbrella
+package.](https://raw.githubusercontent.com/gdrplatform/gDR/main/inst/images/overview.png)
+
+Figure 1. The overview of R packages that are available via gDR umbrella
+package.
+
+# Installation
+
+The easiest way to use functions from gDR package is by using the
+Bioconductor.
+
+1.  Install BiocManager
+
+&nbsp;
+
+    install.packages("BiocManager")
+
+2.  Install gDR packages
+
+&nbsp;
+
+    BiocManager::install(c("gDRstyle", "gDRtestData", "gDR"), version = "devel")
+
+You’ve just successfully set up the environment for the gDR umbrella
+package. Please see [gDR
+vignette](https://gdrplatform.github.io/gDR/articles/gDR.html) for
+examples of usage.
+
+# How to contribute
+
+We are eager to make this tool useful for the community. We welcome any
+suggestions via GitHub issues, or pull requests for bugfixes/new
+features. When making pull requests, please first have a look at the
+style conventions in
+[gDRstyle](https://gdrplatform.github.io/gDRstyle/style_guide.html).
+
+# Package index
+
+## Import
+
+- [`import_data()`](https://gdrplatform.github.io/gDR/reference/import_data.md)
+  : Import raw data
+
+## Data
+
+- [`small_combo_data`](https://gdrplatform.github.io/gDR/reference/small_combo_data.md)
+  : Small data.table with raw combo data used for processing via gDR
+- [`small_data`](https://gdrplatform.github.io/gDR/reference/small_data.md)
+  : Small data.table with raw data used for processing via gDR
+
+# Articles
+
+### All vignettes
+
+- [gDR suite](https://gdrplatform.github.io/gDR/articles/gDR.md):
