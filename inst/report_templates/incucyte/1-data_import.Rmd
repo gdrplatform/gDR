@@ -1,0 +1,429 @@
+---
+title: "1. Import Incucyte data"
+author: 
+- name: gDR team
+  url: https://github.com/gdrplatform
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    toc_float: yes
+    titlecaps: false 
+    code_folding: hide
+    fig_height: 8
+    fig_width: 10
+    self_contained: {{embed}}
+  md_document:
+    preserve_yaml: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+gdr_start_time <- proc.time()
+knitr::opts_chunk$set(warning = FALSE, message = FALSE,
+                      dev = "png", dev.args = if (capabilities("cairo")) list(type = "cairo-png") else list())
+
+```
+
+```{css gDR_style, echo=FALSE}
+:root {
+  --gdr-teal: #129bb3;   /* Matches the light blue/teal in the gDR logo */
+  --gdr-slate: #3b5460;  /* Matches the dark slate grey in the gDR logo */
+  --gdr-light: #f5f8fa;  /* Soft background for callout boxes */
+  --gdr-red-bg: #fdf2f2; /* Soft background for warning */
+  --gdr-red-border: #d9534f; /* Alert border */
+}
+
+/* Hide standard R Markdown/BiocStyle title text, but KEEP the Code Folding button */
+#header .title,
+#header .author,
+#header .date,
+#header h1,
+#header h2,
+#header h3,
+#header h4,
+#header p {
+  display: none !important;
+}
+
+#header {
+  margin-top: 10px; 
+  min-height: 40px; /* Secures dedicated vertical space for the code button */
+}
+
+body {
+  max-width: 100%;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #333333;
+}
+
+div.main-container {
+  max-width: 1500px;
+}
+
+h1, h2, h3, h4, h5 {
+  color: var(--gdr-slate);
+  font-weight: 600;
+}
+
+h1 {
+  border-bottom: 2px solid var(--gdr-teal);
+  padding-bottom: 8px;
+  margin-top: 40px;
+}
+
+h2 {
+  color: var(--gdr-teal);
+  margin-top: 30px;
+}
+
+a {
+  color: var(--gdr-teal);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Custom Professional Header replaces default */
+.report-header {
+  clear: both; /* FIX: Forces the box to sit below the floated Code button */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--gdr-light);
+  padding: 30px 40px;
+  border-left: 8px solid var(--gdr-teal);
+  border-radius: 6px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Container for the logo to prevent shrinking */
+.header-logo-container {
+    flex-shrink: 0;
+    margin-right: 30px;
+}
+
+.header-logo-container img {
+  max-height: 90px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.header-title {
+  text-align: left; 
+  color: var(--gdr-slate);
+  line-height: 1.5;
+}
+
+/* Bypassing BiocStyle's h1 auto-numbering overlap AND preventing line breaks */
+.header-title .custom-title {
+  color: var(--gdr-teal);
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  padding: 0;
+  white-space: nowrap; 
+}
+
+.header-title strong {
+  font-size: 18px;
+  color: var(--gdr-slate);
+}
+
+/* Support & Feedback Card */
+.feedback-panel {
+  background-color: #ffffff;
+  border: 1px solid #e1e8ed;
+  border-top: 4px solid var(--gdr-teal);
+  border-radius: 8px;
+  padding: 30px;
+  margin-top: 60px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(18, 155, 179, 0.08);
+}
+
+.feedback-panel h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.btn-feedback {
+  display: inline-block;
+  background-color: var(--gdr-teal);
+  color: white !important;
+  padding: 12px 24px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 15px 0 20px 0;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-feedback:hover {
+  background-color: var(--gdr-slate);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+
+.fullwidth p {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.fullwidth p > img {
+  max-width: 100%;
+  display: block;
+  padding: 0px 0px 0px 0px;
+}
+
+.datatables {
+  margin-top: 5rem;
+}
+
+```
+
+<div class="report-header">
+<div class="header-logo-container">
+<img src="gdr_logo-01.png" alt="gDR Logo">
+</div>
+<div class="header-title">
+<div class="custom-title">1&#46; Import Incucyte data</div>
+<strong>gDR-Incucyte Time-Course Analysis</strong>
+
+Date: `r Sys.Date()`
+
+Author: <a href="https://github.com/gdrplatform">gDR team</a>
+
+</div>
+</div>
+
+# Introduction
+
+This report covers the first step in the gDR-Incucyte time-course analysis: importing and cleaning the raw data. The goal is to produce a single, clean, and annotated `data.table` that is ready for processing in the next step.
+
+```{r libraries}
+library(qs2)
+library(data.table)
+library(summarytools)
+library(gDRutils)
+library(gDRimport)
+library(gDRcore)
+library(gDR)
+library(gDRplots)
+
+```
+
+```{r get_wd}
+# get working directory path
+wd <- "{{output_dir}}"
+
+```
+
+# Key Output Files
+
+This report generates the following files:
+
+## Processed gDR Data (in `gDR_data/` folder)
+
+* **`gDR_input.qs2`:** The primary output. This is a single qs2 file containing a data.table with all merged, cleaned, and annotated raw data. This file is the required input for Step 2: Processing and QC.
+
+## Data Annotation Files (in `data_annotation/` folder)
+
+* **`drug_annotation.csv`:** An annotation file listing all unique drugs found in the data.
+* **`cell_line_annotation.csv`:** An annotation file listing all unique cell lines.
+
+## Configuration File (in `raw_data/` folder)
+
+* **`time_course_plot_params.yml`:** This YAML configuration file controls all critical parameters for the analysis in **Step 3**, including which cell lines to plot, which time periods to use for growth rate calculation (e.g., the **required** `early_period` and `late_period`, and the **optional** `mid_period`), how to normalize the growth rates, and which treatments to compare side-by-side in the final plots.
+
+# Import Raw Data into gDR and Do Manual Cleanup
+
+This step merges experimental information from three sources: the manifest (plate metadata), template files (well layouts), and raw data files (instrument readouts). This produces the initial raw dataset for the gDR pipeline.
+
+## Minimum Required Fields
+
+For time-course data, the following fields are essential for the gDR pipeline input:
+
+* **Gnumber**: Unique identifier for the experiment.
+* **clid**: Cell line identifier.
+* **ReadoutValue**: Measurement value obtained.
+* **Duration**: Duration of the experiment.
+
+## Additional Annotations
+
+In addition to the minimum required fields, the data undergoes a transformation process where annotations are added. These annotations enhance the contextual understanding of the data and include:
+
+* **For Cell Lines**: Information such as cell line name, primary tissue, doubling time, parental identifier, and subtype.
+* **For Drugs**: Details about the drug, including its name and mechanism of action.
+
+## Annotation Guidelines
+
+The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
+
+```{r load_data}
+#import data
+manifest <- c(
+  {{{manifest}}}
+)
+treatment <- c(
+  {{{treatment}}}
+)
+raw_data <- c(
+  {{{raw_data}}}
+)
+
+
+# copy files to raw_data
+for (file_path in c(manifest, treatment, raw_data)) {
+  file_name <- basename(file_path)  # Extract the filename from the path
+  file.copy(file_path, file.path(wd, "raw_data", file_name))
+}
+
+# Annotations staged alongside the raw data take precedence. Without them the import falls
+# back to looking the annotations up in a database, which is not reachable everywhere.
+drug_annotation_path <- file.path(wd, "data_annotation", "drug_annotation.csv")
+cell_line_annotation_path <- file.path(wd, "data_annotation", "cell_line_annotation.csv")
+
+drug_annotation <- NULL
+if (file.exists(drug_annotation_path)) {
+  drug_annotation <- fread(drug_annotation_path)
+}
+cell_line_annotation <- NULL
+if (file.exists(cell_line_annotation_path)) {
+  cell_line_annotation <- fread(cell_line_annotation_path)
+}
+
+data_imported <- import_data(manifest,
+                             treatment,
+                             raw_data,
+                             instrument = "Incucyte",
+                             cell_line_annotation = cell_line_annotation,
+                             drug_annotation = drug_annotation)
+
+# Ensure it is a data.table
+setDT(data_imported)
+
+
+```
+
+# Visual Quality Control of Plate-Level Data
+
+These plots show the layout of each plate based on the imported data, allowing for a visual quality control check of the manifest and template files.
+
+**What to look for:** Use these plots to confirm your plate layout. Check for obvious errors, such as incorrect drug assignments, missing controls, or mislabeled cell lines. Ensure the concentration gradients follow the expected pattern.
+
+```{r, plate_vis}
+vars_excluded <- unlist(get_env_identifiers(c("well_position", "template"), simplify = FALSE))
+plate_vars <- sort(setdiff(names(data_imported), vars_excluded))
+
+plate_vis <- lapply(plate_vars, function(x){
+  plot_plate(data_imported, x)
+})
+names(plate_vis) <- plate_vars
+
+```
+
+Before executing the pipeline, there exists a provision for manual alterations within the raw data. This allows for the manual modification of certain annotations and the correction of data as needed.
+
+```{r cleanup_data}
+# preview the annotation used in the preprocessing
+drug_annotation_path <- file.path(wd, "data_annotation", "drug_annotation.csv")
+drug_annotation <- if (file.exists(drug_annotation_path)) {
+  fread(drug_annotation_path)
+} else {
+  get_drug_annotation_from_dt(data_imported)
+}
+data_imported <- annotate_dt_with_drug(data_imported, drug_annotation)
+fwrite(drug_annotation, drug_annotation_path)
+generate_datatable(drug_annotation)
+
+cell_line_annotation_path <- file.path(wd, "data_annotation", "cell_line_annotation.csv")
+cell_line_annotation <- if (file.exists(cell_line_annotation_path)) {
+  fread(cell_line_annotation_path)
+} else {
+  get_cellline_annotation_from_dt(data_imported)
+}
+data_imported <- annotate_dt_with_cell_line(data_imported, cell_line_annotation)
+fwrite(cell_line_annotation, cell_line_annotation_path)
+generate_datatable(cell_line_annotation)
+
+# --- SYSTEMIC FIX FOR CUSTOM METADATA BY CONVENTION (drugX_feature) ---
+data_imported <- apply_custom_metadata_tags(dt = data_imported)
+
+qs_save(data_imported, file.path(wd, "gDR_data", "gDR_input.qs2"))
+
+# --- AUTO-GENERATE DRAFT YAML CONFIG ---
+yaml_dir <- file.path(wd, "raw_data")
+dir.create(yaml_dir, showWarnings = FALSE, recursive = TRUE)
+
+draft_yaml_path <- file.path(yaml_dir, "time_course_plot_params_DRAFT.yml")
+final_yaml_path <- file.path(yaml_dir, "time_course_plot_params.yml")
+
+generate_incucyte_yaml_draft(
+  dt = data_imported,
+  out_file = draft_yaml_path
+)
+
+# We assume that in the first run (v1) most users will not prepare the config yet
+# We will copy DRAFT yaml as the target yaml file to make the report
+# (including Step 3) available
+if (!file.exists(final_yaml_path)) {
+  file.copy(from = draft_yaml_path, to = final_yaml_path)
+  message("INFO: No existing YAML config found. Copied DRAFT to ", final_yaml_path, " for initial pipeline run.")
+}
+# ---------------------------------------
+
+```
+
+# Summary of imported data
+
+The table below summarizes the final, annotated dataset. This serves as a final check for data integrity.
+
+**What to look for:** Review this summary to ensure the data is complete. Pay close attention to:
+
+* **`% Miss`:** A high percentage of missing data in `ReadoutValue` may indicate a problem.
+* **`n_distinct`:** Confirm that the number of distinct `DrugName`, `CellLineName`, and `Duration` values matches your experimental design.
+* **Data Distribution:** Check the small histograms to see if the range and spread of your numeric data look reasonable.
+
+```{r, summary}
+print(dfSummary(data_imported,
+                varnumbers = FALSE,
+                valid.col = FALSE,
+                graph.magnif = 0.8,
+                max.distinct.values	= 50,
+                max.string.width = 50,
+                display.labels = FALSE),
+      method = "render")
+
+```
+
+# Conclusion
+
+The data import and quality control step is complete. The final dataset has been saved to `gDR_data/gDR_input.qs2`.
+
+<div class="feedback-panel">
+<h3>We Value Your Feedback!</h3>
+<p>Thank you for using gDR! We are always looking to improve, and your feedback is incredibly valuable to us.</p>
+<a href="https://github.com/gdrplatform/gDR/issues" target="_blank" class="btn-feedback">Share feedback or request features on GitHub</a>
+</div>
+
+# gDR session info
+
+```{r, plot_packages}
+gdr_elapsed <- (proc.time() - gdr_start_time)[["elapsed"]]
+message(sprintf("Report generated in %.1f seconds", gdr_elapsed))
+gdr_sdt <- get_gDR_session_info()
+generate_datatable(gdr_sdt)
+
+cat(sprintf("**Report generation time: %.1f seconds**", gdr_elapsed))
+
+```

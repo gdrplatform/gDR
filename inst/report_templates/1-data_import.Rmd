@@ -1,0 +1,602 @@
+---
+title: "1. Import drug screen data"
+author: 
+- name: gDR team
+  url: https://github.com/gdrplatform
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    toc_float: yes
+    titlecaps: false 
+    code_folding: hide
+    fig_height: 8
+    fig_width: 10
+    self_contained: {{embed}}
+  md_document:
+    preserve_yaml: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+gdr_start_time <- proc.time()
+knitr::opts_chunk$set(warning = FALSE, message = FALSE,
+                      dev = "png", dev.args = if (capabilities("cairo")) list(type = "cairo-png") else list())
+
+```
+
+```{css gDR_style, echo=FALSE}
+:root {
+  --gdr-teal: #129bb3;   /* Matches the light blue/teal in the gDR logo */
+  --gdr-slate: #3b5460;  /* Matches the dark slate grey in the gDR logo */
+  --gdr-light: #f5f8fa;  /* Soft background for callout boxes */
+  --gdr-red-bg: #fdf2f2; /* Soft background for warning */
+  --gdr-red-border: #d9534f; /* Alert border */
+}
+
+/* Hide standard R Markdown/BiocStyle title text, but KEEP the Code Folding button */
+#header .title,
+#header .author,
+#header .date,
+#header h1,
+#header h2,
+#header h3,
+#header h4,
+#header p {
+  display: none !important;
+}
+
+#header {
+  margin-top: 10px; 
+  min-height: 40px; /* Secures dedicated vertical space for the code button */
+}
+
+body {
+  max-width: 100%;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #333333;
+}
+
+div.main-container {
+  max-width: 1500px;
+}
+
+h1, h2, h3, h4, h5 {
+  color: var(--gdr-slate);
+  font-weight: 600;
+}
+
+h1 {
+  border-bottom: 2px solid var(--gdr-teal);
+  padding-bottom: 8px;
+  margin-top: 40px;
+}
+
+h2 {
+  color: var(--gdr-teal);
+  margin-top: 30px;
+}
+
+a {
+  color: var(--gdr-teal);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Custom Professional Header replaces default */
+.report-header {
+  clear: both; /* FIX: Forces the box to sit below the floated Code button */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--gdr-light);
+  padding: 30px 40px;
+  border-left: 8px solid var(--gdr-teal);
+  border-radius: 6px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Container for the logo to prevent shrinking */
+.header-logo-container {
+    flex-shrink: 0;
+    margin-right: 30px;
+}
+
+.header-logo-container img {
+  max-height: 90px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.header-title {
+  text-align: left; 
+  color: var(--gdr-slate);
+  line-height: 1.5;
+}
+
+/* Bypassing BiocStyle's h1 auto-numbering overlap AND preventing line breaks */
+.header-title .custom-title {
+  color: var(--gdr-teal);
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  padding: 0;
+  white-space: nowrap; 
+}
+
+.header-title strong {
+  font-size: 18px;
+  color: var(--gdr-slate);
+}
+
+/* Support & Feedback Card */
+.feedback-panel {
+  background-color: #ffffff;
+  border: 1px solid #e1e8ed;
+  border-top: 4px solid var(--gdr-teal);
+  border-radius: 8px;
+  padding: 30px;
+  margin-top: 60px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(18, 155, 179, 0.08);
+}
+
+.feedback-panel h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.btn-feedback {
+  display: inline-block;
+  background-color: var(--gdr-teal);
+  color: white !important;
+  padding: 12px 24px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 15px 0 20px 0;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-feedback:hover {
+  background-color: var(--gdr-slate);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+
+.fullwidth p {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.fullwidth p > img {
+  max-width: 100%;
+  display: block;
+  padding: 0px 0px 0px 0px;
+}
+
+.datatables {
+  margin-top: 5rem;
+}
+
+```
+
+<div class="report-header">
+<div class="header-logo-container">
+<img src="gdr_logo-01.png" alt="gDR Logo">
+</div>
+<div class="header-title">
+<div class="custom-title">1&#46; Import drug screen data</div>
+<strong>gDR Analysis Pipeline</strong>
+
+
+
+
+Date: `r Sys.Date()`
+
+
+
+
+Author: <a href="https://github.com/gdrplatform">gDR team</a>
+</div>
+</div>
+
+# Introduction
+
+This report covers the first step in the gDR analysis pipeline: importing raw data, adding descriptive metadata, and performing initial quality control (QC). The goal is to produce a clean, organized dataset that is ready for reliable dose-response analysis.
+
+```{r libraries}
+library(qs2)
+library(data.table)
+library(summarytools)
+library(gDRutils)
+library(gDRimport)
+library(gDRcore)
+library(gDR)
+library(gDRplots)
+
+
+```
+
+```{r get_wd}
+# get working directory path
+wd <- "{{output_dir}}"
+
+
+```
+
+# Key Output Files
+
+This report generates several key files that are used in the subsequent steps of the gDR pipeline.
+
+## Data Annotation Files (in `data_annotation/` folder):
+
+* **`drug_annotation.csv`:** An annotation file listing all unique drugs found in the data with their annotations.
+* **`cell_line_annotation.csv`:** An annotation file listing all unique cell lines found in the data with their annotations.
+
+## Processed gDR Data (in `gDR_data/` folder):
+
+* **`gDR_input.qs2`:** This is the primary output of Step 1. It is a single, cleaned, and annotated `data.table` in a 'tidy' format, ready to be used as the input for the 'Step 2: Data Processing' report.
+
+{{{extra_sections_import}}}
+
+{{#LONG_TABLE}}
+
+# Import Raw Data from a Long Table
+
+In this step, drug-response data is imported directly from a tidy 'long table' provided as a CSV/TSV file. The data can be supplied by the user in tabular form, or produced by a custom export. Each row describes a single well/measurement, matching the shape of the `data_imported` object used by the rest of the pipeline.
+
+## Minimum Required Fields
+
+For single-agent data, the following fields are essential for the gDR pipeline input:
+
+* **Gnumber**: Unique identifier for the drug/treatment.
+* **clid**: Cell line identifier.
+* **ReadoutValue**: Measurement value obtained.
+* **Duration**: Duration of the experiment.
+* **Concentration**: Concentration of the treatment.
+
+For combination data, add **Gnumber_2** and **Concentration_2** for the second drug.
+
+## Additional Annotations
+
+As with the other input types, drug and cell line annotations are added after import (see below). These enhance the contextual understanding of the data and follow the guidelines specified in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
+
+The file is loaded and validated with `load_long_table()` (from gDRimport), which checks that all required columns are present and that `Duration`, `Concentration`, and `ReadoutValue` are numeric.
+
+```{r load_data}
+long_table <- c(
+  {{{long_table}}}
+)
+
+# copy file to raw_data
+for (file_path in long_table) {
+  file.copy(file_path, file.path(wd, "raw_data", basename(file_path)))
+}
+
+data_imported <- load_long_table(long_table)
+
+
+```
+
+{{/LONG_TABLE}}
+{{#gDRimport}}
+
+# Import Raw Data into gDR and Do Manual Cleanup
+
+{{{extra_sections_provenance}}}
+
+This step merges experimental information from three sources: the manifest (plate metadata), template files (well layouts), and raw data files (instrument readouts). This produces the initial raw dataset for the gDR pipeline.
+
+## Minimum Required Fields
+
+For single-agent data, the following fields are essential for the gDR pipeline input:
+
+* **Gnumber**: Unique identifier for the experiment.
+* **clid**: Cell line identifier.
+* **ReadoutValue**: Measurement value obtained.
+* **Duration**: Duration of the experiment.
+
+## Additional Annotations
+
+In addition to the minimum required fields, the data undergoes a transformation process where annotations are added. These annotations enhance the contextual understanding of the data and include:
+
+* **For Cell Lines**: Information such as cell line name, primary tissue, doubling time, parental identifier, and subtype.
+* **For Drugs**: Details about the drug, including its name and mechanism of action.
+
+## Annotation Guidelines
+
+The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
+
+```{r load_data}
+#import data
+manifest <- c(
+  {{{manifest}}}
+)
+treatment <- c(
+  {{{treatment}}}
+)
+raw_data <- c(
+  {{{raw_data}}}
+)
+
+# copy files to raw_data
+for (file_path in c(manifest, treatment, raw_data)) {
+  file_name <- basename(file_path)  # Extract the filename from the path
+  file.copy(file_path, file.path(wd, "raw_data", file_name))
+}
+
+# Annotations staged alongside the raw data take precedence. Without them the import falls
+# back to looking the annotations up in a database, which is not reachable everywhere.
+drug_annotation_path <- file.path(wd, "data_annotation", "drug_annotation.csv")
+cell_line_annotation_path <- file.path(wd, "data_annotation", "cell_line_annotation.csv")
+
+drug_annotation <- NULL
+if (file.exists(drug_annotation_path)) {
+  drug_annotation <- fread(drug_annotation_path)
+}
+cell_line_annotation <- NULL
+if (file.exists(cell_line_annotation_path)) {
+  cell_line_annotation <- fread(cell_line_annotation_path)
+}
+
+data_imported <- import_data(manifest,
+                             treatment,
+                             raw_data,
+                             instrument = detect_file_format(raw_data[1]),
+                             cell_line_annotation = cell_line_annotation,
+                             drug_annotation = drug_annotation)
+
+
+```
+
+## Visual Quality Control of Plate-Level Data
+
+Here is the refined interpretation text for your report. It has been updated to align with the new visualization method (Heatmap + Numbered Dose Ranks + Shapes).
+
+### **Raw Plate Data Interpretation**
+
+Visually checking the raw plate data is a crucial quality control step to identify technical artifacts. The plots below combine a **Readout Heatmap** with **Dose Ranking** to help you spot issues quickly.
+
+**How to Read the Plot:**
+
+* **Background Color (Heatmap):** Represents the raw **`ReadoutValue`**. Lighter colors indicate lower signal (e.g., dead cells), while darker blue colors indicate higher signal (e.g., healthy controls).
+* **Treatment Symbols (Center of Well):**
+* **Symbol Shape:** Represents the **Cell Line** (e.g., Circle = Cell Line A, Square = Cell Line B).
+* **Single Agent:** Represented by a **single symbol** in the center of the well.
+* **Combination / Cotreatment:** Represented by **two symbols** side-by-side. The left symbol corresponds to Drug 1, and the right symbol corresponds to Drug 2.
+* **Number inside Symbol:** Represents the **Dose Rank** (1 = Lowest dose, N = Highest dose). Refer to the **"Dose Key"** at the bottom of the plot for exact concentrations.
+
+**Automated QC Flags (Borders):**
+
+* <span style="color:red">**Red Border:**</span> **Low Control Failure.** The control well signal is significantly below the plate average (potential edge effect or pipetting error).
+* <span style="color:darkorange">**Orange Border:**</span> **High Signal Artifact.** The treated well signal is anomalously high, exceeding the statistical ceiling defined by controls (potential precipitation or contamination).
+
+**What to Look For:**
+
+1. **Spatial Patterns:** Scan the background colors for unintended gradients. For example, if all outer wells are lighter than the center, this often indicates an **Edge Effect** (evaporation).
+2. **Dose-Response Consistency:** Follow the numbers (1  N). For a standard inhibitor, you expect the background color to fade (signal decrease) as the dose rank increases. If dose N is darker than dose 1, check for solubility issues or outliers.
+3. **Anomalies:** Identify isolated wells that deviate from their neighbors (e.g., a dark spot in a white region) or rows/columns that show a "striping" effect due to liquid handling issues.
+
+```{r, plate_vis}
+plate_vis <- plot_plate_stack_info(data_imported)
+
+
+```
+
+::: {.fullwidth}
+
+### Plate visualization split by variable and barcode {.unnumbered .tabset .tabset-dropdown}
+
+```{r plate_vis_ls, warning=FALSE, echo=FALSE}
+ls_plate_link <- lapply(names(plate_vis), function(barcode_name) {
+  file.path(".",
+            "plots",
+            paste0("plate_stack_", barcode_name, ".png"))
+})
+names(ls_plate_link) <- names(plate_vis)
+
+plate_viz_ls <- prep_plot_chunk(plt_list = plate_vis,
+                                link_list = ls_plate_link,
+                                chunk_name = "plate_viz_stack",
+                                header_level = 4)
+                                
+invisible(loop(seq_along(plate_vis), function(i) {
+  barcode_name <- names(plate_vis)[[i]]
+  plot_object <- plate_vis[[i]]
+
+  save_plot(plt = plot_object,
+            path = file.path(wd, "plots", paste0("plate_stack_", barcode_name)),
+            format = "png")
+}))
+
+
+```
+
+`r knitr::knit(text = unlist(plate_viz_ls))`
+:::
+{{/gDRimport}}
+{{#PRISM_level5}}
+
+# Import PRISM data
+
+This step involves transforming the data extracted from PRISM into a format that is compatible with the gDR (Genentech Drug Response) pipeline. The transformation process ensures that the data aligns with the required fields for input into the gDR pipeline and incorporates annotations essential for comprehensive analysis.
+
+Converting GDS data into a gDR-friendly format is essential to seamlessly integrate it with the gDR pipeline, enabling efficient analysis of drug response data. By adding annotations such as cell line information, drug details, and subtype classifications, researchers can enhance the interpretability and utility of the data for downstream analysis.
+
+## Minimum Required Fields
+
+For single-agent data, the following fields are essential for the gDR pipeline input:
+
+* **Gnumber**: Unique identifier for the experiment.
+* **clid**: Cell line identifier.
+* **ReadoutValue**: Measurement value obtained.
+* **Duration**: Duration of the experiment.
+
+## Additional Annotations
+
+In addition to the minimum required fields, the data undergoes a transformation process where annotations are added. These annotations enhance the contextual understanding of the data and include:
+
+* **For Cell Lines**: Information such as cell line name, primary tissue, doubling time, parental identifier, and subtype.
+* **For Drugs**: Details about the drug, including its name and mechanism of action.
+
+## Annotation Guidelines
+
+The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
+
+```{r load_data}
+#import data
+data_imported <- convert_LEVEL5_prism_to_gDR_input(prism_data_path = "{{prism_data_path}}",
+                                                   meta_data_path = "{{meta_data_path}}")
+data_imported <- cleanup_metadata(data_imported)
+
+
+```
+
+{{/PRISM_level5}}
+
+{{#PRISM_level6}}
+
+# Import PRISM data
+
+This step involves transforming the data extracted from PRISM into a format that is compatible with the gDR (Genentech Drug Response) pipeline. The transformation process ensures that the data aligns with the required fields for input into the gDR pipeline and incorporates annotations essential for comprehensive analysis.
+
+Converting GDS data into a gDR-friendly format is essential to seamlessly integrate it with the gDR pipeline, enabling efficient analysis of drug response data. By adding annotations such as cell line information, drug details, and subtype classifications, researchers can enhance the interpretability and utility of the data for downstream analysis.
+
+## Minimum Required Fields
+
+For single-agent data, the following fields are essential for the gDR pipeline input:
+
+* **Gnumber**: Unique identifier for the experiment.
+* **clid**: Cell line identifier.
+* **ReadoutValue**: Measurement value obtained.
+* **Duration**: Duration of the experiment.
+
+## Additional Annotations
+
+In addition to the minimum required fields, the data undergoes a transformation process where annotations are added. These annotations enhance the contextual understanding of the data and include:
+
+* **For Cell Lines**: Information such as cell line name, primary tissue, doubling time, parental identifier, and subtype.
+* **For Drugs**: Details about the drug, including its name and mechanism of action.
+
+## Annotation Guidelines
+
+The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
+
+```{r load_data}
+#import data
+data_imported <- convert_LEVEL6_prism_to_gDR_input(prism_data_path = "{{prism_data_path}}",
+                                                   cell_line_data_path = "{{cell_line_data_path}}",
+                                                   treatment_data_path = "{{treatment_data_path}}",
+                                                   meta_data_path = "{{meta_data_path}}")
+data_imported <- cleanup_metadata(data_imported)
+
+
+```
+
+{{/PRISM_level6}}
+
+{{#MAE}}
+
+# Import raw data from MAE object
+
+This step involves transforming the MAE object into the raw data.
+
+## Annotation Guidelines
+
+The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
+
+```{r load_data}
+#import data
+mae <- qs_read("{{mae_path}}")
+data_imported <- convert_mae_to_raw_data(standardize_mae(mae))
+data_imported <- cleanup_metadata(data_imported)
+
+
+```
+
+{{/MAE}}
+
+Before executing the pipeline, there exists a provision for manual alterations within the raw data. This allows for the manual modification of certain annotations and the correction of data as needed.
+
+```{r cleanup_data}
+# preview the annotation used in the preprocessing
+drug_annotation_path <- file.path(wd, "data_annotation", "drug_annotation.csv")
+drug_annotation <- if (file.exists(drug_annotation_path)) {
+  fread(drug_annotation_path)
+} else {
+  get_drug_annotation_from_dt(data_imported)
+}
+data_imported <- annotate_dt_with_drug(data_imported, drug_annotation)
+fwrite(drug_annotation, drug_annotation_path)
+generate_datatable(drug_annotation)
+
+
+cell_line_annotation_path <- file.path(wd, "data_annotation", "cell_line_annotation.csv")
+cell_line_annotation <- if (file.exists(cell_line_annotation_path)) {
+  fread(cell_line_annotation_path)
+} else {
+  get_cellline_annotation_from_dt(data_imported)
+}
+data_imported <- annotate_dt_with_cell_line(data_imported, cell_line_annotation)
+fwrite(cell_line_annotation, cell_line_annotation_path)
+generate_datatable(cell_line_annotation)
+
+qs_save(data_imported, file.path(wd, "gDR_data", "gDR_input.qs2"))
+
+
+```
+
+# Imported Data Summary
+
+The table below summarizes the final, annotated dataset. This serves as a final check for data integrity. Key areas for review are:
+
+* **Unique Values (`n_distinct`):** Confirms that the number of unique drugs, cell lines, and other identifiers matches the experimental design.
+* **Missing Data (`% Miss`):** Look at the percentage of missing data in important columns like `ReadoutValue`.
+* **Data Distribution:** Check the small histograms to see if the range and spread of your numeric data look reasonable.
+
+```{r, summary}
+print(dfSummary(data_imported,
+                varnumbers = FALSE,
+                valid.col = FALSE,
+                graph.magnif = 0.8,
+                max.distinct.values	= 50,
+                max.string.width = 50,
+                display.labels = FALSE),
+      method = "render")
+
+
+```
+
+# Conclusion
+
+The data import and quality control step is complete. The final dataset has been saved to `gDR_data/gDR_input.qs2`.
+
+<div class="feedback-panel">
+<h3>We Value Your Feedback!</h3>
+<p>Thank you for using gDR! We are always looking to improve, and your feedback is incredibly valuable to us.</p>
+<a href="https://github.com/gdrplatform/gDR/issues" target="_blank" class="btn-feedback">Share feedback or request features on GitHub</a>
+</div>
+
+# gDR session info
+
+```{r, plot_packages}
+gdr_elapsed <- (proc.time() - gdr_start_time)[["elapsed"]]
+message(sprintf("Report generated in %.1f seconds", gdr_elapsed))
+gdr_sdt <- get_gDR_session_info()
+generate_datatable(gdr_sdt)
+
+cat(sprintf("**Report generation time: %.1f seconds**", gdr_elapsed))
+
+
+```

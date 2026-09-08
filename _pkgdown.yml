@@ -9,3 +9,6 @@ reference:
 - title: Data
 - contents:
   - has_keyword("data")
+- title: Report
+- contents:
+  - has_keyword("report")
