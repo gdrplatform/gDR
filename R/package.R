@@ -3,6 +3,7 @@
 #' @importFrom gDRimport load_data
 #' @importFrom gDRcore merge_data
 #' @importFrom gDRutils fit_curves
+#' @importFrom data.table :=
 
 #' @keywords internal
 #' @return package help page
