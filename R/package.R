@@ -9,3 +9,11 @@
 #' @return package help page
 "_PACKAGE"
 NULL
+
+# data.table columns and symbols referenced by non-standard evaluation
+utils::globalVariables(
+  c(
+    ".SD",
+    "treatment"
+  ),
+  utils::packageName())
