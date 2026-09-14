@@ -1,8 +1,8 @@
 Type: Package
 Package: gDR
 Title: Umbrella package for R packages in the gDR suite
-Version: 1.11.5
-Date: 2026-09-11
+Version: 1.11.6
+Date: 2026-09-14
 Authors@R: c(
     person("Allison", "Vuong", , "vuong.allison@gene.com", role = "aut"),
     person("Bartosz", "Czech", role = "aut",
@@ -41,7 +41,6 @@ Imports:
 Suggests:
     BiocStyle,
     futile.logger,
-    gDRplots,
     gDRstyle (>= 1.7.1),
     gDRtestData (>= 1.7.1),
     ggplot2,
