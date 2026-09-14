@@ -1,8 +1,8 @@
 Type: Package
 Package: gDR
 Title: Umbrella package for R packages in the gDR suite
-Version: 1.11.3
-Date: 2026-06-08
+Version: 1.11.5
+Date: 2026-09-11
 Authors@R: c(
     person("Allison", "Vuong", , "vuong.allison@gene.com", role = "aut"),
     person("Bartosz", "Czech", role = "aut",
@@ -25,19 +25,37 @@ Depends:
     gDRcore (>= 1.7.1),
     gDRimport (>= 1.7.1),
     gDRutils (>= 1.7.1)
+Imports:
+    BumpyMatrix,
+    checkmate,
+    data.table,
+    MultiAssayExperiment,
+    qs2,
+    rmarkdown,
+    S4Vectors,
+    stats,
+    SummarizedExperiment,
+    tools,
+    utils,
+    whisker
 Suggests:
     BiocStyle,
-    BumpyMatrix,
     futile.logger,
+    gDRplots,
     gDRstyle (>= 1.7.1),
     gDRtestData (>= 1.7.1),
+    ggplot2,
     kableExtra,
     knitr,
     markdown,
+    mockery,
+    patchwork,
     purrr,
-    rmarkdown,
-    SummarizedExperiment,
+    RColorBrewer,
+    stringr,
+    summarytools,
     testthat,
+    writexl,
     yaml
 URL: https://github.com/gdrplatform/gDR, https://gdrplatform.github.io/gDR/
 BugReports: https://github.com/gdrplatform/gDR/issues

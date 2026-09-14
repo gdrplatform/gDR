@@ -26,7 +26,7 @@ For now we share a subset of the gDR suite components for pre-processing and pro
 ## R Packages {#rpackages}
 
 gDR suite consists of a few packages that power our app and make it a comprehensive tool.
-All the packages under the gDR umbrella are stored in the [gDR platform GitHub organization](https://github.roche.com/gdrplatform/).
+All the packages under the gDR umbrella are stored in the [gDR platform GitHub organization](https://github.com/gdrplatform).
 
 We are happy to share with you our packages for importing, processing and managing gDR data:
 - gDRimport

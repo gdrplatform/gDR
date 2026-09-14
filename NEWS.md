@@ -1,3 +1,9 @@
+## gDR 1.11.5 - 2026-09-11
+* add the five Incucyte helpers the Incucyte report templates call, so those templates run outside a deployment
+
+## gDR 1.11.4 - 2026-09-01
+* add `run_report()`, a deployment-agnostic driver for the report pipeline, together with its report templates
+
 ## gDR 1.11.3 - 2026-06-08
 * add custom annotation support to `import_data`
 

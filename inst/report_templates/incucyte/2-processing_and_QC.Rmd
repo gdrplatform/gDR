@@ -1,0 +1,357 @@
+---
+title: "2. Time-Course Data Processing"
+author: 
+- name: gDR team
+  url: https://github.com/gdrplatform
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    toc_float: yes
+    titlecaps: false
+    code_folding: hide
+    fig_height: 6
+    fig_width: 8
+    self_contained: {{embed}}
+  md_document:
+    preserve_yaml: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+gdr_start_time <- proc.time()
+knitr::opts_chunk$set(warning = FALSE, message = FALSE,
+                      dev = "png", dev.args = if (capabilities("cairo")) list(type = "cairo-png") else list())
+
+```
+
+```{css gDR_style, echo=FALSE}
+:root {
+  --gdr-teal: #129bb3;   /* Matches the light blue/teal in the gDR logo */
+  --gdr-slate: #3b5460;  /* Matches the dark slate grey in the gDR logo */
+  --gdr-light: #f5f8fa;  /* Soft background for callout boxes */
+  --gdr-red-bg: #fdf2f2; /* Soft background for warning */
+  --gdr-red-border: #d9534f; /* Alert border */
+}
+
+/* Hide standard R Markdown/BiocStyle title text, but KEEP the Code Folding button */
+#header .title,
+#header .author,
+#header .date,
+#header h1,
+#header h2,
+#header h3,
+#header h4,
+#header p {
+  display: none !important;
+}
+
+#header {
+  margin-top: 10px; 
+  min-height: 40px; /* Secures dedicated vertical space for the code button */
+}
+
+body {
+  max-width: 100%;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #333333;
+}
+
+div.main-container {
+  max-width: 1500px;
+}
+
+h1, h2, h3, h4, h5 {
+  color: var(--gdr-slate);
+  font-weight: 600;
+}
+
+h1 {
+  border-bottom: 2px solid var(--gdr-teal);
+  padding-bottom: 8px;
+  margin-top: 40px;
+}
+
+h2 {
+  color: var(--gdr-teal);
+  margin-top: 30px;
+}
+
+a {
+  color: var(--gdr-teal);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Custom Professional Header replaces default */
+.report-header {
+  clear: both; /* FIX: Forces the box to sit below the floated Code button */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--gdr-light);
+  padding: 30px 40px;
+  border-left: 8px solid var(--gdr-teal);
+  border-radius: 6px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Container for the logo to prevent shrinking */
+.header-logo-container {
+    flex-shrink: 0;
+    margin-right: 30px;
+}
+
+.header-logo-container img {
+  max-height: 90px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.header-title {
+  text-align: left; 
+  color: var(--gdr-slate);
+  line-height: 1.5;
+}
+
+/* Bypassing BiocStyle's h1 auto-numbering overlap AND preventing line breaks */
+.header-title .custom-title {
+  color: var(--gdr-teal);
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  padding: 0;
+  white-space: nowrap; 
+}
+
+.header-title strong {
+  font-size: 18px;
+  color: var(--gdr-slate);
+}
+
+/* Support & Feedback Card */
+.feedback-panel {
+  background-color: #ffffff;
+  border: 1px solid #e1e8ed;
+  border-top: 4px solid var(--gdr-teal);
+  border-radius: 8px;
+  padding: 30px;
+  margin-top: 60px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(18, 155, 179, 0.08);
+}
+
+.feedback-panel h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.btn-feedback {
+  display: inline-block;
+  background-color: var(--gdr-teal);
+  color: white !important;
+  padding: 12px 24px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 15px 0 20px 0;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-feedback:hover {
+  background-color: var(--gdr-slate);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+
+.fullwidth p {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.fullwidth p > img {
+  max-width: 100%;
+  display: block;
+  padding: 0px 0px 0px 0px;
+}
+
+.datatables {
+  margin-top: 5rem;
+}
+
+```
+
+<div class="report-header">
+<div class="header-logo-container">
+<img src="gdr_logo-01.png" alt="gDR Logo">
+</div>
+<div class="header-title">
+<div class="custom-title">2&#46; Time-Course Data Processing</div>
+<strong>gDR-Incucyte Time-Course Analysis</strong>
+
+
+
+
+Date: `r Sys.Date()`
+
+
+
+
+Author: <a href="https://github.com/gdrplatform">gDR team</a>
+</div>
+</div>
+
+# Introduction
+
+This report documents the core data processing steps of the gDR-Incucyte pipeline.  Starting with the cleaned data from Step 1, this workflow converts the data into a standardized format and maps controls to treatments.
+
+This step is critical as it maps control wells (e.g., DMSO) to their corresponding treatment wells. This file does **not** perform normalization. All normalization and growth rate calculations are handled in Step 3, based on the `time_course_plot_params.yml` config file.
+
+```{r libraries}
+library(qs2)
+library(MultiAssayExperiment)
+library(data.table)
+library(gDRutils)
+library(gDRcore)
+library(gDRplots)
+
+```
+
+# Key Output File
+
+* **`gDR_data/gDR_mae.qs2`:** The main output of this step. This is a MultiAssayExperiment (MAE) object containing the processed SummarizedExperiment for the time-course data. This file includes all data assays (e.g., RawTreated, Controls, Normalized) and is the required input for Step 3: Analysis.
+
+# Read Input Data
+
+This section loads the cleaned and annotated `data.table` from Step 1 (`gDR_input.qs`), which contains all the merged information from the manifest, template, and raw Incucyte data files.
+
+```{r drug_dose_layout}
+wd <- "{{output_dir}}"
+data_imported <- qs_read(file.path(wd, "gDR_data", "gDR_input.qs2"))
+# Ensure it is explicitly a data.table
+setDT(data_imported)
+
+```
+
+# Structure Data into SummarizedExperiment Object
+
+This step converts the data.table into a SummarizedExperiment object. A key action here is the mapping of control data (e.g., DMSO-treated wells) to the appropriate drug-treated wells.
+
+**Created assays:** `RawTreated`, `Controls`
+
+```{r}
+# Use the standard identifier from gDRutils for consistency
+tc_type <- get_supported_experiments("time-course")
+se_tc <- create_SE(data_imported, data_type = tc_type)
+
+```
+
+More information about this and the following steps related to the gDR pipeline can be found in the [gDR pipeline documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDRcore.Rmd).
+
+# Normalize Viability Data
+
+Normalized values are calculated with the Log2 Fold Change relative to Time 0 for every well.
+
+**Created assays:** `LogFoldChange`
+
+```{r}
+se_tc <- normalize_SE(se_tc, data_type = tc_type)
+
+```
+
+## SE rowData
+
+This table shows the metadata for the rows of the SummarizedExperiment, which correspond to the drugs and treatments.
+
+```{r, create_SE_rowData}
+generate_datatable(as.data.table(rowData(se_tc), keep.rownames = TRUE))
+
+```
+
+## SE colData
+
+This table shows the metadata for the columns of the SummarizedExperiment, which correspond to the cell lines and experimental conditions.
+
+```{r, create_SE_colData}
+generate_datatable(as.data.table(colData(se_tc), keep.rownames = TRUE))
+
+```
+
+## Quality Control: Control-to-Treatment Mapping
+
+This heatmap serves as a quality control check to ensure that every drug treatment in every cell line has a corresponding control value (e.g., DMSO) mapped to it. This mapping is critical for accurate data normalization.
+
+**What to look for:**
+
+* **Green Cells:** Ideal. This indicates a valid control was found.
+* **Red Cells:** A problem. This indicates a missing control mapping for that specific drug/cell line, which will cause normalization errors.
+
+```{r, create_SE_sa_qc, warning=FALSE, fig.show="hide"}
+treat <- convert_se_assay_to_dt(se = se_tc, 
+                                assay_name = "RawTreated")
+controls <- convert_se_assay_to_dt(se = se_tc, 
+                                   assay_name = "Controls")
+
+# Calculate the frequency & create a heatmap
+p <- heatmap_control_mapping_qc(dt_treat = treat, dt_controls = controls)
+
+# create link to chart
+txt_link <- create_zoom_link(
+  file.path(".", "plots", paste("map_controls_to_treated", "{{viz_format}}", sep = ".")))
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = txt_link)`
+
+```{r sa_controls, echo=FALSE}
+print(p)
+
+```
+
+:::
+
+```{r sa_controls_save, echo=FALSE}
+save_plot(plt = p, 
+          path = file.path(wd, "plots", "map_controls_to_treated"), 
+          format = "{{viz_format}}")
+
+```
+
+# Assemble and Save Final Results (MAE)
+
+```{r create_mae}
+# Save using the standard experiment name ("time-course")
+mae <- MultiAssayExperiment(experiments = setNames(list(se_tc), tc_type))
+mae <- standardize_mae(mae)
+qs_save(mae, file.path(wd, "gDR_data", "gDR_mae.qs2"))
+
+```
+
+<div class="feedback-panel">
+<h3>We Value Your Feedback!</h3>
+<p>Thank you for using gDR! We are always looking to improve, and your feedback is incredibly valuable to us.</p>
+<a href="https://github.com/gdrplatform/gDR/issues" target="_blank" class="btn-feedback">Share feedback or request features on GitHub</a>
+</div>
+
+# gDR session info
+
+```{r, plot_packages}
+gdr_elapsed <- (proc.time() - gdr_start_time)[["elapsed"]]
+message(sprintf("Report generated in %.1f seconds", gdr_elapsed))
+gdr_sdt <- get_gDR_session_info()
+generate_datatable(gdr_sdt)
+
+cat(sprintf("**Report generation time: %.1f seconds**", gdr_elapsed))
+
+```

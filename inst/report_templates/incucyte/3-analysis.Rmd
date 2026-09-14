@@ -1,0 +1,916 @@
+---
+title: "3. Time Series Plot of Cell Line Response"
+author: 
+- name: gDR team
+  url: https://github.com/gdrplatform
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    toc_float: yes
+    titlecaps: false
+    code_folding: hide
+    fig_height: 6
+    fig_width: 8
+    self_contained: {{embed}}
+  md_document:
+    preserve_yaml: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+gdr_start_time <- proc.time()
+knitr::opts_chunk$set(warning = FALSE, message = FALSE,
+                      dev = "png", dev.args = if (capabilities("cairo")) list(type = "cairo-png") else list())
+
+```
+
+```{css gDR_style, echo=FALSE}
+:root {
+  --gdr-teal: #129bb3;   /* Matches the light blue/teal in the gDR logo */
+  --gdr-slate: #3b5460;  /* Matches the dark slate grey in the gDR logo */
+  --gdr-light: #f5f8fa;  /* Soft background for callout boxes */
+  --gdr-red-bg: #fdf2f2; /* Soft background for warning */
+  --gdr-red-border: #d9534f; /* Alert border */
+}
+
+/* Hide standard R Markdown/BiocStyle title text, but KEEP the Code Folding button */
+#header .title,
+#header .author,
+#header .date,
+#header h1,
+#header h2,
+#header h3,
+#header h4,
+#header p {
+  display: none !important;
+}
+
+#header {
+  margin-top: 10px; 
+  min-height: 40px; /* Secures dedicated vertical space for the code button */
+}
+
+body {
+  max-width: 100%;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #333333;
+}
+
+div.main-container {
+  max-width: 1500px;
+}
+
+h1, h2, h3, h4, h5 {
+  color: var(--gdr-slate);
+  font-weight: 600;
+}
+
+h1 {
+  border-bottom: 2px solid var(--gdr-teal);
+  padding-bottom: 8px;
+  margin-top: 40px;
+}
+
+h2 {
+  color: var(--gdr-teal);
+  margin-top: 30px;
+}
+
+a {
+  color: var(--gdr-teal);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Custom Professional Header replaces default */
+.report-header {
+  clear: both; /* FIX: Forces the box to sit below the floated Code button */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--gdr-light);
+  padding: 30px 40px;
+  border-left: 8px solid var(--gdr-teal);
+  border-radius: 6px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Container for the logo to prevent shrinking */
+.header-logo-container {
+    flex-shrink: 0;
+    margin-right: 30px;
+}
+
+.header-logo-container img {
+  max-height: 90px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.header-title {
+  text-align: left; 
+  color: var(--gdr-slate);
+  line-height: 1.5;
+}
+
+/* Bypassing BiocStyle's h1 auto-numbering overlap AND preventing line breaks */
+.header-title .custom-title {
+  color: var(--gdr-teal);
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  padding: 0;
+  white-space: nowrap; 
+}
+
+.header-title strong {
+  font-size: 18px;
+  color: var(--gdr-slate);
+}
+
+/* Support & Feedback Card */
+.feedback-panel {
+  background-color: #ffffff;
+  border: 1px solid #e1e8ed;
+  border-top: 4px solid var(--gdr-teal);
+  border-radius: 8px;
+  padding: 30px;
+  margin-top: 60px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(18, 155, 179, 0.08);
+}
+
+.feedback-panel h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.btn-feedback {
+  display: inline-block;
+  background-color: var(--gdr-teal);
+  color: white !important;
+  padding: 12px 24px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 15px 0 20px 0;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-feedback:hover {
+  background-color: var(--gdr-slate);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+
+.fullwidth p {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.fullwidth p > img {
+  max-width: 100%;
+  display: block;
+  padding: 0px 0px 0px 0px;
+}
+
+```
+
+<div class="report-header">
+<div class="header-logo-container">
+<img src="gdr_logo-01.png" alt="gDR Logo">
+</div>
+<div class="header-title">
+<div class="custom-title">3&#46; Time Series Plot of Cell Line Response</div>
+<strong>gDR-Incucyte Time-Course Analysis</strong>
+
+
+
+
+Date: `r Sys.Date()`
+
+
+
+
+Author: <a href="https://github.com/gdrplatform">gDR team</a>
+</div>
+</div>
+
+# Introduction
+
+This report analyzes the processed time-course data from Step 2. Its primary goal is to calculate growth rates over different time periods (defined in the `time_course_plot_params.yml` config) and visualize how different treatments affect cell growth over time.
+
+This analysis helps identify if a drug has an early (cytostatic) vs. late (cytotoxic) effect, or if its effect is constant across the experiment.
+
+# Key Output Files
+
+This report generates both data tables and plots:
+
+* **`tables/grow_rates.csv`:** A long-format table with the calculated growth rate (`rate`, `sd_rate`) for every treatment, cell line, and time period (`range`). It also includes the normalized `plot_value` used for the bar plots.
+* **`tables/grow_rates_wide.csv`:** The same growth rate data, but pivoted to a wide format where columns are cell lines.
+* **`plots/cell_count_curves_...pdf`:** A multi-page PDF document containing the final time-series and growth-rate bar plots for each cell line and treatment comparison, as defined in the config file.
+
+# Data transformation
+
+```{r packages}
+library(ggplot2)
+library(patchwork)
+library(RColorBrewer)
+library(MultiAssayExperiment)
+library(yaml)
+library(qs2)
+library(stringr)
+library(data.table)
+library(gDRcore)
+library(gDRplots)
+library(gDRutils)
+library(gDR)
+
+```
+
+## Read Plotting Configurations
+
+All parameters for this analysis report are controlled by the **`time_course_plot_params.yml`** file, which was provided in the `raw_data` folder in Step 1.
+
+This file defines the time periods, normalization strategy, and plots to be generated. Below is a description of each key parameter, using the file from this run as an example.
+
+```{r read_config}
+wd <- "{{output_dir}}"
+config_path <- file.path(wd, "raw_data/time_course_plot_params.yml")
+config <- read_yaml(config_path)
+
+# Create a summary table of key config parameters
+config_summary <- data.table(
+  Parameter = character(),
+  Description = character(),
+  Value = character()
+)
+
+# Prepare display values for x-axis settings
+# Default theme_bw() axis text size is approx 9pt (base_size 11 * 0.8)
+x_axis_show_val <- if (is.null(config$x_axis_text_show)) TRUE else as.logical(config$x_axis_text_show)
+x_axis_size_str <- if (is.null(config$x_axis_text_size)) "9 (Default)" else as.character(config$x_axis_text_size)
+
+# Add basic parameters
+config_summary <- rbindlist(list(
+  config_summary,
+  data.table(
+    Parameter = "plot_date",
+    Description = "Date string for output file naming",
+    Value = as.character(config$plot_date)
+  ),
+  data.table(
+    Parameter = "cell_lines",
+    Description = "Cell line(s) to analyze and plot",
+    Value = paste(config$cell_lines, collapse = ", ")
+  ),
+  data.table(
+    Parameter = "early_period",
+    Description = "Time window (hours) for early growth rate calculation",
+    Value = paste(config$early_period, collapse = " - ")
+  ),
+  data.table(
+    Parameter = "late_period",
+    Description = "Time window (hours) for late growth rate calculation",
+    Value = paste(config$late_period, collapse = " - ")
+  )
+))
+
+# Add mid_period if defined
+if (!is.null(config$mid_period)) {
+  config_summary <- rbindlist(list(
+    config_summary,
+    data.table(
+      Parameter = "mid_period",
+      Description = "Time window (hours) for mid growth rate calculation (optional)",
+      Value = paste(config$mid_period, collapse = " - ")
+    )
+  ))
+}
+
+# Add normalization and scaling parameters
+config_summary <- rbindlist(list(
+  config_summary,
+  data.table(
+    Parameter = "y_axis_scaling",
+    Description = "Y-axis scaling strategy for bar plots",
+    Value = as.character(config$y_axis_scaling)
+  ),
+  data.table(
+    Parameter = "x_axis_text_show",
+    Description = "Show x-axis text on bar plots (TRUE/FALSE)",
+    Value = as.character(x_axis_show_val)
+  ),
+  data.table(
+    Parameter = "x_axis_text_size",
+    Description = "Font size for x-axis text (if shown)",
+    Value = x_axis_size_str
+  ),
+  data.table(
+    Parameter = "normalization_map",
+    Description = "Normalization targets for each period",
+    Value = paste(names(config$normalization_map), "→", unlist(config$normalization_map), collapse = "; ")
+  )
+))
+
+generate_datatable(config_summary, options = list(pageLength = 20))
+
+```
+
+### Config File Breakdown
+
+The table above shows the key parameters from your configuration file. Below is additional detail on the most important settings:
+
+* **`normalization_map`**: Controls normalization for bar plots. For each period (`early`, `mid`, `late`), you specify a `norm_target`:
+* **`"None"`**: Use the raw log2 growth rate.
+* **`"early"`**: Normalize by the **'early' DMSO** growth rate (relative value where 1.0 = DMSO control).
+
+
+* **`treatment_comparisons`**: Defines which treatments to plot side-by-side (one page per comparison in the output PDF).
+
+## Reading Data
+
+This section loads the processed data from Step 2 (`gDR_mae.qs2`). This object contains the `LogFoldChange` assay, which has been normalized relative to time 0 (log2 scale).
+
+```{r read_in_data}
+mae <- qs_read(file.path(wd, "gDR_data", "gDR_mae.qs2"))
+
+# Extract the time-course experiment
+se <- mae[[get_supported_experiments("time-course")]]
+
+# Extract the normalized data directly into a data.table.
+# convert_se_assay_to_dt automatically merges rowData and colData.
+# The assay name comes from the time-course fit profile rather than a literal,
+# so the report reads whatever gDRcore fits on even if that default changes.
+lfc_assay <- get_fit_profile("time-course")$input_assay
+all_data <- convert_se_assay_to_dt(se, lfc_assay)
+
+# Ensure it is a data.table
+setDT(all_data)
+
+
+```
+
+## Merging Combination Treatment Names
+
+This helper function creates a clean treatment label for plotting (e.g., "DrugA 10uM + DrugB 5uM").
+
+```{r add_treatment_names}
+all_data <- add_treatment_column(dt = all_data)
+
+```
+
+## Opening Output Directory
+
+```{r output_dir}
+dir.create(file.path(wd, "plots"), showWarnings = FALSE)
+rel_output_pdf_path <- file.path("plots", paste0("cell_count_curves_", config$plot_date, "_", config$cell_line, ".pdf"))
+rel_output_pdf_path <- gsub(' ', '_', rel_output_pdf_path)
+output_pdf_path <- file.path(wd, rel_output_pdf_path)
+
+```
+
+# Calculating Time-Specific Growth Rates
+
+To understand the dynamics of the drug response, we don't just look at the endpoint. This section calculates the log2 growth rate (via a linear model) for distinct time periods (e.g., `early`, `mid`, `late`) defined in the config.
+
+## Defining events
+
+Defining the periods from the config file to be used for calculation and plotting.
+
+```{r defining_events}
+
+# Start with the baseline 'treatment' event
+events <- data.table(
+  name = c("treatment"),
+  Duration = c(10))
+
+# Dynamically add periods from config
+period_names <- c()
+period_durations <- c()
+
+if (!is.null(config$early_period)) {
+  period_names <- c(period_names, "early")
+  # ensure period durations are numeric (handles potential config parsing issues)
+  period_durations <- c(period_durations, mean(as.numeric(config$early_period)))
+}
+if (!is.null(config$mid_period)) {
+  period_names <- c(period_names, "mid")
+  period_durations <- c(period_durations, mean(as.numeric(config$mid_period)))
+}
+if (!is.null(config$late_period)) {
+  period_names <- c(period_names, "late")
+  period_durations <- c(period_durations, mean(as.numeric(config$late_period)))
+}
+
+# Bind the new periods to the events data.frame
+if (length(period_names) > 0) {
+  events <- rbindlist(list(events,
+                 data.table(name = period_names, Duration = period_durations)))
+}
+
+```
+
+## Data combinations
+
+This table shows all unique combinations of Cell Line, Treatment, and Plate Barcode found in the data.
+
+```{r data_combinations}
+trt_list <- unique(all_data[, .(treatment)])
+u_combs <- unique(all_data[, .(CellLineName, treatment, Barcode)])
+generate_datatable(u_combs, options = list(pageLength = 15))
+
+```
+
+# Computing Growth Rates Per Time Period (Long format)
+
+In this section the growth rate is calculated for each period, then aggregated, and normalized, based on the normalization_map in the config.
+
+For example, the growth rate of the `mid` and `late` periods can be normalized to the growth rate of the `early` DMSO control. This creates a relative growth rate, allowing you to see how the change in growth rate compares to the control.
+
+The first table below lists the measurement timepoints that each window contains. Read it before the rates: a window is defined by bounds, but the fit only ever sees the measurements that fall inside them, and a window placed close to the sampling grid can hold fewer points than intended. Note the listing is the union across all plates in the dataset, so on a uniform sampling grid it describes every well, but if plates were read on different schedules it is an upper bound rather than a per-well count.
+
+```{r calc_growth_rates}
+
+# Create a list of periods to process from the config
+periods_to_process <- list()
+if (is.null(config$early_period)) {
+  stop("Error: 'early_period' must be defined in config.")
+} else {
+  periods_to_process$early <- config$early_period
+}
+
+if (!is.null(config$mid_period)) periods_to_process$mid <- config$mid_period
+if (!is.null(config$late_period)) periods_to_process$late <- config$late_period
+
+# Check for normalization_map
+if (is.null(config$normalization_map)) {
+  stop("Error: 'normalization_map' block missing from YAML config file.")
+}
+if (!all(names(periods_to_process) %in% names(config$normalization_map))) {
+  stop("Error: 'normalization_map' is missing an entry for one or more defined periods (e.g., early, mid, late).")
+}
+
+
+# Growth rates are computed by compute_growth_rates() from gDRcore, the stage 1
+# of fit_SE.timecourse(). The report used to carry its own copy of this logic; a
+# single implementation keeps the report and the package from drifting apart.
+# Note the time windows are half-open [start, end): a timepoint on the boundary
+# between two contiguous periods belongs to the later one, and t = 0 is kept.
+periods_num <- lapply(periods_to_process, as.numeric)
+norm_map <- unlist(config$normalization_map)[names(periods_to_process)]
+
+# State which measurements each window actually contains. The bounds on their
+# own are ambiguous - whether a timepoint sitting exactly on a boundary counts
+# depends on the window convention - and a window can silently hold far fewer
+# points than intended. gDRcore answers this with the same rule it fits on.
+period_timepoints <- get_period_timepoints(se, periods_num)
+generate_datatable(period_timepoints)
+
+growth_dt <- compute_growth_rates(
+  se,
+  periods = periods_num,
+  normalization_map = norm_map
+)
+
+# Attach the report treatment label by joining on the drug/concentration
+# identifiers, so the labels match the rest of the report exactly.
+id_keys <- c("drug_name", "drug_name2", "drug_name3",
+             "concentration", "concentration2", "concentration3")
+id_cols <- unlist(get_env_identifiers(id_keys, simplify = FALSE))
+join_cols <- intersect(id_cols, intersect(names(all_data), names(growth_dt)))
+if (length(join_cols) == 0) {
+  # merge(by = character(0)) silently degrades to a cartesian join
+  stop("Error: no shared drug/concentration identifier to join the treatment labels on.")
+}
+trt_map <- unique(all_data[, c(join_cols, "treatment"), with = FALSE])
+growth_dt <- merge(growth_dt, trt_map, by = join_cols, all.x = TRUE)
+
+if (anyNA(growth_dt$treatment)) {
+  stop("Error: could not resolve a treatment label for every growth rate row.")
+}
+
+# rate_0 is guaranteed by compute_growth_rates() on every path, controls or not.
+setnames(growth_dt,
+         c("period", "GrowthRate", "sd_GrowthRate"),
+         c("range", "rate", "sd_rate"))
+
+# One row per (cell line, treatment, period). Several drug/concentration
+# groups collapsing into one label would be a labelling problem, not a data
+# problem, so warn rather than fail.
+key_cols <- c("CellLineName", "treatment", "range")
+if (anyDuplicated(growth_dt, by = key_cols) > 0) {
+  warning("Several drug/concentration groups share a treatment label; averaging them.")
+  growth_dt <- growth_dt[, .(rate = mean(rate, na.rm = TRUE),
+                             sd_rate = mean(sd_rate, na.rm = TRUE),
+                             rate_0 = mean(rate_0, na.rm = TRUE),
+                             NormalizedGrowthRate = mean(NormalizedGrowthRate, na.rm = TRUE)),
+                         by = key_cols]
+}
+
+# --- PER-PHASE NORMALIZATION ---
+# compute_growth_rates() already applied normalization_map: NormalizedGrowthRate
+# is the raw rate for "None" periods and rate / control rate otherwise, with
+# rate_0 holding the control baseline that was used.
+norm_df <- data.table(range = names(norm_map), norm_target = unname(norm_map))
+
+cat("\n--- Applying Normalization Map ---\n")
+print(norm_df)
+
+av_rates <- merge(growth_dt[, c(key_cols, "rate", "sd_rate", "rate_0",
+                                "NormalizedGrowthRate"), with = FALSE],
+                  norm_df, by = "range")
+
+av_rates[, is_normalized := norm_target != "None"]
+av_rates[, rel_rates := ifelse(is_normalized, NormalizedGrowthRate, NA_real_)]
+av_rates[, rel_rates_sd := ifelse(is_normalized, sd_rate / abs(rate_0), NA_real_)]
+av_rates[, plot_value := ifelse(is_normalized, rel_rates, rate)]
+av_rates[, plot_sd := ifelse(is_normalized, rel_rates_sd, sd_rate)]
+av_rates[, rate_0 := ifelse(is_normalized, rate_0, NA_real_)]
+av_rates[, NormalizedGrowthRate := NULL]
+
+cat("--- Control Baseline Rates (for normalization lookup) ---\n")
+print(unique(av_rates[is_normalized == TRUE, .(CellLineName, norm_target, rate_0)]))
+
+# Restore the plotting order of periods and treatments
+av_rates[, range := factor(range, levels = names(periods_to_process))]
+av_rates[, treatment := factor(treatment, levels = trt_list$treatment)]
+setcolorder(av_rates, c("range", "CellLineName", "treatment", "rate",
+                        "sd_rate", "norm_target", "rate_0", "rel_rates",
+                        "rel_rates_sd", "plot_value", "plot_sd",
+                        "is_normalized"))
+
+
+# This handles the edge-case  for the "all None" normalization case.
+# Identify all potential numeric columns
+potential_num_cols <- c("rate", "sd_rate", "plot_value", "plot_sd", "rel_rates", "rel_rates_sd", "rate_0")
+
+# Find which of these columns actually exist in av_rates
+existing_num_cols <- intersect(potential_num_cols, colnames(av_rates))
+
+# Check which of these existing columns are NOT all NA
+if (length(existing_num_cols) > 0) {
+  are_not_all_na <- sapply(av_rates[, ..existing_num_cols], function(col) !all(is.na(col)))
+  # The columns to round are the ones that exist and are not all NA
+  round_cols <- existing_num_cols[are_not_all_na]
+} else {
+  round_cols <- c() # No numeric columns found to round
+}
+
+generate_datatable(av_rates, col_to_round = round_cols, options = list(pageLength = 15))
+gr_fpath <- file.path(wd, "tables", "grow_rates.csv")
+fwrite(av_rates, gr_fpath)
+
+```
+
+**What to look for in the table: Scan the `av_rates` table above.**
+
+* Check the `plot_value` column. For 'Raw' phases (`is_normalized: FALSE`), this is the raw log2 growth rate.
+* For normalized phases (`is_normalized: TRUE`), a value of 1.0 means the growth rate is identical to the control (e.g., 'early' DMSO). A value < 1.0 indicates growth inhibition, and < 0 indicates cell death.
+
+## Wide format
+
+This is the same data as above, but pivoted to a wide format where cell lines are columns, which may be more convenient for some users.
+
+```{r grow_rates_wide_format}
+
+av_wide_rates <- cast_to_wide(
+  long_data = av_rates,
+  id_vars   = c("treatment", "range"),
+  col_var   = "CellLineName",
+  val_var   = "rate"
+)
+
+# Ensure av_wide_rates is explicitly a data.table to satisfy check_class assertions
+setDT(av_wide_rates)
+
+round_cols2 <- colnames(av_wide_rates)[!colnames(av_wide_rates) %in% c("CellLineName", "treatment", "range")]
+generate_datatable(av_wide_rates, col_to_round = round_cols2, options = list(pageLength = 15))
+gr_wide_fpath <- file.path(wd, "tables", "grow_rates_wide.csv")
+fwrite(av_wide_rates, gr_wide_fpath)
+
+
+```
+
+## Combined treatment names
+
+This section aggregates the data by treatment and time point for visualization. The `LogFoldChange` (`CellCount_norm`) is used directly from the processed assay.
+
+```{r aggregate_treatments}
+# Use data.table aggregation instead of aggregate()
+# LogFoldChange is already the normalized value we want (log2 fold change from T0)
+df_av <- all_data[, .(CellCount_norm = mean(LogFoldChange, na.rm = TRUE),
+                      sd_CellCount = sd(LogFoldChange, na.rm = TRUE)),
+                  by = .(Duration, CellLineName, treatment)]
+
+ct <- data.table(combined_treaments = sort(levels(unique(av_rates$treatment))))
+generate_datatable(ct, options = list(pageLength = 15))
+
+```
+
+In this section a SummarizedExperiment object is created, to hold the normalized data for plotting.
+
+```{r create_se}
+
+filtered_df_av <- df_av[CellLineName %in% config$cell_line, ]
+
+# Vectorized pivot: Duration x treatment matrices via dcast
+summarized_experiment_normalized <- as.matrix(
+  data.table::dcast(filtered_df_av, Duration ~ treatment, value.var = "CellCount_norm"),
+  rownames = "Duration"
+)
+# Raw counts placeholder (plot only uses NormalizedCellCounts)
+summarized_experiment_raw_counts <- matrix(1,
+  nrow = NROW(summarized_experiment_normalized),
+  ncol = ncol(summarized_experiment_normalized),
+  dimnames = dimnames(summarized_experiment_normalized)
+)
+
+se <- SummarizedExperiment(
+  assays = list(CellCounts = summarized_experiment_raw_counts,
+                NormalizedCellCounts = summarized_experiment_normalized),
+  rowData = rownames(summarized_experiment_normalized),
+  colData = colnames(summarized_experiment_normalized))
+
+metadata(se)$CellLineName <- config$cell_line
+
+```
+
+# Plot Cell Count Fold-Change
+
+The following plots visualize the results for each cell line defined in the config file. Each plot is a 2-panel figure:
+
+**What to look for (Top: Line Plot):**
+
+* This plot shows the log2(Cell count fold-change) over time (relative to T=0).
+* **Control (DMSO):** This is your baseline for normal growth.
+* **Treatment Curves:** Observe how the colored treatment lines diverge from the control. Do they flatten out (cytostatic) or go down (cytotoxic)?
+* **Shaded Regions:** These correspond to the `early`, `mid`, and `late` periods where growth rates are calculated.
+
+**What to look for (Bottom: Bar Plot):**
+
+* This plot summarizes the calculated growth rate from the line plot for each period.
+* **Raw Rate (e.g., `early` phase):** The y-axis is the raw log2 growth rate.
+* **Normalized Rate (e.g., `mid`, `late` phases):** The y-axis is the relative growth rate. The gray line at y=1 represents the control growth rate (from the `early` phase). Bars significantly below 1 show strong growth inhibition in that specific period.
+
+```{r process_and_plot_cell_lines, results='asis', comment=NA}
+
+# In this section all cell lines specified in the config are analyzed, 
+# a SummarizedExperiment object is generated, as well as plots, and embedded PDFs.
+
+# --- 1. Get Cell Lines ---
+# Ensure config$cell_lines is defined. 
+# If not, try to fall back to old config$cell_line for robustness.
+if (is.null(config$cell_lines)) {
+  if (!is.null(config$cell_line)) {
+    config$cell_lines <- c(config$cell_line)
+    warning("Config parameter 'cell_lines' not found. Falling back to 'cell_line'.")
+  } else {
+    stop("No 'cell_lines' or 'cell_line' found in config file.")
+  }
+}
+
+# --- 2. Start Loop ---
+for (current_cell_line in config$cell_lines) {
+  
+  # Print markdown header for this cell line section
+  cat(paste("\n\n---\n\n# 🔬 Plots for Cell Line:", current_cell_line, "\n\n"))
+  
+  # --- 3. Opening Output Directory (Moved from above) ---
+  dir.create(file.path(wd, "plots"), showWarnings = FALSE)
+  
+  # use current_cell_line in the file name
+  # snitize cell line name for the file path
+  # this removes special characters like '#' and '()' which can break embedding
+  safe_cell_line_name <- gsub("[^a-zA-Z0-9_ -]", "", current_cell_line)
+  
+  # Build the filename using the "safe" name
+  pdf_filename <- paste0("cell_count_curves_", config$plot_date, "_", safe_cell_line_name, ".pdf")
+  
+  # Replace spaces with underscores
+  pdf_filename <- gsub(' ', '_', pdf_filename) 
+  
+  # Set the final paths
+  rel_output_pdf_path <- file.path("plots", pdf_filename)
+  output_pdf_path <- file.path(wd, rel_output_pdf_path)
+  
+  # --- 4. Create SummarizedExperiment
+  
+  # filter df_av for the current cell line in the loop
+  filtered_df_av <- df_av[CellLineName == current_cell_line]
+  
+  # Check if data exists for this cell line
+  if (nrow(filtered_df_av) == 0) {
+    cat(paste0("<p style='color:red;'><strong>Warning:</strong> No data found for cell line: ", 
+               current_cell_line, ". Skipping plots for this cell line.</p>"))
+    next # Skip to the next iteration of the loop
+  }
+  
+  # Vectorized pivot: Duration x treatment matrices via dcast
+  summarized_experiment_normalized <- as.matrix(
+    data.table::dcast(filtered_df_av, Duration ~ treatment, value.var = "CellCount_norm"),
+    rownames = "Duration"
+  )
+  # Raw counts placeholder — df_av holds only LogFoldChange (CellCount_norm);
+  # raw cell counts are not available at this stage so we use a ones matrix.
+  summarized_experiment_raw_counts <- matrix(1L,
+    nrow = nrow(summarized_experiment_normalized),
+    ncol = ncol(summarized_experiment_normalized),
+    dimnames = dimnames(summarized_experiment_normalized)
+  )
+
+  se <- SummarizedExperiment(
+    assays = list(CellCounts = summarized_experiment_raw_counts,
+                  NormalizedCellCounts = summarized_experiment_normalized),
+    rowData = rownames(summarized_experiment_normalized),
+    colData = colnames(summarized_experiment_normalized))
+  
+  # set metadata to the current cell line
+  metadata(se)$CellLineName <- current_cell_line
+  
+
+  # --- 5. Plot Cell Count Fold-Change (Moved from above) ---
+  
+  pdf(output_pdf_path, 8, 6)
+   
+  for (sel_trt in config$treatment_comparisons) {
+    trt_names <- sel_trt
+    trt_names <- gsub(' \\+', '\n+', trt_names)
+      
+    trt_colors <- config$all_colors[1:length(sel_trt)]
+    names(trt_colors) <- trt_names
+    
+    # This function is now generic and will use the 'se' metadata
+    sel_av <- filter_treatments(se, sel_trt) 
+    sel_av$Duration <- as.numeric(sel_av$Duration)
+    sel_av$treatment <- factor(sel_av$treatment, sel_trt)
+    levels(sel_av$treatment) <- trt_names
+    
+    # filter sel_rates by the current_cell_line as well
+    # The 'range' column here is now a factor with the correct levels
+    sel_rates <- av_rates[treatment %in% sel_trt & CellLineName == current_cell_line] 
+    
+    sel_rates$treatment <- factor(sel_rates$treatment, sel_trt)
+    levels(sel_rates$treatment) <- trt_names
+    y_max <- max(sel_av$CellCount_norm, na.rm = TRUE)
+    
+    # calculate negative y-limit so cytotoxic curves aren't cut off at 0
+    y_min <- min(sel_av$CellCount_norm, na.rm = TRUE)
+    y_min_limit <- min(0, y_min)
+    
+    x_max <- max(all_data$Duration, na.rm = TRUE)
+    
+    # --- DYNAMIC PLOTTING ---
+    
+    # 1. Build the base line plot
+    p1 <- ggplot(sel_av, aes(x = Duration, color = treatment, y = CellCount_norm))
+    
+    # 2. Create a data.table for period rectangles
+    period_df <- data.table(
+      name = character(),
+      xmin = numeric(),
+      xmax = numeric(),
+      fill = character()
+    )
+    if (!is.null(config$early_period)) {
+      period_df <- rbindlist(list(period_df, data.table(name = "early", xmin = config$early_period[1], xmax = config$early_period[2], fill = "#ffffdd")))
+    }
+    if (!is.null(config$mid_period)) {
+      # Add a new color for the mid period
+      period_df <- rbindlist(list(period_df, data.table(name = "mid", xmin = config$mid_period[1], xmax = config$mid_period[2], fill = "#ddffff"))) # light cyan
+    }
+    if (!is.null(config$late_period)) {
+      period_df <- rbindlist(list(period_df, data.table(name = "late", xmin = config$late_period[1], xmax = config$late_period[2], fill = "#ffddff")))
+    }
+    
+    # 3. Add dynamic layers
+    if (NROW(period_df) > 0) {
+      p1 <- p1 + geom_rect(data = period_df, 
+                          aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf, fill = name), 
+                          alpha = 0.8, color = 'white', inherit.aes = FALSE) +
+                  # Use scale_fill_manual to assign the correct colors
+                  scale_fill_manual(values = setNames(period_df$fill, period_df$name), guide = "none")
+    }
+    
+    # Add vlines and text (which use the dynamic 'events' data.table)
+    p1 <- p1 +
+      geom_vline(xintercept = events$Duration) + # Dynamically plots all vlines
+      geom_text(data = events, 
+                aes(y = y_max + .1, label = name, x = Duration), # Explicitly set aes
+                color = 'black', angle = 90, vjust = 1, hjust = 1, 
+                inherit.aes = FALSE) + # Disable aes inheritance
+      scale_color_manual(values = trt_colors)+
+      # use dynamic y_min_limit
+      coord_cartesian(ylim = c(y_min_limit, y_max+.3), xlim = c(0, 1.001 * x_max))+
+      geom_line(linewidth = 2) +
+      ylab('log2(Cell count fold-change)')+
+      xlab('Time (h)')+
+      ggtitle(metadata(se)$CellLineName) +
+      theme_bw()
+    
+    # 4. Build the bar plot (p2)
+    
+    # --- Set Y-Axis Scaling ---
+    if (is.null(config$y_axis_scaling)) {
+      y_axis_scales <- "free_y" 
+    } else {
+      y_axis_scales <- config$y_axis_scaling
+    }
+    if (!y_axis_scales %in% c("free_y", "fixed")) {
+      warning(paste("Invalid 'y_axis_scaling' value:", y_axis_scales, ". Defaulting to 'free_y'."))
+      y_axis_scales <- "free_y"
+    }
+    
+    # 1. Create the base plot
+    p2 <- ggplot(sel_rates, 
+                 aes(x = treatment, fill = treatment, y = plot_value)) +
+        
+        # This hline at 0 is always present
+        geom_hline(yintercept = 0, color = 'gray') +
+        
+        geom_col(linewidth = 1, width = .6, position = 'dodge') + 
+        
+        # Error bars now use the generic 'plot_sd'
+        geom_errorbar(mapping = aes(ymin = plot_value - plot_sd, 
+                                    ymax = plot_value + plot_sd), 
+                      width = .3) +
+        
+        theme(legend.position = "none") +
+        theme_bw() +
+        scale_colour_grey(guide = "none") +
+        scale_fill_manual(values = trt_colors)
+        
+    # --- X-Axis Text Logic ---
+    # Default to TRUE if not specified in config
+    show_x_text <- if (is.null(config$x_axis_text_show)) TRUE else as.logical(config$x_axis_text_show)
+    
+    # Use specified size or default (9) if NULL
+    x_text_size <- if (is.null(config$x_axis_text_size)) 9 else as.numeric(config$x_axis_text_size)
+    
+    if (show_x_text) {
+       p2 <- p2 + theme(axis.text.x = element_text(angle = 90, hjust = 1, size = x_text_size))
+    } else {
+      p2 <- p2 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+    }
+    
+    p2 <- p2 + 
+        # The 'scales' argument is controlled by the config variable
+        facet_wrap(vars(range), scales = y_axis_scales) +
+        
+        # A generic y-axis label, as units may be mixed
+        ylab("Value (Normalized or Raw Rate)")
+        
+
+    # 2. Conditionally add the y=1 hline
+    # This check prevents the "all None" scaling bug.
+    if (any(sel_rates$is_normalized == TRUE)) {
+      p2 <- p2 + 
+        # This hline at 1 is only drawn for facets where 'is_normalized' is TRUE
+        # uses a subsetting function on the data passed to the plot
+        geom_hline(data = function(x) x[is_normalized == TRUE], 
+               yintercept = 1, color = 'gray')
+    }
+        
+    # 5. Arrange the plots
+    print(patchwork::wrap_plots(p1, p2, ncol = 1))
+  }
+  invisible(dev.off())
+  
+  
+  # --- 6. Embed PDF
+  # This prints the embed tag to the markdown output
+  cat(paste0('\n\n<embed src="', rel_output_pdf_path, '" width="100%" height="600px" type="application/pdf">\n\n'))
+  
+} # --- End of for loop ---  
+
+```
+
+<div class="feedback-panel">
+<h3>We Value Your Feedback!</h3>
+<p>Thank you for using gDR! We are always looking to improve, and your feedback is incredibly valuable to us.</p>
+<a href="https://github.com/gdrplatform/gDR/issues" target="_blank" class="btn-feedback">Share feedback or request features on GitHub</a>
+</div>
+
+# gDR session info
+
+```{r, plot_packages}
+gdr_elapsed <- (proc.time() - gdr_start_time)[["elapsed"]]
+message(sprintf("Report generated in %.1f seconds", gdr_elapsed))
+gdr_sdt <- get_gDR_session_info()
+generate_datatable(gdr_sdt)
+
+cat(sprintf("**Report generation time: %.1f seconds**", gdr_elapsed))
+
+```
+

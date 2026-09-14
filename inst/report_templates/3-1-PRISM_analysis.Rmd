@@ -1,0 +1,897 @@
+---
+title: "3.1 Correlation analysis of PRISM data"
+author: 
+- name: gDR team
+  url: https://github.com/gdrplatform
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    toc_float: yes
+    titlecaps: false
+    code_folding: hide
+    fig_height: 6
+    fig_width: 8
+    self_contained: {{embed}}
+  md_document:
+    preserve_yaml: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+gdr_start_time <- proc.time()
+knitr::opts_chunk$set(warning = FALSE, message = FALSE,
+                      dev = "png", dev.args = if (capabilities("cairo")) list(type = "cairo-png") else list())
+
+
+```
+
+```{css gDR_style, echo=FALSE}
+:root {
+  --gdr-teal: #129bb3;   /* Matches the light blue/teal in the gDR logo */
+  --gdr-slate: #3b5460;  /* Matches the dark slate grey in the gDR logo */
+  --gdr-light: #f5f8fa;  /* Soft background for callout boxes */
+  --gdr-red-bg: #fdf2f2; /* Soft background for warning */
+  --gdr-red-border: #d9534f; /* Alert border */
+}
+
+/* Hide standard R Markdown/BiocStyle title text, but KEEP the Code Folding button */
+#header .title,
+#header .author,
+#header .date,
+#header h1,
+#header h2,
+#header h3,
+#header h4,
+#header p {
+  display: none !important;
+}
+
+#header {
+  margin-top: 10px; 
+  min-height: 40px; /* Secures dedicated vertical space for the code button */
+}
+
+body {
+  max-width: 100%;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #333333;
+}
+
+div.main-container {
+  max-width: 1500px;
+}
+
+h1, h2, h3, h4, h5 {
+  color: var(--gdr-slate);
+  font-weight: 600;
+}
+
+h1 {
+  border-bottom: 2px solid var(--gdr-teal);
+  padding-bottom: 8px;
+  margin-top: 40px;
+}
+
+h2 {
+  color: var(--gdr-teal);
+  margin-top: 30px;
+}
+
+a {
+  color: var(--gdr-teal);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Custom Professional Header replaces default */
+.report-header {
+  clear: both; /* FIX: Forces the box to sit below the floated Code button */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--gdr-light);
+  padding: 30px 40px;
+  border-left: 8px solid var(--gdr-teal);
+  border-radius: 6px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Container for the logo to prevent shrinking */
+.header-logo-container {
+    flex-shrink: 0;
+    margin-right: 30px;
+}
+
+.header-logo-container img {
+  max-height: 90px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.header-title {
+  text-align: left; 
+  color: var(--gdr-slate);
+  line-height: 1.5;
+}
+
+/* Bypassing BiocStyle's h1 auto-numbering overlap AND preventing line breaks */
+.header-title .custom-title {
+  color: var(--gdr-teal);
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  padding: 0;
+  white-space: nowrap; 
+}
+
+.header-title strong {
+  font-size: 18px;
+  color: var(--gdr-slate);
+}
+
+/* Support & Feedback Card */
+.feedback-panel {
+  background-color: #ffffff;
+  border: 1px solid #e1e8ed;
+  border-top: 4px solid var(--gdr-teal);
+  border-radius: 8px;
+  padding: 30px;
+  margin-top: 60px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(18, 155, 179, 0.08);
+}
+
+.feedback-panel h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.btn-feedback {
+  display: inline-block;
+  background-color: var(--gdr-teal);
+  color: white !important;
+  padding: 12px 24px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 15px 0 20px 0;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-feedback:hover {
+  background-color: var(--gdr-slate);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+
+.fullwidth p {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.fullwidth p > img {
+  max-width: 100%;
+  display: block;
+  padding: 0px 0px 0px 0px;
+}
+
+.datatables {
+  margin-top: 5rem;
+}
+
+```
+
+<div class="report-header">
+<div class="header-logo-container">
+<img src="gdr_logo-01.png" alt="gDR Logo">
+</div>
+<div class="header-title">
+<div class="custom-title">3.1&#46; Correlation analysis of PRISM data</div>
+<strong>gDR Analysis Pipeline</strong>
+
+
+
+
+Date: `r Sys.Date()`
+
+
+
+
+Author: <a href="https://github.com/gdrplatform">gDR team</a>
+</div>
+</div>
+
+# Introduction
+
+This report performs a correlation analysis to identify potential biomarkers of drug sensitivity. It correlates the drug response metrics calculated in the previous steps (e.g., IC50, GR_AOC, synergy scores) with external datasets, such as genomic and transcriptomic data from the DepMap portal. The goal is to uncover relationships between molecular features (like gene expression or mutations) and sensitivity or resistance to the tested drugs.
+
+```{r libraries}
+library(qs2)
+library(SummarizedExperiment)
+library(data.table)
+library(gDRutils)
+library(gDRplots)
+library(writexl)
+
+
+```
+
+# Key Output Files
+
+This report generates the **`tables`** folder, which is populated with Excel files containing the detailed results of the correlation analysis.
+
+## Full Association Results (in `tables/` folder)
+
+These files contain the complete statistical results for every feature correlated.
+
+* **`sa_depmap_assoc_tab_...xlsx`:** One file is created for each combination of drug, metric, and feature set (e.g., `sa_depmap_assoc_tab_RV__expression_all_genes_drug_A.xlsx`).
+* **Content:** A table with all features (e.g., genes) as rows and statistical results as columns (`feature`, `rho`, `q_value`).
+* **`combo_depmap_assoc_tab_...xlsx`:** The same as above, but for combination data.
+
+## Top Association Summaries (in `tables/` folder)
+
+These files provide a convenient summary of only the most statistically significant hits from the analysis.
+
+* **`sa_depmap_assoc_tab_summary_...xlsx`:** One file is created for each drug, summarizing the top hits (e.g., q-value < 0.05) across all its metrics, making it easier to identify the most promising biomarkers.
+* **`combo_depmap_assoc_tab_summary_...xlsx`:** The same summary, but for the combination data.
+
+# Read the gDR MAE data
+
+This section loads the final `MultiAssayExperiment` (MAE) object, which contains all the processed data and results from the previous step.
+
+```{r load_mae}
+wd <- "{{output_dir}}"
+mae <- qs_read(file.path(wd, "gDR_data", "gDR_mae.qs2"))
+
+
+```
+
+# Split SE objects into list of assays
+
+This step converts the `SummarizedExperiment` objects into a user-friendly list of data tables for easier data handling in the following analysis.
+
+```{r read_assays}
+assay_list <- MAEpply(mae, function(x) {
+  lst <- lapply(assayNames(x), function(y) convert_se_assay_to_dt(x, y,
+                                                                  unify_metadata = TRUE,
+                                                                  merge_additional_variables = TRUE))
+  names(lst) <- assayNames(x)
+  lst
+})
+
+
+```
+
+# Preparing assay data
+
+The relevant data assays (`Averaged` and `Metrics`) are extracted from the list for the correlation analysis.
+
+```{r prepare_data_sa}
+sa_name <- get_supported_experiments("sa")
+
+response_data_sa <- assay_list[[sa_name]][["Averaged"]]
+response_metrics_sa <- assay_list[[sa_name]][["Metrics"]]
+response_metrics_sa_capped <- 
+  cap_assay_infinities(conc_assay_dt = response_data_sa,
+                       assay_dt = response_metrics_sa,
+                       experiment_name = sa_name,
+                       col = "xc50",
+                       capping_fold = 5)
+
+
+```
+
+{{#has_combo}}
+
+```{r prepare_data_combo}
+combo_name <- get_supported_experiments("combo")
+
+response_metrics_combo <- assay_list[[combo_name]][["Metrics"]]
+response_data_combo <- assay_list[[combo_name]][["Averaged"]]
+response_metrics_scores <- assay_list[[combo_name]][["scores"]]
+response_metrics_combo_capped <- 
+  cap_assay_infinities(conc_assay_dt = response_data_combo,
+                       assay_dt = response_metrics_combo,
+                       experiment_name = combo_name,
+                       col = "xc50",
+                       capping_fold = 5)
+
+
+```
+
+{{/has_combo}}
+
+# Correlation Analysis with DepMap by Drugs (Single-Agent Data)
+
+This step analyzes gDR metrics against selected molecular features (e.g., gene expression, copy number) and metadata from the DepMap portal. For each drug, the analysis generates a panel of plots. The main **volcano plot** (left) visualizes the strength and significance of all correlations, while the **scatter/box plots** (right) show the raw data for the top 4 most significant hits.
+
+**Main Volcano Plot (Left Side)**
+
+Each volcano plot displays the results of correlating one drug sensitivity metric against a full set of molecular features (e.g., all genes in the expression dataset).
+
+**What to look for:**
+
+* **Significant Hits:** Points in the **top-left and top-right** corners of the plot are the most significant. They represent molecular features that are strongly correlated with drug response and pass the statistical significance threshold.
+
+* **Effect Size (X-axis):** The x-axis (`rho`) represents the correlation coefficient. Points far to the **right** are features positively correlated with the metric (e.g., high gene expression is associated with high IC50, indicating resistance). Points far to the **left** are negatively correlated (e.g., high gene expression is associated with low IC50, indicating sensitivity).
+
+* **Statistical Significance (Y-axis):** The y-axis represents the statistical significance (-log10 of the q-value). **The higher a point is on the plot, the more statistically significant** the correlation.
+
+* **Data Tables:** A table of the top associations is provided below each plot for detailed review and can be downloaded as an Excel file.
+
+**Top-Hit Plots (Right Side)**
+
+These plots (usually 4) show the raw data for the top 4 most significant hits from the volcano plot on the left. The plot type depends on the molecular feature:
+
+* **If the feature is numeric (e.g., Gene Expression):** A **scatter plot** is shown.
+* **What to look for:** You should be able to see the correlation visually. If the 'rho' on the volcano plot was negative, the scatter plot should show a top-left to bottom-right trend. The red line is the line of best fit, and labeled points are the cell lines most influential in driving the correlation.
+* **If the feature is categorical (e.g., Mutation Status):** A **boxplot** is shown.
+* **What to look for:** Look for a clear difference in the median (the solid line in the box) between the groups (e.g., between "0" for wild-type and "1" for mutant). A significant hit on the volcano plot should correspond to a boxplot where the distributions are clearly different. The numbers on the x-axis `(N)` show the number of cell lines in each group.
+
+```{r depmap}
+# omics feature set to be correlated
+feature_sets <- c({{feature_sets}})
+if (all(nchar(feature_sets) == 0)) {
+  feature_sets <- info_feature_sets <- NULL
+} else {
+  info_feature_sets <- 
+    sprintf("The following molecular features were selected for analysis: %s.", 
+            paste(feature_sets, collapse = ", "))
+}
+
+metadata_columns <- c({{metadata_columns}})
+if (all(nchar(metadata_columns) == 0)) {
+  metadata_columns <- info_metadata_columns <- NULL
+} else {
+  info_metadata_columns <- 
+    sprintf("The following metadata columns were selected for analysis: %s.", 
+            paste(metadata_columns, collapse = ", "))
+}
+
+
+```
+
+`r info_feature_sets`
+
+`r info_metadata_columns`
+
+```{r features_obj_sa, warning=FALSE, fig.show="hide"}
+drug_name_vec <- sort(unique(response_metrics_sa_capped[["DrugName"]]))
+normalization_type_vec <- ifelse({{plot_GR_values}}, c("RV", "GR"), "RV")
+
+obj_plot <- create_PRISM_plot_list_sa(drug_name_vec = drug_name_vec,
+                                      dt_metrics = response_metrics_sa_capped,
+                                      dt_average = response_data_sa,
+                                      normalization_type_vec = normalization_type_vec,
+                                      metric = c("x_mean", "xc50", "x_max"),
+                                      meta_data_path = "{{meta_data_path}}",
+                                      feat_data_path = "{{feat_data_path}}",
+                                      feature_sets = feature_sets,
+                                      metadata_columns = metadata_columns,
+                                      with_decoding = {{with_decoding}})
+names(obj_plot[["ls_plot"]]) <- 
+  vapply(names(obj_plot[["ls_plot"]]), function(i) escape_special_characters(i), 
+         FUN.VALUE = character(1), USE.NAMES = FALSE)
+names(obj_plot[["ls_assoc_data"]]) <- 
+  vapply(names(obj_plot[["ls_assoc_data"]]), function(i) escape_special_characters(i), 
+         FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+
+```
+
+```{r txt_feature_meta_sa, warning=FALSE, echo=FALSE}
+ls_link <- list()
+dwn_link <- list()
+for (feat_meta in c(feature_sets, metadata_columns)) {
+  for (d_name in drug_name_vec) {
+    # RV plot
+    ls_vol_RV <- obj_plot[["ls_plot"]][[feat_meta]][[d_name]][["RV"]]
+    prefix_RV <- 
+      paste0("sa_depmap_vol_panel_RV__", feat_meta, "_", neutralize_spaces(d_name), "_")
+    ls_link_RV <- 
+      prep_filename_path(plt_list = ls_vol_RV,
+                         prefix = prefix_RV,
+                         path_file = file.path(".", "plots"),
+                         file_format = "{{viz_format}}")
+    ls_link[[feat_meta]][[d_name]][["RV"]] <- ls_link_RV
+    
+    ls_path_RV <- 
+      prep_filename_path(plt_list = ls_vol_RV,
+                         prefix = prefix_RV,
+                         path_file = file.path(wd, "plots"))
+    invisible(loop(seq_along(ls_vol_RV), function(x) {
+      save_plot(plt = ls_vol_RV[[x]], 
+                path = ls_path_RV[[x]],
+                format = "{{viz_format}}")
+    }))
+    # RV table
+    ls_tab_RV <- obj_plot[["ls_assoc_data"]][[feat_meta]][[d_name]][["RV"]]
+    ls_tab_RV <- ls_tab_RV[lengths(ls_tab_RV) != 0]
+    prefix_tab_RV <- 
+      paste0("sa_depmap_assoc_tab_RV__", feat_meta, "_", neutralize_spaces(d_name), "_")
+    ls_data_RV <- 
+      prep_filename_path(plt_list = ls_tab_RV,
+                         prefix = prefix_tab_RV,
+                         path_file = file.path(".", "tables"),
+                         file_format = "xlsx")
+    dwn_link[[feat_meta]][[d_name]][["RV"]] <- ls_data_RV
+    
+    ls_path_data_RV <- 
+      prep_filename_path(plt_list = ls_tab_RV,
+                         prefix = prefix_tab_RV,
+                         path_file = file.path(wd, "tables"),
+                         file_format = "xlsx")
+    invisible(loop(seq_along(ls_tab_RV), function(x) {
+      write_xlsx(
+        ls_tab_RV[[x]],
+        path = ls_path_data_RV[[x]]
+      )
+    }))
+    # GR plot
+    ls_vol_GR <- obj_plot[["ls_plot"]][[feat_meta]][[d_name]][["GR"]]
+    if (NROW(ls_vol_GR) > 0) {
+      prefix_GR <- 
+        paste0("sa_depmap_vol_panel_GR__", feat_meta, "_", neutralize_spaces(d_name), "_")
+      ls_link_GR <- 
+        prep_filename_path(plt_list = ls_vol_GR,
+                           prefix = prefix_GR,
+                           path_file = file.path(".", "plots"),
+                           file_format = "{{viz_format}}")
+      ls_link[[feat_meta]][[d_name]][["GR"]] <- ls_link_GR
+      
+      ls_path_GR <- 
+        prep_filename_path(plt_list = ls_vol_GR,
+                           prefix = prefix_GR,
+                           path_file = file.path(wd, "plots"))
+      invisible(loop(seq_along(ls_vol_GR), function(x) {
+        save_plot(plt = ls_vol_GR[[x]],
+                  path = ls_path_GR[[x]],
+                  format = "{{viz_format}}")
+      }))
+    }
+    # GR table
+    ls_tab_GR <- obj_plot[["ls_assoc_data"]][[feat_meta]][[d_name]][["GR"]]
+    ls_tab_GR <- ls_tab_GR[lengths(ls_tab_GR) != 0]
+    if (NROW(ls_tab_GR) > 0) {
+      prefix_tab_GR <- 
+        paste0("sa_depmap_assoc_tab_GR__", feat_meta, "_", neutralize_spaces(d_name), "_")
+      ls_data_GR <- 
+        prep_filename_path(plt_list = ls_tab_GR,
+                           prefix = prefix_tab_GR,
+                           path_file = file.path(".", "tables"),
+                           file_format = "xlsx")
+      dwn_link[[feat_meta]][[d_name]][["GR"]] <- ls_data_GR
+      
+      ls_path_data_GR <- 
+        prep_filename_path(plt_list = ls_tab_GR,
+                           prefix = prefix_tab_GR,
+                           path_file = file.path(wd, "tables"),
+                           file_format = "xlsx")
+      invisible(loop(seq_along(ls_tab_GR), function(x) {
+        write_xlsx(
+          ls_tab_GR[[x]],
+          path = ls_path_data_GR[[x]]
+        )
+      }))
+    }
+  }
+}
+
+txt_feature_meta_sa <- 
+  prep_nested_plot_chunk(plt_list = obj_plot[["ls_plot"]],
+                         link_list = ls_link,
+                         dwn_list = dwn_link,
+                         chunk_name = "sa_depmap_vol_panel")
+
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(txt_feature_meta_sa))`
+:::
+
+## Summary of associations (Single-Agent Data) {.tabset}
+
+The following tables summarize the most statistically significant associations (q-value < 0.05) found across all the analyses for each drug.
+
+**What to look for:**
+
+* Scan the **'q_value'** column for the lowest values, as these represent the most statistically significant associations.
+* Examine the **'rho'** (correlation coefficient) to understand the direction of the association: a positive value means the feature is associated with resistance (e.g., higher IC50), while a negative value means it's associated with sensitivity (e.g., lower IC50).
+* Note the **'feature'** and **'metric'** to understand which specific molecular feature is linked to which drug sensitivity metric.
+
+```{r prep_assoc_tab_sa}
+ls_sa_RV <- list.files(file.path(wd, "tables"), pattern = "sa_depmap_assoc_tab_RV_")
+ls_sa_GR <- list.files(file.path(wd, "tables"), pattern = "sa_depmap_assoc_tab_GR_")
+
+alpha <- 0.05
+no_of_stat_sign_row <- 10
+
+sa_RV_tab <- prep_assoc_summary(dir_path = file.path(wd, "tables"), 
+                                ls_file = ls_sa_RV,
+                                alpha = alpha,
+                                n_stat_sig_row = no_of_stat_sign_row)
+sa_GR_tab <- prep_assoc_summary(dir_path = file.path(wd, "tables"), 
+                                ls_file = ls_sa_GR,
+                                alpha = alpha,
+                                n_stat_sig_row = no_of_stat_sign_row)
+
+ls_sa_all <- create_PRISM_summary_list(sa_RV_tab, sa_GR_tab)
+
+
+```
+
+```{r prep_assoc_tab_sa_info, echo=FALSE}
+if (NROW(ls_sa_all) == 0) {
+  info_sa_summary <- sprintf(
+    "No statistically significant associations for the single-data experiment (q-value < %s) were found for the selected %s.",
+    alpha,
+    paste(c("molecular features", "metadata columns")[c(!is.null(feature_sets), !is.null(metadata_columns))], collapse = " and "))
+  sa_summary_flag <- FALSE
+} else {
+  info_sa_summary <- NULL
+  sa_summary_flag <- TRUE
+}
+
+
+```
+
+`r info_sa_summary`
+
+```{r prep_assoc_tab_sa_summary, echo=FALSE, eval=sa_summary_flag}
+ls_path_dwn <- list()
+ls_path_dwn <- lapply(names(ls_sa_all), function(i) {
+  ls_ <- prep_filename_path(
+    plt_list = ls_sa_all[[i]],
+    prefix = sprintf("sa_depmap_assoc_tab_summary__%s_", i),
+    path_file = file.path(".", "tables"),
+    file_format = "xlsx")
+  ls_path_dwn[[i]] <- ls_
+})
+names(ls_path_dwn) <- names(ls_sa_all)
+
+ls_path_data <- list()
+ls_path_data <- lapply(names(ls_sa_all), function(i) {
+  ls_ <- prep_filename_path(
+    plt_list = ls_sa_all[[i]],
+    prefix = sprintf("sa_depmap_assoc_tab_summary__%s_", i),
+    path_file = file.path(wd, "tables"),
+    file_format = "xlsx")
+  ls_path_data[[i]] <- ls_
+})
+names(ls_path_data) <- names(ls_sa_all)
+
+invisible(loop(names(ls_sa_all), function(nm) {
+  for (i in seq_len(NROW(ls_sa_all[[nm]]))) {
+    write_xlsx(
+      ls_sa_all[[nm]][[i]], 
+      path = ls_path_data[[nm]][[i]]
+    )
+  }
+}))
+
+wrapped_sa_all <- list()
+wrapped_sa_all <- lapply(names(ls_sa_all), function(i) {
+  ls_ <- lapply(names(ls_sa_all[[i]]), function(nm) {
+    dt_ <- ls_sa_all[[i]][[nm]]
+    num_cols <- names(dt_)[vapply(dt_, is.numeric, logical(1))]
+    generate_datatable(dt_,
+                       options = list(scrollX = TRUE, dom = "ftp"),
+                       col_to_round = intersect(c("rho", "q_value", "neglog_q_value"), num_cols),
+                       digits = 5)
+  })
+  vec_met <- names(ls_sa_all[[i]])
+  vec_met <- gsub("RV", "Relative Viability", vec_met)
+  vec_met <- gsub("GR", "GR Value", vec_met)
+  names(ls_) <- vec_met
+  wrapped_sa_all[[i]] <- ls_
+})
+names(wrapped_sa_all) <- names(ls_sa_all)
+
+
+ls_tab_sa_all <- prep_plot_chunk(plt_list = wrapped_sa_all, 
+                                 dwn_list = ls_path_dwn,
+                                 chunk_name = "sa_depmap_assoc_tab_summary_by_drug", 
+                                 header_level = 3,
+                                 tabset_options = c("tabset", "tabset-fade", "tabset-pills"))
+```
+
+::: {.fullwidth}
+`r if (sa_summary_flag) knitr::knit(text = unlist(ls_tab_sa_all))`
+:::
+
+{{#has_combo}}
+
+# Correlation Analysis with DepMap by Drugs Combination (Combination Data)
+
+This section repeats the correlation analysis for the combination data, correlating both single-agent metrics (in the context of the combination) and synergy scores with the selected molecular features.
+
+The interpretation is the same as for the single-agent data. The plots will show correlations for metrics like IC50, GR50, and also for synergy scores like `hsa_score` or `bliss_score`. A positive correlation with a synergy score means the feature is associated with a more synergistic outcome.
+
+```{r features_obj_combo, warning=FALSE, fig.show="hide"}
+drug_name_vec <- sort(unique(response_metrics_combo[["DrugName"]]))
+codrug_name_vec <- sort(unique(response_metrics_combo[["DrugName_2"]]))
+normalization_type_vec <- ifelse({{plot_GR_values}}, c("RV", "GR"), "RV")
+
+obj_plot <- create_PRISM_plot_list_combo(drug1_name_vec = drug_name_vec,
+                                         drug2_name_vec = codrug_name_vec,
+                                         dt_metrics = response_metrics_combo_capped,
+                                         dt_scores = response_metrics_scores,
+                                         normalization_type_vec = normalization_type_vec,
+                                         metric =  c("x_mean", "xc50", "x_max"),
+                                         metric_scores = c("hsa_score", "bliss_score"),
+                                         meta_data_path = "{{meta_data_path}}",
+                                         feat_data_path = "{{feat_data_path}}",
+                                         feature_sets = feature_sets,
+                                         metadata_columns = metadata_columns,
+                                         with_decoding = {{with_decoding}})
+names(obj_plot[["ls_plot"]]) <- 
+  vapply(names(obj_plot[["ls_plot"]]), function(i) escape_special_characters(i), 
+         FUN.VALUE = character(1), USE.NAMES = FALSE)
+names(obj_plot[["ls_assoc_data"]]) <- 
+  vapply(names(obj_plot[["ls_assoc_data"]]), function(i) escape_special_characters(i), 
+         FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+
+```
+
+```{r txt_feature_meta_combo, warning=FALSE, echo=FALSE}
+drug_name_grid <- unique(
+  response_metrics_combo[DrugName %in% drug_name_vec & DrugName_2 %in% codrug_name_vec, 
+                         c("DrugName", "DrugName_2"), with = FALSE])
+setorder(drug_name_grid)
+drug_name_grid[, drug_combo := paste(DrugName, DrugName_2, sep = " x ")]
+
+ls_link <- list()
+dwn_link <- list()
+for (feat_meta in c(feature_sets, metadata_columns)) {
+  for (d_combo in drug_name_grid$drug_combo) {
+    # RV plot
+    ls_vol_RV <- obj_plot[["ls_plot"]][[feat_meta]][[d_combo]][["RV"]]
+    prefix_RV <- 
+      paste0("combo_depmap_vol_panel_RV__", feat_meta, "_", neutralize_spaces(d_combo), "_")
+    ls_link_RV <- 
+      prep_filename_path(plt_list = ls_vol_RV,
+                         prefix = prefix_RV,
+                         path_file = file.path(".", "plots"),
+                         file_format = "{{viz_format}}")
+    ls_link[[feat_meta]][[d_combo]][["RV"]] <- ls_link_RV
+    
+    ls_path_RV <- 
+      prep_filename_path(plt_list = ls_vol_RV,
+                         prefix = prefix_RV,
+                         path_file = file.path(wd, "plots"))
+    invisible(loop(seq_along(ls_vol_RV), function(x) {
+      save_plot(plt = ls_vol_RV[[x]], 
+                path = ls_path_RV[[x]],
+                format = "{{viz_format}}")
+    }))
+    # RV table
+    ls_tab_RV <- obj_plot[["ls_assoc_data"]][[feat_meta]][[d_combo]][["RV"]]
+    ls_tab_RV <- ls_tab_RV[lengths(ls_tab_RV) != 0]
+    prefix_tab_RV <- 
+      paste0("combo_depmap_assoc_tab_RV__", feat_meta, "_", neutralize_spaces(d_combo), "_")
+    ls_data_RV <- 
+      prep_filename_path(plt_list = ls_tab_RV,
+                         prefix = prefix_tab_RV,
+                         path_file = file.path(".", "tables"),
+                         file_format = "xlsx")
+    dwn_link[[feat_meta]][[d_combo]][["RV"]] <- ls_data_RV
+    
+    ls_path_data_RV <- 
+      prep_filename_path(plt_list = ls_tab_RV,
+                         prefix = prefix_tab_RV,
+                         path_file = file.path(wd, "tables"),
+                         file_format = "xlsx")
+    invisible(loop(seq_along(ls_tab_RV), function(x) {
+      write_xlsx(
+        ls_tab_RV[[x]],
+        path = ls_path_data_RV[[x]]
+      )
+    }))
+    # GR plot
+    ls_vol_GR <- obj_plot[["ls_plot"]][[feat_meta]][[d_combo]][["GR"]]
+    if (NROW(ls_vol_GR) > 0) {
+      prefix_GR <-
+        paste0("combo_depmap_vol_panel_GR__", feat_meta, "_", neutralize_spaces(d_combo), "_")
+      ls_link_GR <- 
+        prep_filename_path(plt_list = ls_vol_GR,
+                           prefix = prefix_GR,
+                           path_file = file.path(".", "plots"),
+                           file_format = "svg")
+      ls_link[[feat_meta]][[d_combo]][["GR"]] <- ls_link_GR
+      
+      ls_path_GR <- 
+        prep_filename_path(plt_list = ls_vol_GR,
+                           prefix = prefix_GR,
+                           path_file = file.path(wd, "plots"))
+      invisible(loop(seq_along(ls_vol_GR), function(x) {
+        save_plot(plt = ls_vol_GR[[x]],
+                  path = ls_path_GR[[x]],
+                  format = "{{viz_format}}")
+      }))
+    }
+    # GR table
+    ls_tab_GR <- obj_plot[["ls_assoc_data"]][[feat_meta]][[d_combo]][["GR"]]
+    ls_tab_GR <- ls_tab_GR[lengths(ls_tab_GR) != 0]
+    if (NROW(ls_tab_GR) > 0) {
+      prefix_tab_GR <- 
+        paste0("combo_depmap_assoc_tab_GR__", feat_meta, "_", neutralize_spaces(d_combo), "_")
+      ls_data_GR <- 
+        prep_filename_path(plt_list = ls_tab_GR,
+                           prefix = prefix_tab_GR,
+                           path_file = file.path(".", "tables"),
+                           file_format = "xlsx")
+      dwn_link[[feat_meta]][[d_combo]][["GR"]] <- ls_data_GR
+      
+      ls_path_data_GR <- 
+        prep_filename_path(plt_list = ls_tab_GR,
+                           prefix = prefix_tab_GR,
+                           path_file = file.path(wd, "tables"),
+                           file_format = "xlsx")
+      invisible(loop(seq_along(ls_tab_GR), function(x) {
+        write_xlsx(
+          ls_tab_GR[[x]],
+          path = ls_path_data_GR[[x]]
+        )
+      }))
+    }
+  }
+}
+
+txt_feature_meta_combo <- 
+  prep_nested_plot_chunk(plt_list = obj_plot[["ls_plot"]],
+                         link_list = ls_link,
+                         dwn_list = dwn_link,
+                         chunk_name = "combo_depmap_vol_panel")
+
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(txt_feature_meta_combo))`
+:::
+
+## Summary of associations (Combination Data) {.tabset}
+
+The following tables summarize the most statistically significant associations (q-value < 0.05) found for the combination data.
+
+**What to look for:**
+
+* Look for features that are significantly correlated with synergy scores (`hsa_score`, `bliss_score`). These are potential biomarkers for synergistic or antagonistic responses to the drug combination.
+* As before, use the **'q_value'** and **'rho'** to assess the significance and direction of the associations.
+
+```{r prep_assoc_tab_combo}
+ls_combo_RV <- list.files(file.path(wd, "tables"), pattern = "combo_depmap_assoc_tab_RV_")
+ls_combo_GR <- list.files(file.path(wd, "tables"), pattern = "combo_depmap_assoc_tab_GR_")
+
+combo_RV_tab <- prep_assoc_summary(dir_path = file.path(wd, "tables"), 
+                                   ls_file = ls_combo_RV,
+                                   alpha = alpha,
+                                   n_stat_sig_row = no_of_stat_sign_row)
+combo_GR_tab <- prep_assoc_summary(dir_path = file.path(wd, "tables"), 
+                                   ls_file = ls_combo_GR,
+                                   alpha = alpha,
+                                   n_stat_sig_row = no_of_stat_sign_row)
+
+ls_combo_all <- create_PRISM_summary_list(combo_RV_tab, combo_GR_tab)
+
+
+```
+
+```{r prep_assoc_tab_combo_info, echo=FALSE}
+if (NROW(ls_sa_all) == 0) {
+  info_combo_summary <- sprintf(
+    "No statistically significant associations for the combination experiment (q-value < %s) were found for the selected %s.",
+    alpha,
+    paste(c("molecular features", "metadata columns")[c(!is.null(feature_sets), !is.null(metadata_columns))], collapse = " and "))
+  combo_summary_flag <- FALSE
+} else {
+  info_combo_summary <- NULL
+  combo_summary_flag <- TRUE
+}
+
+
+```
+
+`r info_sa_summary`
+
+```{r prep_assoc_tab_combo_summary, echo=FALSE, eval=combo_summary_flag}
+ls_path_dwn <- list()
+ls_path_dwn <- lapply(names(ls_combo_all), function(i) {
+  ls_ <- prep_filename_path(
+    plt_list = ls_combo_all[[i]],
+    prefix = sprintf("combo_depmap_assoc_tab_summary__%s_", i),
+    path_file = file.path(".", "tables"),
+    file_format = "xlsx")
+  ls_path_dwn[[i]] <- ls_
+})
+names(ls_path_dwn) <- names(ls_combo_all)
+
+ls_path_data <- list()
+ls_path_data <- lapply(names(ls_combo_all), function(i) {
+  ls_ <- prep_filename_path(
+    plt_list = ls_combo_all[[i]],
+    prefix = sprintf("combo_depmap_assoc_tab_summary__%s_", i),
+    path_file = file.path(wd, "tables"),
+    file_format = "xlsx")
+  ls_path_data[[i]] <- ls_
+})
+names(ls_path_data) <- names(ls_combo_all)
+
+invisible(loop(names(ls_combo_all), function(nm) {
+  for (i in seq_len(NROW(ls_combo_all[[nm]]))) {
+    write_xlsx(
+      ls_combo_all[[nm]][[i]], 
+      path = ls_path_data[[nm]][[i]]
+    )
+  }
+}))
+
+wrapped_combo_all <- list()
+wrapped_combo_all <- lapply(names(ls_combo_all), function(i) {
+  ls_ <- lapply(names(ls_combo_all[[i]]), function(nm) {
+    dt_ <- ls_combo_all[[i]][[nm]]
+    num_cols <- names(dt_)[vapply(dt_, is.numeric, logical(1))]
+    generate_datatable(dt_,
+                       options = list(scrollX = TRUE, dom = "ftp"),
+                       col_to_round = intersect(c("rho", "q_value", "neglog_q_value"), num_cols),
+                       digits = 5)
+  })
+  vec_met <- names(ls_combo_all[[i]])
+  vec_met <- gsub("RV", "Relative Viability", vec_met)
+  vec_met <- gsub("GR", "GR Value", vec_met)
+  names(ls_) <- vec_met
+  wrapped_combo_all[[i]] <- ls_
+})
+names(wrapped_combo_all) <- names(ls_combo_all)
+
+ls_tab_combo_all <- 
+  prep_plot_chunk(plt_list = wrapped_combo_all, 
+                  dwn_list = ls_path_dwn,
+                  chunk_name = "combo_depmap_assoc_tab_summary_by_drug", 
+                  header_level = 3,
+                  tabset_options = c("tabset", "tabset-fade", "tabset-pills"))
+```
+
+::: {.fullwidth}
+`r if (combo_summary_flag) knitr::knit(text = unlist(ls_tab_combo_all))`
+:::
+
+{{/has_combo}}
+
+## {.unnumbered}
+
+# Conclusion
+
+This report has identified potential associations between molecular features and drug sensitivity by correlating the experimental gDR results with data from the DepMap portal. The volcano plots and summary tables highlight the most statistically significant relationships, providing a foundation for biomarker discovery and further mechanistic investigation.
+
+<div class="feedback-panel">
+<h3>We Value Your Feedback!</h3>
+<p>Thank you for using gDR! We are always looking to improve, and your feedback is incredibly valuable to us.</p>
+<a href="https://github.com/gdrplatform/gDR/issues" target="_blank" class="btn-feedback">Share feedback or request features on GitHub</a>
+</div>
+
+# gDR session info
+
+```{r, plot_packages}
+gdr_elapsed <- (proc.time() - gdr_start_time)[["elapsed"]]
+message(sprintf("Report generated in %.1f seconds", gdr_elapsed))
+gdr_sdt <- get_gDR_session_info()
+generate_datatable(gdr_sdt)
+
+cat(sprintf("**Report generation time: %.1f seconds**", gdr_elapsed))
+
+
+```

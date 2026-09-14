@@ -1,0 +1,2309 @@
+---
+title: "3. Results Analysis and Visualization"
+author: 
+- name: gDR team
+  url: https://github.com/gdrplatform
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    toc_float: yes
+    titlecaps: false
+    code_folding: hide
+    fig_height: 6
+    fig_width: 8
+    self_contained: {{embed}}
+  md_document:
+    preserve_yaml: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+gdr_start_time <- proc.time()
+knitr::opts_chunk$set(warning = FALSE, message = FALSE,
+                      dev = "png", dev.args = if (capabilities("cairo")) list(type = "cairo-png") else list())
+```
+
+```{css gDR_style, echo=FALSE}
+:root {
+  --gdr-teal: #129bb3;   /* Matches the light blue/teal in the gDR logo */
+  --gdr-slate: #3b5460;  /* Matches the dark slate grey in the gDR logo */
+  --gdr-light: #f5f8fa;  /* Soft background for callout boxes */
+  --gdr-red-bg: #fdf2f2; /* Soft background for warning */
+  --gdr-red-border: #d9534f; /* Alert border */
+}
+
+/* Hide standard R Markdown/BiocStyle title text, but KEEP the Code Folding button */
+#header .title,
+#header .author,
+#header .date,
+#header h1,
+#header h2,
+#header h3,
+#header h4,
+#header p {
+  display: none !important;
+}
+
+#header {
+  margin-top: 10px; 
+  min-height: 40px; /* Secures dedicated vertical space for the code button */
+}
+
+body {
+  max-width: 100%;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #333333;
+}
+
+div.main-container {
+  max-width: 1500px;
+}
+
+h1, h2, h3, h4, h5 {
+  color: var(--gdr-slate);
+  font-weight: 600;
+}
+
+h1 {
+  border-bottom: 2px solid var(--gdr-teal);
+  padding-bottom: 8px;
+  margin-top: 40px;
+}
+
+h2 {
+  color: var(--gdr-teal);
+  margin-top: 30px;
+}
+
+a {
+  color: var(--gdr-teal);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Custom Professional Header replaces default */
+.report-header {
+  clear: both; /* FIX: Forces the box to sit below the floated Code button */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--gdr-light);
+  padding: 30px 40px;
+  border-left: 8px solid var(--gdr-teal);
+  border-radius: 6px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Container for the logo to prevent shrinking */
+.header-logo-container {
+    flex-shrink: 0;
+    margin-right: 30px;
+}
+
+.header-logo-container img {
+  max-height: 90px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.header-title {
+  text-align: left; 
+  color: var(--gdr-slate);
+  line-height: 1.5;
+}
+
+/* Bypassing BiocStyle's h1 auto-numbering overlap AND preventing line breaks */
+.header-title .custom-title {
+  color: var(--gdr-teal);
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  padding: 0;
+  white-space: nowrap; 
+}
+
+.header-title strong {
+  font-size: 18px;
+  color: var(--gdr-slate);
+}
+
+/* Support & Feedback Card */
+.feedback-panel {
+  background-color: #ffffff;
+  border: 1px solid #e1e8ed;
+  border-top: 4px solid var(--gdr-teal);
+  border-radius: 8px;
+  padding: 30px;
+  margin-top: 60px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(18, 155, 179, 0.08);
+}
+
+.feedback-panel h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.btn-feedback {
+  display: inline-block;
+  background-color: var(--gdr-teal);
+  color: white !important;
+  padding: 12px 24px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 15px 0 20px 0;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-feedback:hover {
+  background-color: var(--gdr-slate);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+
+.fullwidth p {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.fullwidth p > img {
+  max-width: 100%;
+  display: block;
+  padding: 0px 0px 0px 0px;
+}
+
+.datatables {
+  margin-top: 5rem;
+}
+
+```
+
+<div class="report-header">
+<div class="header-logo-container">
+<img src="gdr_logo-01.png" alt="gDR Logo">
+</div>
+<div class="header-title">
+<div class="custom-title">3&#46; Results Analysis and Visualization</div>
+<strong>gDR Analysis Pipeline</strong>
+
+
+
+
+Date: `r Sys.Date()`
+
+
+
+
+Author: <a href="https://github.com/gdrplatform">gDR team</a>
+</div>
+</div>
+
+# Introduction
+
+This report concludes the gDR analysis pipeline by presenting the final results in user-friendly formats. Starting with the processed `MultiAssayExperiment` object from Step 2, this report first exports all data into Excel files. It then generates a series of visualizations designed for biological interpretation, including dose-response curves and summary heatmaps of the calculated drug sensitivity metrics.
+
+```{r libraries}
+library(qs2)
+library(SummarizedExperiment)
+library(data.table)
+library(writexl)
+library(gDRutils)
+library(gDRplots)
+library(ggplot2)
+library(purrr)
+```
+
+# Key Output Files
+
+This report generates the **`tables`** folder, which contains the final, user-friendly Excel files for all processed data and visualization data.
+
+## Main Assay Reports (in `tables/` folder)
+
+These files contain the full processed data in a "long" (tidy) format, with one Excel file per experiment type (e.g., `single-agent-assay-data.xlsx`, `combo-assay-data.xlsx`). Each file contains multiple sheets:
+
+* **`Averaged`:** The normalized dose-response data, averaged across technical replicates.
+* **Key columns:** `Concentration`, `x`, and `x_std`. The `x` column represents the mean normalized response, and `x_std` is its standard deviation. The meaning of these values (Relative Viability or GR value) is defined by the `normalization_type` column in the same row.
+
+
+* **`Metrics`:** The final calculated drug-response parameters. The meaning of all metrics prefixed with `x_` (e.g., `xc50`, `x_mean`) is dependent on the `normalization_type` column (e.g., "RV" or "GR") in the same row.
+* **Key columns:**
+* `x_mean`: The mean normalized response across all concentrations (excluding controls).
+* `x_AOC`: The Area Over the Curve, averaged over the full concentration range.
+* `x_AOC_range`: The Area Over the Curve, calculated only within the tested concentration range.
+* `xc50`: The concentration (e.g., IC50 or GR50) at which the response reaches 0.5.
+* `x_max`: The maximum effect of the drug (Emax).
+* `ec50`: The drug concentration at half-maximal effect.
+* `x_inf`: The asymptotic response as concentration goes to infinity (bottom asymptote).
+* `x_0`: The asymptotic response at zero concentration (top asymptote).
+* `h`: The Hill slope, reflecting the steepness of the curve.
+* `r2`: R-squared, indicating the goodness-of-fit.
+* `p_value`: The p-value associated with the model fit.
+* `rss`: Residual sum of squares, a measure of model error.
+* `x_sd_avg`: The average standard deviation of the normalized response values.
+* `fit_type`: The status of the curve fit (e.g., "DRC4pHillFitModel" for a successful 4-parameter fit, "DRCConstantFitResult" for a flat fit, or "DRCInvalidFitResult" for a failed fit).
+* `maxlog10Concentration`: The highest log10 concentration tested.
+* `N_conc`: The number of unique concentrations used in the fit.
+* `cotrt_value` (combo only): The concentration of the fixed co-drug in a dose-response series.
+* `ratio` (combo only): The concentration ratio between the two drugs in a series.
+* `dilution_drug` (combo only): Indicates which drug was diluted in the series (e.g., "drug_1", "drug_2", or "codilution").
+
+
+
+
+* **`excess` (combo only):** Contains the calculated "excess" response (synergy/antagonism) at *every* dose combination, which is the basis for the final summary scores.
+* **Key columns:** `smooth` (the model-smoothed normalized response value), `hsa_excess` (the calculated synergy/antagonism score using the HSA model), and `bliss_excess` (the synergy/antagonism score using the Bliss model). The `normalization_type` column indicates if these values are based on "RV" or "GR" data.
+
+
+* **`all_iso_points` (combo only):** The complete dataset of fitted points from the dose-response surface used to calculate the isobolograms.
+* **Key columns:**
+* `iso_level`: The effect level (e.g., 0.25, 0.5, 0.75).
+* `conc_1`, `conc_2`: The concentrations of drug 1 and drug 2 that produce the given effect level.
+* `pos_x`, `pos_y`: The x/y coordinates of this point on the (log-transformed) dose-response surface.
+* `fit_type`: The source of the fit (`by_row`, `by_col`, or `by_codil`).
+
+
+
+
+* `scores` (combo only): The single-value summary scores that quantify the overall synergistic or antagonistic effect for each drug combination.
+* **Key columns:**
+* `hsa_score`: Synergy score based on the Highest Single Agent (HSA) model. A positive score indicates the combination is more effective than its most active single drug.
+* `bliss_score`: Synergy score based on the Bliss Independence model. A positive score indicates the combination is more effective than expected if the drugs acted independently.
+* `CIScore_50`: Combination Index (CI) score at 50% effect. A value < 1 indicates synergy.
+* `CIScore_80`: Combination Index (CI) score at 80% effect. A value < 1 indicates synergy.
+* `normalization_type`: Indicates if these scores are based on "RV" or "GR" data.
+
+
+
+
+* **`isobolograms` (combo only):** The data points used to draw the final isobole lines (contours of equal effect) and the Combination Index plots.
+* **Key columns:**
+* `iso_level`: The effect level being plotted (e.g., 0.5 for 50% effect).
+* `pos_x`, `pos_y`: The coordinates for the *measured* isobole line (solid line on the heatmap).
+* `pos_x_ref`, `pos_y_ref`: The coordinates for the *theoretical additivity* line (dashed line on the heatmap).
+* `log10_ratio_conc`: The log10 of the concentration ratio, used as the x-axis for the CI plot.
+* `log2_CI`: The log2 of the Combination Index, used as the y-axis for the CI plot (where 0 = additivity).
+
+
+
+
+
+## Heatmap Data (in `tables/` folder)
+
+These files contain the specific data used to generate the summary heatmaps, pre-formatted for convenience. Each Excel file (e.g., `data__sa_fit_heat_RV__log10(IC50).xlsx` or `data__combo_fit_...xlsx`) contains three sheets:
+
+* **`matrix`:** The wide-format data matrix. The first column lists the rows (e.g., Drugs or Drug Combinations), the first row lists the columns (e.g., Cell Lines), and the cells contain the metric values.
+* **`annotation_col`:** A table of metadata for the columns of the `matrix` sheet (e.g., cell line tissue type).
+* **`annotation_row`:** A table of metadata for the rows of the `matrix` sheet (e.g., drug MOA).
+
+# Read the gDR MAE data
+
+This section loads the final `MultiAssayExperiment` (MAE) object, which contains all the processed data and results from the previous step.
+
+```{r load_mae}
+wd <- "{{output_dir}}"
+mae <- qs_read(file.path(wd, "gDR_data", "gDR_mae.qs2"))
+
+```
+
+# Split SE objects into list of assays and save as an XLSX file
+
+For convenience and for sharing with non-R users, all processed data assays (Averaged, Metrics, etc.) are extracted from the MAE object and saved as multi-sheet Excel files. One file is created for each experiment type (e.g., single-agent, combo).
+
+```{r split_assay}
+assay_list <- MAEpply(mae, function(x) {
+  lst <- lapply(setdiff(assayNames(x), c("RawTreated", "Controls", "Normalized")),
+                function(y) convert_se_assay_to_dt(x, y,
+                                                   unify_metadata = TRUE,
+                                                   merge_additional_variables = TRUE))
+  names(lst) <- setdiff(assayNames(x), c("RawTreated", "Controls", "Normalized"))
+  lst
+})
+
+```
+
+```{r save_xlsx}
+assay_list_to_save <- lapply(assay_list, split_big_table_for_xlsx)
+for (experiment in names(assay_list_to_save)) {
+  write_xlsx(assay_list_to_save[[experiment]], file.path(wd, "tables",
+                                                         paste0(experiment,
+                                                                "-assay-data.xlsx")))
+}
+
+```
+
+# Downstream data analysis
+
+This section prepares the final data for plotting and generates a series of visualizations for biological interpretation of the results.
+
+```{r prepare_data_sa}
+sa_name <- get_supported_experiments("sa")
+
+response_data_sa <- assay_list[[sa_name]][["Averaged"]]
+response_metrics_sa <- assay_list[[sa_name]][["Metrics"]]
+response_metrics_sa_capped <- 
+  cap_assay_infinities(conc_assay_dt = response_data_sa,
+                       assay_dt = response_metrics_sa,
+                       experiment_name = sa_name,
+                       col = "xc50",
+                       capping_fold = 5)
+
+```
+
+```{r verbose_mode_info, echo=FALSE}
+if ({{verbose_mode}}) {
+  verbose_mode_info <- verbose_mode_info_2 <- NULL
+} else {
+  verbose_mode_info <- sprintf("This section will be generated if `verbose_mode` is set to TRUE.")
+  verbose_mode_info_2 <- paste(verbose_mode_info, 
+                               "(Instead of dose-response curves for each drug, heatmaps with average values are prepared.)")
+}
+
+```
+
+{{#has_combo}}
+
+```{r prepare_data_combo}
+combo_name <- get_supported_experiments("combo")
+
+response_metrics_combo <- assay_list[[combo_name]][["Metrics"]]
+response_data_combo <- assay_list[[combo_name]][["Averaged"]]
+response_metrics_excess <- assay_list[[combo_name]][["excess"]]
+response_metrics_isobolograms <- assay_list[[combo_name]][["isobolograms"]]
+response_metrics_scores <- assay_list[[combo_name]][["scores"]]
+response_metrics_combo_capped <- 
+  cap_assay_infinities(conc_assay_dt = response_data_combo,
+                       assay_dt = response_metrics_combo,
+                       experiment_name = combo_name,
+                       col = "xc50",
+                       capping_fold = 5)
+
+```
+
+{{/has_combo}}
+
+{{#PRISM_excluded}}
+
+## Data Analysis - Dose-response Curves by Drugs - Single-Agent Data {.tabset .tabset-fade .tabset-pills}
+
+In this view, each plot displays a single **drug** tested across all **cell lines**. This format is ideal for quickly identifying which cell lines are sensitive or resistant to a specific drug.
+
+**What to look for:** Look for curves that shift to the left (indicating higher potency) or have a lower plateau (indicating greater efficacy) in certain cell lines.
+
+`r verbose_mode_info_2`
+
+```{r fit_data_curv_cl_viz_RV, warning=FALSE, fig.show="hide"}
+cellline_name_vec <- sort(unique(response_metrics_sa[["CellLineName"]]))
+drug_name_vec <- sort(unique(response_metrics_sa[["DrugName"]]))
+
+if ({{verbose_mode}}) {
+  ls_curv_RV <- plot_dose_response_sa_by_CLs(dt_metrics = response_metrics_sa, 
+                                             dt_average = response_data_sa,
+                                             cellline_name_vec = cellline_name_vec, 
+                                             drug_name_vec = drug_name_vec,
+                                             normalization_type = "RV")
+  names(ls_curv_RV) <- vapply(names(ls_curv_RV), function(i) escape_special_characters(i), 
+                              FUN.VALUE = character(1), USE.NAMES = FALSE)
+} else {
+  sa_splits <- split(response_data_sa, by = "DrugName")
+  ls_heat_d_RV <- loop(drug_name_vec, function(nm) {
+    pheatmap_qc(dt_average = sa_splits[[nm]],
+                normalization_type = "RV",
+                lbl_by_CellLineName = TRUE,
+                lbl_by_DrugName = TRUE,
+                cluster_rows = TRUE)
+  })
+  names(ls_heat_d_RV) <- vapply(drug_name_vec, function(i) escape_special_characters(i),
+                                FUN.VALUE = character(1), USE.NAMES = FALSE)
+}
+
+```
+
+{{#plot_GR_values}}
+
+```{r fit_data_curv_cl_viz_GR, warning=FALSE, fig.show="hide"}
+if ({{verbose_mode}}) {
+  ls_curv_GR <- plot_dose_response_sa_by_CLs(dt_metrics = response_metrics_sa, 
+                                             dt_average = response_data_sa,
+                                             cellline_name_vec = cellline_name_vec, 
+                                             drug_name_vec = drug_name_vec,
+                                             normalization_type = "GR")
+  names(ls_curv_GR) <- vapply(names(ls_curv_GR), function(i) escape_special_characters(i), 
+                              FUN.VALUE = character(1), USE.NAMES = FALSE)
+} else {
+  if (!exists("sa_splits")) sa_splits <- split(response_data_sa, by = "DrugName")
+  ls_heat_d_GR <- loop(drug_name_vec, function(nm) {
+    pheatmap_qc(dt_average = sa_splits[[nm]],
+                normalization_type = "GR",
+                lbl_by_CellLineName = TRUE,
+                lbl_by_DrugName = TRUE,
+                cluster_rows = TRUE)
+  })
+  names(ls_heat_d_GR) <- vapply(drug_name_vec, function(i) escape_special_characters(i),
+                                FUN.VALUE = character(1), USE.NAMES = FALSE)
+}
+
+```
+
+{{/plot_GR_values}}
+
+::: {.fullwidth}
+
+### Relative Viability {.tabset .tabset-dropdown}
+
+```{r fit_data_curv_cl_tab, warning=FALSE, echo=FALSE}
+if ({{verbose_mode}}) {
+ ls_plts <- ls_curv_RV
+ plt_prefix <- "sa_fit_curv_cl_RV__"
+ chunk_name <- "fit_curv_cl_tab_RV"
+} else {
+ ls_plts <- ls_heat_d_RV
+ plt_prefix <- "sa_heat_d_RV__"
+ chunk_name <- "fit_pheat_d_tab_RV"
+}
+ls_link_RV <- prep_filename_path(plt_list = ls_plts,
+                                 prefix = plt_prefix,
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_plts, 
+                           link_list = ls_link_RV,
+                           chunk_name = chunk_name, 
+                           header_level = 4)
+ls_path_RV <- prep_filename_path(plt_list = ls_plts,
+                                 prefix = plt_prefix,
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plts), function(x) {
+  save_plot(plt = ls_plts[[x]], 
+            path = ls_path_RV[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+
+### GR Value {.tabset .tabset-dropdown}
+
+```{r fit_data_curv_cl_tab_GR, warning=FALSE, echo=FALSE}
+if ({{verbose_mode}}) {
+  ls_plts <- ls_curv_GR
+  plt_prefix <- "sa_fit_curv_cl_GR__"
+  chunk_name <- "fit_curv_cl_tab_GR"
+} else {
+  ls_plts <- ls_heat_d_GR
+  plt_prefix <- "sa_heat_d_GR__"
+  chunk_name <- "fit_pheat_d_tab_GR"
+}
+ls_link_GR <- prep_filename_path(plt_list = ls_plts,
+                                 prefix = plt_prefix,
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_plts, 
+                           link_list = ls_link_GR,
+                           chunk_name = chunk_name, 
+                           header_level = 4)
+ls_path_GR <- prep_filename_path(plt_list = ls_plts,
+                                 prefix = plt_prefix,
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plts), function(x) {
+  save_plot(plt = ls_plts[[x]], 
+            path = ls_path_GR[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+{{/PRISM_excluded}}
+
+{{#PRISM}}
+
+## Data Analysis - Dose-response by Drugs - Single-Agent Data {.tabset .tabset-fade .tabset-pills}
+
+These heatmaps provide an overview of the averaged response data across all drugs and cell lines. One heatmap shows the mean response.
+
+**What to look for:** Look for expected patterns of sensitivity (e.g., some drugs being more effective than others).
+
+```{r fit_data_curv_cl_viz_RV, warning=FALSE, fig.show="hide"}
+drug_name_vec <- sort(unique(response_metrics_sa[["DrugName"]]))
+
+sa_splits <- split(response_data_sa, by = "DrugName")
+ls_heat_d_RV <- loop(drug_name_vec, function(nm) {
+  pheatmap_qc(dt_average = sa_splits[[nm]],
+              normalization_type = "RV",
+              lbl_by_CellLineName = TRUE,
+              lbl_by_DrugName = TRUE,
+              cluster_rows = TRUE)
+})
+names(ls_heat_d_RV) <- vapply(drug_name_vec, function(i) escape_special_characters(i),
+                              FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+```
+
+{{#plot_GR_values}}
+
+```{r fit_data_curv_cl_viz_GR, warning=FALSE, fig.show="hide"}
+ls_heat_d_GR <- loop(drug_name_vec, function(nm) {
+  pheatmap_qc(dt_average = sa_splits[[nm]],
+              normalization_type = "GR",
+              lbl_by_CellLineName = TRUE,
+              lbl_by_DrugName = TRUE,
+              cluster_rows = TRUE)
+})
+names(ls_heat_d_GR) <- vapply(drug_name_vec, function(i) escape_special_characters(i), 
+                              FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+```
+
+{{/plot_GR_values}}
+
+::: {.fullwidth}
+
+### Relative Viability {.tabset .tabset-dropdown}
+
+```{r fit_data_curv_cl_tab, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = ls_heat_d_RV,
+                                 prefix = "sa_heat_d_RV__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_heat_d_RV, 
+                           link_list = ls_link_RV,
+                           chunk_name = "fit_pheat_d_tab_RV", 
+                           header_level = 4)
+ls_path_RV <- prep_filename_path(plt_list = ls_heat_d_RV,
+                                 prefix = "sa_heat_d_RV__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_heat_d_RV), function(x) {
+  save_plot(plt = ls_heat_d_RV[[x]], 
+            path = ls_path_RV[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+
+### GR Value {.tabset .tabset-dropdown}
+
+```{r fit_data_curv_cl_tab_GR, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = ls_heat_d_GR,
+                                 prefix = "sa_heat_d_GR__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_heat_d_GR, 
+                           link_list = ls_link_GR,
+                           chunk_name = "fit_pheat_d_tab_GR" , 
+                           header_level = 4)
+ls_path_GR <- prep_filename_path(plt_list = ls_heat_d_GR,
+                                 prefix = "sa_heat_d_GR__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_heat_d_GR), function(x) {
+  save_plot(plt = ls_heat_d_GR[[x]], 
+            path = ls_path_GR[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+{{/PRISM}}
+
+## Data Analysis - Dose-response Curves by Cell Lines - Single-Agent Data {.tabset .tabset-fade .tabset-pills}
+
+Here, each plot displays a single **cell line** tested against all **drugs**. This format is useful for understanding the sensitivity profile of a particular cell line and identifying its vulnerabilities.
+
+**What to look for:** Compare the different colored curves to see which drugs are most potent or effective against this specific cell line.
+
+`r verbose_mode_info`
+
+{{#verbose_mode}}
+
+```{r fit_data_curv_d_viz_RV, warning=FALSE, fig.show="hide"}
+cellline_name_vec <- sort(unique(response_metrics_sa[["CellLineName"]]))
+drug_name_vec <- sort(unique(response_metrics_sa[["DrugName"]]))
+
+ls_curv_RV <- plot_dose_response_sa_by_drugs(dt_metrics = response_metrics_sa, 
+                                             dt_average = response_data_sa,
+                                             cellline_name_vec = cellline_name_vec, 
+                                             drug_name_vec = drug_name_vec,
+                                             normalization_type = "RV")
+names(ls_curv_RV) <- vapply(names(ls_curv_RV), function(i) escape_special_characters(i), 
+                            FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+```
+
+{{#plot_GR_values}}
+
+```{r fit_data_curv_d_viz_GR, warning=FALSE, fig.show="hide"}
+ls_curv_GR <- plot_dose_response_sa_by_drugs(dt_metrics = response_metrics_sa, 
+                                             dt_average = response_data_sa,
+                                             cellline_name_vec = cellline_name_vec, 
+                                             drug_name_vec = drug_name_vec,
+                                             normalization_type = "GR")
+names(ls_curv_GR) <- vapply(names(ls_curv_GR), function(i) escape_special_characters(i), 
+                            FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+```
+
+{{/plot_GR_values}}
+
+::: {.fullwidth}
+
+### Relative Viability {.tabset .tabset-dropdown}
+
+```{r fit_data_curv_d_tab, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = ls_curv_RV,
+                                 prefix = "sa_fit_curv_d_RV__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_curv_RV, 
+                           link_list = ls_link_RV,
+                           chunk_name = "fit_curv_d_tab_RV", 
+                           header_level = 4)
+ls_path_RV <- prep_filename_path(plt_list = ls_curv_RV,
+                                 prefix = "sa_fit_curv_d_RV__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_curv_RV), function(x) {
+  save_plot(plt = ls_curv_RV[[x]], 
+            path = ls_path_RV[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+
+### GR Value {.tabset .tabset-dropdown}
+
+```{r fit_data_curv_d_tab_GR, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = ls_curv_GR,
+                                 prefix = "sa_fit_curv_d_GR__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_curv_GR, 
+                           link_list = ls_link_GR,
+                           chunk_name = "fit_curv_d_tab_GR", 
+                           header_level = 4)
+ls_path_GR <- prep_filename_path(plt_list = ls_curv_GR,
+                                 prefix = "sa_fit_curv_d_GR__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_curv_GR), function(x) {
+  save_plot(plt = ls_curv_GR[[x]], 
+            path = ls_path_GR[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+{{/verbose_mode}}
+
+## Data Analysis of Fitted Metrics - Single-Agent Data
+
+The following plots summarize the key metrics calculated from the curve fits (e.g., IC50, GR_AOC). They provide a high-level, global overview of the drug response landscape.
+
+### Heatmaps {.tabset .tabset-fade .tabset-pills}
+
+The heatmaps display a selected metric for every drug (row) against every cell line (column). Rows and columns are clustered to group similar response profiles.
+
+**What to look for:** Look for 'hot' or 'cold' blocks, which indicate groups of cell lines that are particularly sensitive or resistant to a group of drugs. The annotations for tissue type or drug MOA can help in interpreting these clusters.
+
+```{r fit_data_heat_RV, warning=FALSE, fig.show="hide"}
+# metrics
+metrics <- data.table(
+  expand.grid(normalization_type = c("GR", "RV"),
+              metric = c("xc50", "x_max", "x_mean", "x_AOC", "x_AOC_range"),
+              stringsAsFactors = FALSE))
+metrics$hm_title <- pmap(metrics, get_hm_title)
+
+annotation_manual_col <-
+  unique(response_metrics_sa[,.SD, .SDcols = c("CellLineName", "Tissue")])
+annotation_manual_row <-
+  unique(response_metrics_sa[,.SD, .SDcols = c("DrugName", "drug_moa")])
+annotation_map <- get_ann_color_map(unique(response_metrics_sa[,.SD, .SDcols = c("Tissue", "drug_moa")]))
+
+ls_plt_RV <- pmap(metrics[normalization_type == "RV", ], 
+                  pheatmap_with_anno_sa,
+                  dt_metrics = response_metrics_sa,
+                  dt_metrics_capped = response_metrics_sa_capped,
+                  annotation_row = annotation_manual_row,
+                  annotation_col = annotation_manual_col,
+                  annotation_colors = annotation_map)
+names(ls_plt_RV) <- metrics[normalization_type == "RV", ]$hm_title
+
+```
+
+{{#plot_GR_values}}
+
+```{r fit_data_heat_GR, warning=FALSE, fig.show="hide"}
+ls_plt_GR <- pmap(metrics[normalization_type == "GR", ], 
+                  pheatmap_with_anno_sa, 
+                  dt_metrics = response_metrics_sa,
+                  dt_metrics_capped = response_metrics_sa_capped,
+                  annotation_row = annotation_manual_row,
+                  annotation_col = annotation_manual_col,
+                  annotation_colors = annotation_map)
+names(ls_plt_GR) <- metrics[normalization_type == "GR", ]$hm_title
+
+```
+
+{{/plot_GR_values}}
+
+#### Relative Viability {.tabset}
+
+```{r fit_data_tab_heat_RV, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = lapply(ls_plt_RV, "[[", "heatmap"),
+                                 prefix = "sa_fit_heat_RV__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+ls_data_RV <- prep_filename_path(plt_list = lapply(ls_plt_RV, "[[", "heatmap"),
+                                 prefix = "data__sa_fit_heat_RV__",
+                                 path_file = file.path(".", "tables"),
+                                 file_format = "xlsx")
+# Since the data in the table for xc10 is not log10
+ls_data_RV[["log10(IC50)"]] <- gsub("log10\\(IC50\\)", "IC50", ls_data_RV[["log10(IC50)"]])
+plts_RV <- prep_plot_chunk(plt_list = lapply(ls_plt_RV, "[[", "heatmap"),
+                           link_list = ls_link_RV,
+                           dwn_list = ls_data_RV,
+                           chunk_name = "fit_sa_heat_RV",
+                           header_level = 5)
+ls_path_RV <- prep_filename_path(plt_list = lapply(ls_plt_RV, "[[", "heatmap"),
+                                 prefix = "sa_fit_heat_RV__",
+                                 path_file = file.path(wd, "plots"))
+ls_path_data_RV <- prep_filename_path(plt_list = lapply(ls_plt_RV, "[[", "heatmap"),
+                                      prefix = "data__sa_fit_heat_RV__",
+                                      path_file = file.path(wd, "tables"),
+                                      file_format = "xlsx")
+# Since the data in the table for xc10 is not log10
+ls_path_data_RV[["log10(IC50)"]] <- gsub("log10\\(IC50\\)", "IC50", ls_path_data_RV[["log10(IC50)"]])
+# Save plots
+invisible(loop(seq_along(ls_plt_RV), function(i) {
+  item <- ls_plt_RV[[i]]
+  name <- names(ls_plt_RV)[[i]]
+  save_plot(
+    plt = item[["heatmap"]], 
+    path = ls_path_RV[[name]],
+    format = "{{viz_format}}"
+  )
+}))
+# Write data to Excel
+invisible(loop(seq_along(ls_plt_RV), function(i) {
+  item <- ls_plt_RV[[i]]
+  name <- names(ls_plt_RV)[[i]]
+  write_xlsx(
+    item[["data"]], 
+    path = ls_path_data_RV[[name]]
+  )
+}))
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+
+#### GR Value {.tabset}
+
+```{r fit_data_tab_heat_GR, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = lapply(ls_plt_GR, "[[", "heatmap"),
+                                 prefix = "sa_fit_heat_GR__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+ls_data_GR <- prep_filename_path(plt_list = lapply(ls_plt_GR, "[[", "heatmap"),
+                                 prefix = "data__sa_fit_heat_GR__",
+                                 path_file = file.path(".", "tables"),
+                                 file_format = "xlsx")
+# Since the data in the table for xc10 is not log10
+ls_data_GR[["log10(GR50)"]] <- gsub("log10\\(GR50\\)", "GR50", ls_data_GR[["log10(GR50)"]])
+plts_GR <- prep_plot_chunk(plt_list = lapply(ls_plt_GR, "[[", "heatmap"),
+                           link_list = ls_link_GR,
+                           dwn_list = ls_data_GR,
+                           chunk_name = "fit_sa_heat_GR",
+                           header_level = 5)
+ls_path_GR <- prep_filename_path(plt_list = lapply(ls_plt_GR, "[[", "heatmap"),
+                                 prefix = "sa_fit_heat_GR__",
+                                 path_file = file.path(wd, "plots"))
+ls_path_data_GR <- prep_filename_path(plt_list = lapply(ls_plt_GR, "[[", "heatmap"),
+                                      prefix = "data__sa_fit_heat_GR__",
+                                      path_file = file.path(wd, "tables"),
+                                      file_format = "xlsx")
+# Since the data in the table for xc10 is not log10
+ls_path_data_GR[["log10(GR50)"]] <- gsub("log10\\(GR50\\)", "GR50", ls_path_data_GR[["log10(GR50)"]])
+# Save plots
+invisible(loop(seq_along(ls_plt_GR), function(i) {
+  item <- ls_plt_GR[[i]]
+  name <- names(ls_plt_GR)[[i]]
+  save_plot(
+    plt = item[["heatmap"]], 
+    path = ls_path_GR[[name]],
+    format = "{{viz_format}}"
+  )
+}))
+# Write data to Excel
+invisible(loop(seq_along(ls_plt_GR), function(i) {
+  item <- ls_plt_GR[[i]]
+  name <- names(ls_plt_GR)[[i]]
+  write_xlsx(
+    item[["data"]], 
+    path = ls_path_data_GR[[name]]
+  )
+}))
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+
+{{#PRISM_excluded}}
+
+### Boxplots by Cell Lines {.tabset .tabset-fade .tabset-pills}
+
+The boxplots show the distribution of a given metric, grouped by cell line.
+
+**What to look for:** When grouped by cell line, you can identify cell lines that are, on average, more sensitive or resistant to the entire panel of drugs.
+
+```{r fit_data_box_cl_RV, warning=FALSE, fig.show="hide"}
+# metrics
+metrics <- data.table(
+  expand.grid(normalization_type = c("GR", "RV"),
+              metric = c("xc50", "x_max", "x_mean", "x_AOC", "x_AOC_range"),
+              stringsAsFactors = FALSE))
+
+ls_plt_RV <- pmap(metrics[normalization_type == "RV", ], 
+                  plot_boxplot_metric_sa_by_CLs,
+                  dt_metrics = response_metrics_sa_capped,
+                  colored_pts_flag = TRUE)
+names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_title))
+
+```
+
+{{#plot_GR_values}}
+
+```{r fit_data_box_cl_GR, warning=FALSE, fig.show="hide"}
+ls_plt_GR <- pmap(metrics[normalization_type == "GR", ], 
+                  plot_boxplot_metric_sa_by_CLs, 
+                  dt_metrics = response_metrics_sa_capped,
+                  colored_pts_flag = TRUE)
+names(ls_plt_GR) <- unlist(pmap(metrics[normalization_type == "GR", ], get_hm_title))
+
+```
+
+{{/plot_GR_values}}
+
+#### Relative Viability {.tabset}
+
+```{r fit_data_tab_box_cl_RV, warning=FALSE, echo=FALSE}
+
+ls_link_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "sa_fit_box_cl_RV__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV, 
+                           link_list = ls_link_RV,
+                           chunk_name = "fit_sa_box_cl_tab_RV", 
+                           header_level = 5)
+ls_path_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "sa_fit_box_cl_RV__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_RV), function(x) {
+  save_plot(plt = ls_plt_RV[[x]], 
+            path = ls_path_RV[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+
+#### GR Value {.tabset}
+
+```{r fit_data_tab_box_cl_GR, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "sa_fit_box_cl_GR__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR, 
+                           link_list = ls_link_GR,
+                           chunk_name = "fit_sa_box_cl_tab_GR", 
+                           header_level = 5)
+ls_path_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "sa_fit_box_cl_GR__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_GR), function(x) {
+  save_plot(plt = ls_plt_GR[[x]], 
+            path = ls_path_GR[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+{{/PRISM_excluded}}
+
+### Boxplots by Drugs {.tabset .tabset-fade .tabset-pills}
+
+These boxplots show the distribution of a given metric, grouped by drug.
+
+**What to look for:** You can identify drugs that are, on average, more potent or effective across all cell lines.
+
+```{r fit_data_box_d_RV, warning=FALSE, fig.show="hide"}
+metrics <- data.table(
+  expand.grid(normalization_type = c("GR", "RV"),
+              metric = c("xc50", "x_max", "x_mean", "x_AOC", "x_AOC_range"),
+              stringsAsFactors = FALSE))
+
+ls_plt_RV <- pmap(metrics[normalization_type == "RV", ], 
+                  plot_boxplot_metric_sa_by_drugs,
+                  dt_metrics = response_metrics_sa_capped,
+                  colored_pts_flag = TRUE)
+names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_title))
+
+```
+
+{{#plot_GR_values}}
+
+```{r fit_data_box_d_GR, warning=FALSE, fig.show="hide"}
+ls_plt_GR <- pmap(metrics[normalization_type == "GR", ], 
+                  plot_boxplot_metric_sa_by_drugs, 
+                  dt_metrics = response_metrics_sa_capped,
+                  colored_pts_flag = TRUE)
+names(ls_plt_GR) <- unlist(pmap(metrics[normalization_type == "GR", ], get_hm_title))
+
+```
+
+{{/plot_GR_values}}
+
+#### Relative Viability {.tabset}
+
+```{r fit_data_tab_box_d_RV, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "sa_fit_box_d_RV__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV, 
+                           link_list = ls_link_RV,
+                           chunk_name = "fit_sa_box_d_tab_RV", 
+                           header_level = 5)
+ls_path_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "sa_fit_box_d_RV__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_RV), function(x) {
+  save_plot(plt = ls_plt_RV[[x]], 
+            path = ls_path_RV[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+
+#### GR Value {.tabset}
+
+```{r fit_data_tab_box_d_GR, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "sa_fit_box_d_GR__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR, 
+                           link_list = ls_link_GR,
+                           chunk_name = "fit_sa_box_d_tab_GR", 
+                           header_level = 5)
+ls_path_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "sa_fit_box_d_GR__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_GR), function(x) {
+  save_plot(plt = ls_plt_GR[[x]], 
+            path = ls_path_GR[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+
+### Boxplots by Tissue {.tabset .tabset-fade .tabset-pills}
+
+The boxplots show the distribution of a given metric, grouped by tissue.
+
+**What to look for:** When grouped by tissue, you can identify tissues that are, on average, more sensitive or resistant to the entire panel of drugs.
+
+```{r fit_data_box_t_RV, warning=FALSE}
+drug_name_vec <- 
+  list(selection_name = sort(unique(response_metrics_sa_capped[["DrugName"]])))
+
+ls_names <- 
+  vapply(drug_name_vec$selection_name, function(i) escape_special_characters(i),
+         FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+metrics <- data.table(
+  expand.grid(normalization_type = c("GR", "RV"),
+              metric = c("xc50", "x_max", "x_mean", "x_AOC", "x_AOC_range"),
+              stringsAsFactors = FALSE),
+  named_n_mode = rep(c("bottom", "bottom", "bottom", "top", "top"), each = 2))
+```
+{{#PRISM}}
+```{r fit_data_box_t_RV_viz_PRISM, warning=FALSE, fig.show="hide"}
+# shorten CellLineName
+response_metrics_sa_capped_short <- 
+  copy(response_metrics_sa_capped)[, CellLineName := sub("_.*", "", CellLineName)]
+
+metrics_RV <- metrics[normalization_type == "RV", ]
+ls_plt_RV <- lapply(seq_len(NROW(metrics_RV)), function(i) {
+  ls_ <- pmap(drug_name_vec,
+              plot_boxplot_metric_sa_by_grp,
+              dt_metrics = response_metrics_sa_capped_short,
+              selection_var = "DrugName",
+              group_var = "Tissue",
+              normalization_type = "RV",
+              metric = metrics_RV[["metric"]][i],
+              grouped_flag = TRUE,
+              named_n = 15,
+              named_n_mode = metrics_RV[["named_n_mode"]][i])
+  names(ls_) <- ls_names
+  ls_
+})
+
+names(ls_plt_RV) <- 
+  unlist(pmap(metrics_RV[, .(metric, normalization_type)], get_hm_title))
+```
+{{/PRISM}}
+
+{{#PRISM_excluded}}
+```{r fit_data_box_t_RV_viz, warning=FALSE, fig.show="hide"}
+metrics_RV <- metrics[normalization_type == "RV", ]
+ls_plt_RV <- lapply(seq_len(NROW(metrics_RV)), function(i) {
+  ls_ <- pmap(drug_name_vec,
+              plot_boxplot_metric_sa_by_grp,
+              dt_metrics = response_metrics_sa_capped,
+              selection_var = "DrugName",
+              group_var = "Tissue",
+              normalization_type = "RV",
+              metric = metrics_RV[["metric"]][i],
+              grouped_flag = TRUE,
+              named_n = 15,
+              named_n_mode = metrics_RV[["named_n_mode"]][i])
+  names(ls_) <- ls_names
+  ls_
+})
+
+names(ls_plt_RV) <- 
+  unlist(pmap(metrics_RV[, .(metric, normalization_type)], get_hm_title))
+```
+{{/PRISM_excluded}}
+
+{{#plot_GR_values}}
+{{#PRISM}}
+```{r fit_data_box_t_GR_viz_PRISM, warning=FALSE, fig.show="hide"}
+metrics_GR <- metrics[normalization_type == "GR", ]
+ls_plt_GR <- lapply(seq_len(NROW(metrics_GR)), function(i) {
+  ls_ <- pmap(drug_name_vec,
+              plot_boxplot_metric_sa_by_grp,
+              dt_metrics = response_metrics_sa_capped_short,
+              selection_var = "DrugName",
+              group_var = "Tissue",
+              normalization_type = "GR",
+              metric = metrics_GR[["metric"]][i],
+              grouped_flag = TRUE,
+              named_n = 15,
+              named_n_mode = metrics_GR[["named_n_mode"]][i])
+  names(ls_) <- ls_names
+  ls_
+})
+
+names(ls_plt_GR) <- 
+  unlist(pmap(metrics_GR[, .(metric, normalization_type)], get_hm_title))
+```
+{{/PRISM}}
+
+{{#PRISM_excluded}}
+```{r fit_data_box_t_GR_viz, warning=FALSE, fig.show="hide"}
+metrics_GR <- metrics[normalization_type == "GR", ]
+ls_plt_GR <- lapply(seq_len(NROW(metrics_GR)), function(i) {
+  ls_ <- pmap(drug_name_vec,
+              plot_boxplot_metric_sa_by_grp,
+              dt_metrics = response_metrics_sa_capped,
+              selection_var = "DrugName",
+              group_var = "Tissue",
+              normalization_type = "GR",
+              metric = metrics_GR[["metric"]][i],
+              grouped_flag = TRUE,
+              named_n = 15,
+              named_n_mode = metrics_GR[["named_n_mode"]][i])
+  names(ls_) <- ls_names
+  ls_
+})
+
+names(ls_plt_GR) <- 
+  unlist(pmap(metrics_GR[, .(metric, normalization_type)], get_hm_title))
+```
+{{/PRISM_excluded}}
+{{/plot_GR_values}}
+
+#### Relative Viability {.tabset}
+
+```{r fit_data_tab_box_t_RV, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "sa_fit_box_t_RV__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV, 
+                           link_list = ls_link_RV,
+                           chunk_name = "fit_sa_box_t_tab_RV", 
+                           header_level = 5)
+ls_path_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "sa_fit_box_t_RV__",
+                                 path_file = file.path(wd, "plots"))
+plot_plan <- list(
+  plt  = unlist(ls_plt_RV),
+  path = unlist(ls_path_RV)
+)
+invisible(loop(seq_along(plot_plan$plt), function(i) {
+  save_plot(plt = plot_plan$plt[[i]], path = plot_plan$path[[i]], format = "{{viz_format}}")
+}))
+```
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+#### GR Value {.tabset}
+
+```{r fit_data_tab_box_t_GR, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "sa_fit_box_t_GR__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR, 
+                           link_list = ls_link_GR,
+                           chunk_name = "fit_sa_box_t_tab_GR", 
+                           header_level = 5)
+ls_path_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "sa_fit_box_t_GR__",
+                                 path_file = file.path(wd, "plots"))
+plot_plan <- list(
+  plt  = unlist(ls_plt_GR),
+  path = unlist(ls_path_GR)
+)
+invisible(loop(seq_along(plot_plan$plt), function(i) {
+  save_plot(plt = plot_plan$plt[[i]], path = plot_plan$path[[i]], format = "{{viz_format}}")
+}))
+```
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+
+
+{{#has_combo}}
+## Data Analysis - Dose-response Curves by Cell Lines - Combination Data {.tabset .tabset-fade .tabset-pills}
+
+These plots show the dose-response surface for each drug combination within a given cell line. Each small panel shows the dose-response curve for the first drug at a fixed concentration of the second drug.
+
+**What to look for:** Look for shifts in the curves of Drug 1 in the presence of increasing concentrations of Drug 2 (and vice versa). A leftward shift or a lower plateau indicates an enhanced effect from the combination.
+
+```{r title_combo, results="asis", echo=FALSE}
+section_title <- if ({{verbose_mode}}) {
+  "Data Analysis - Dose-response Curves by Cell Lines - Combination Data"
+} else {
+  "Data Analysis - Dose-response Curves by Drugs - Combination Data"
+}
+cat("\n\n##", section_title, "{.tabset .tabset-fade .tabset-pills}\n")
+
+```
+
+`r verbose_mode_info_2`
+
+```{r fit_data_combo_curv_cl_viz_GR, warning=FALSE, fig.show="hide"}
+if ({{verbose_mode}}) {
+  cellline_name_vec <- sort(unique(response_data_combo[["CellLineName"]]))
+  
+  ls_curv_RV <- pmap(list(cl_name = cellline_name_vec),
+                     plot_dose_response_combo_panel,
+                     dt_average = response_data_combo,
+                     normalization_type = "RV")
+  names(ls_curv_RV) <- vapply(cellline_name_vec, function(i) escape_special_characters(i),
+                              FUN.VALUE = character(1), USE.NAMES = FALSE)
+} else {
+  tab_grid <- 
+    unique(response_data_combo[, .SD, .SDcols = c("DrugName", "DrugName_2")])
+  setorder(tab_grid)
+  
+  ls_names <- sprintf("%s x %s", tab_grid$DrugName, tab_grid$DrugName_2)
+  ls_names <- vapply(ls_names, function(i) escape_special_characters(i), 
+                     FUN.VALUE = character(1), USE.NAMES = FALSE)
+  
+  ls_heat_d_RV <- lapply(seq_len(NROW(tab_grid)), function(i) {
+    pheatmap_qc(dt_average = 
+                  response_data_combo[DrugName == tab_grid[i, ]$DrugName &
+                                        DrugName_2 == tab_grid[i, ]$DrugName_2],
+                normalization_type = "RV",
+                lbl_by_CellLineName = TRUE, 
+                lbl_by_DrugName = TRUE,
+                cluster_rows = TRUE)
+  })
+  names(ls_heat_d_RV) <- ls_names
+}
+
+```
+
+{{#plot_GR_values}}
+
+```{r fit_data_combo_curv_cl_viz_RV, warning=FALSE, fig.show="hide"}
+if ({{verbose_mode}}) {
+  cellline_name_vec <- sort(unique(response_data_combo[["CellLineName"]]))
+  
+  ls_curv_GR <- pmap(list(cl_name = cellline_name_vec),
+                     plot_dose_response_combo_panel,
+                     dt_average = response_data_combo,
+                     normalization_type = "GR")
+  names(ls_curv_GR) <- vapply(cellline_name_vec, function(i) escape_special_characters(i),
+                              FUN.VALUE = character(1), USE.NAMES = FALSE)
+} else {
+  tab_grid <- 
+    unique(response_data_combo[, .SD, .SDcols = c("DrugName", "DrugName_2")])
+  setorder(tab_grid)
+  
+  ls_names <- sprintf("%s x %s", tab_grid$DrugName, tab_grid$DrugName_2)
+  ls_names <- vapply(ls_names, function(i) escape_special_characters(i), 
+                     FUN.VALUE = character(1), USE.NAMES = FALSE)
+  
+  ls_heat_d_GR <- lapply(seq_len(NROW(tab_grid)), function(i) {
+    pheatmap_qc(dt_average = 
+                  response_data_combo[DrugName == tab_grid[i, ]$DrugName &
+                                        DrugName_2 == tab_grid[i, ]$DrugName_2],
+                normalization_type = "GR",
+                lbl_by_CellLineName = TRUE, 
+                lbl_by_DrugName = TRUE,
+                cluster_rows = TRUE)
+  })
+  names(ls_heat_d_GR) <- ls_names
+}
+
+```
+
+{{/plot_GR_values}}
+
+::: {.fullwidth}
+
+### Relative Viability {.tabset .tabset-dropdown}
+
+```{r fit_data_combo_curv_cl_tab_RV, warning=FALSE, echo=FALSE}
+if ({{verbose_mode}}) {
+  ls_plts <- ls_curv_RV
+  plt_prefix <- "combo_fit_curv_cl_RV__"
+  chunk_name <- "fit_combo_curv_cl_tab_RV"
+} else {
+  ls_plts <- ls_heat_d_RV
+  plt_prefix <- "combo_heat_d_RV__"
+  chunk_name <- "fit_combo_pheat_d_tab_RV"
+}
+ls_link_RV <- prep_filename_path(plt_list = ls_plts,
+                                 prefix = plt_prefix,
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_plts, 
+                           link_list = ls_link_RV,
+                           chunk_name = chunk_name, 
+                           header_level = 4)
+ls_path_RV <- prep_filename_path(plt_list = ls_plts,
+                                 prefix = plt_prefix,
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plts), function(x) {
+  save_plot(plt = ls_plts[[x]], 
+            path = ls_path_RV[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+
+### GR Value {.tabset .tabset-dropdown}
+
+```{r fit_data_combo_curv_cl_tab_GR, warning=FALSE, echo=FALSE}
+if ({{verbose_mode}}) {
+  ls_plts <- ls_curv_GR
+  plt_prefix <- "combo_fit_curv_cl_GR__"
+  chunk_name <- "fit_combo_curv_cl_tab_GR"
+} else {
+  ls_plts <- ls_heat_d_GR
+  plt_prefix <- "combo_heat_d_GR__"
+  chunk_name <- "fit_combo_pheat_d_tab_GR"
+}
+ls_link_GR <- prep_filename_path(plt_list = ls_plts,
+                                 prefix = plt_prefix,
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_plts, 
+                           link_list = ls_link_GR,
+                           chunk_name = chunk_name, 
+                           header_level = 4)
+ls_path_GR <- prep_filename_path(plt_list = ls_plts,
+                                 prefix = plt_prefix,
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plts), function(x) {
+  save_plot(plt = ls_plts[[x]], 
+            path = ls_path_GR[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+
+{{#PRISM_excluded}}
+{{#plot_iso}}
+
+## Data Analysis - Metrics Heatmap for Combination Data {.tabset .tabset-fade .tabset-pills}
+
+This section visualizes the synergy results for each drug combination in each cell line. The 2x2 panel of plots provides a comprehensive view of the interaction, combining the measured response, calculated synergy scores, isobolograms, and the Combination Index.
+
+**What to look for:**
+
+* **Top-Left (Smoothed Response Heatmap):** This is the primary data. Look for a strong dose-dependent effect where the color darkens as the concentration of both drugs increases. This confirms the drugs are active in the combination.
+* **Bottom Row (Synergy Score Heatmaps):** These show the synergy score (e.g., Bliss Excess or HSA Excess). Look for **regions of warm colors (like red or orange)**, which indicate synergy (the combination is more effective than expected). **Regions of cool colors (like blue)** indicate antagonism.
+* **Isobolograms (lines on the heatmaps):** These lines show the dose combinations needed to achieve a certain effect level (e.g. IC50). The dashed line is the theoretical line of additivity. Look for solid lines that are **inwards** with respect to the dashes. This is a classic sign of synergy. The greater the area between the solid and dotted line, the wider the dose range in which the two drugs exhibit synergy.
+* **Top-Right (Combination Index Plot):** This plot summarizes synergy across different dose ratios. The horizontal line at CI = 1 represents an additive effect. **Look for lines that dip below CI = 1**, as this indicates synergy. The further below 1, the stronger the synergy.s the origin. This is a classic sign of synergy, as it means less of each drug is required to achieve the same effect.
+
+`r verbose_mode_info`
+
+{{#verbose_mode}}
+
+```{r fit_data_combo_heat_viz_RV, warning=FALSE, fig.show="hide"}
+tab_grid <- 
+  unique(response_metrics_excess[, .SD, .SDcols = c("CellLineName", "DrugName", "DrugName_2")])
+setorder(tab_grid)
+setnames(tab_grid, old = c("CellLineName", "DrugName", "DrugName_2"),
+                   new = c("cl_name", "drug1_name", "drug2_name"))
+
+ls_names <- sprintf("%s (%s x %s)", tab_grid$cl_name, tab_grid$drug1_name, tab_grid$drug2_name)
+ls_names <- vapply(ls_names, function(i) escape_special_characters(i), 
+                  FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+ls_plt_RV <- pmap(tab_grid,
+                  heatmap_combo_metrics_panel,
+                  dt_excess = response_metrics_excess,
+                  dt_isobolograms = response_metrics_isobolograms,
+                  iso_levels = "0.5",
+                  normalization_type = "RV")
+names(ls_plt_RV) <- ls_names
+
+```
+
+{{#plot_GR_values}}
+
+```{r fit_data_combo_heat_viz_GR, warning=FALSE, fig.show="hide"}
+ls_plt_GR <- pmap(tab_grid,
+                  heatmap_combo_metrics_panel,
+                  dt_excess = response_metrics_excess,
+                  dt_isobolograms = response_metrics_isobolograms,
+                  iso_levels = "0.5",
+                  normalization_type = "GR")
+names(ls_plt_GR) <- ls_names
+
+```
+
+{{/plot_GR_values}}
+
+::: {.fullwidth}
+
+### Relative Viability {.tabset .tabset-dropdown}
+
+```{r fit_data_combo_heat_tab_RV, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "combo_fit_heat_RV__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV, 
+                           link_list = ls_link_RV,
+                           chunk_name = "fit_combo_heat_tab_RV", 
+                           header_level = 4)
+ls_path_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "combo_fit_heat_RV__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_RV), function(x) {
+  save_plot(plt = ls_plt_RV[[x]], 
+            path = ls_path_RV[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+
+### GR Value {.tabset .tabset-dropdown}
+
+```{r fit_data_combo_heat_tab_GR, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "combo_fit_heat_GR__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR, 
+                           link_list = ls_link_GR,
+                           chunk_name = "fit_combo_heat_tab_GR", 
+                           header_level = 4)
+ls_path_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "combo_fit_heat_GR__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_GR), function(x) {
+  save_plot(plt = ls_plt_GR[[x]], 
+            path = ls_path_GR[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+{{/verbose_mode}}
+
+## Data Analysis - Reference Isobolograms for Combination Data {.tabset}
+
+This section provides a detailed comparison of synergy for each drug combination across all tested cell lines. The plots are organized by synergy metric (e.g., Smooth response, HSA Excess, Bliss Excess). Each plot panel shows the synergy heatmaps for one drug combination across multiple cell lines, making it easy to spot differences in response.
+
+**What to look for:**
+
+* **Comparing Cell Lines:** Look at the panel of heatmaps to see which cell lines show the strongest synergistic or antagonistic responses for the selected drug combination.
+* **Interpreting Each Heatmap:**
+* For **benefit score heatmaps (HSA/Bliss Excess)**, look for **regions of warm colors (red/orange)**, which indicate combination benefit. **Regions of cool colors (blue)** indicate antagonism.
+* For **smoothed response heatmaps**, look for a strong dose-dependent effect (darkening color) to confirm drug activity.
+
+
+* **Interpreting the Isobologram Lines:** The lines on the heatmap show the dose combinations needed to achieve a certain effect level.
+* The **dashed line** represents the theoretical line of additivity.
+* The **solid line** represents the measured effect.
+* **Synergy** is indicated when the solid line **bows inwards (is concave)**, meaning less of each drug was needed to achieve the effect.
+* **Antagonism** is indicated when the solid line **bows outwards (is convex)**.
+
+
+
+```{r fit_data_combo_iso_viz_RV, warning=FALSE, fig.show="hide"}
+cellline_name_vec <- sort(unique(response_metrics_excess[["CellLineName"]]))
+
+tab_grid <- 
+  unique(response_metrics_excess[, .SD, .SDcols = c("DrugName", "DrugName_2")])
+setorder(tab_grid)
+setnames(tab_grid, old = c("DrugName", "DrugName_2"),
+                     new = c("drug1_name", "drug2_name"))
+
+ls_names <- sprintf("%s x %s", tab_grid$drug1_name, tab_grid$drug2_name)
+ls_names <- vapply(ls_names, function(i) escape_special_characters(i), 
+                  FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+ls_plt_RV <- lapply(names(get_combo_excess_field_names()), function(metric) {
+  ls_plt <- pmap(tab_grid,
+                 heatmap_combo_with_isoref_panel,
+                 dt_excess = response_metrics_excess,
+                 dt_isobolograms = response_metrics_isobolograms,
+                 cl_names = cellline_name_vec,
+                 iso_levels = "0.5",
+                 metric = metric,
+                 normalization_type = "RV")
+  names(ls_plt) <- ls_names
+  ls_plt
+})
+names(ls_plt_RV) <- names(get_combo_excess_field_names())
+
+```
+
+{{#plot_GR_values}}
+
+```{r fit_data_combo_iso_viz_GR, warning=FALSE, fig.show="hide"}
+ls_plt_GR <- lapply(names(get_combo_excess_field_names()), function(metric) {
+  ls_plt <- pmap(tab_grid,
+                 heatmap_combo_with_isoref_panel,
+                 dt_excess = response_metrics_excess,
+                 dt_isobolograms = response_metrics_isobolograms,
+                 cl_names = cellline_name_vec,
+                 iso_levels = "0.5",
+                 metric = metric,
+                 normalization_type = "GR")
+  names(ls_plt) <- ls_names
+  ls_plt
+})
+names(ls_plt_GR) <- names(get_combo_excess_field_names())
+
+```
+
+{{/plot_GR_values}}
+
+### Smooth {.tabset .tabset-fade .tabset-pills}
+
+::: {.fullwidth}
+
+#### Relative Viability {.tabset .tabset-dropdown}
+
+```{r fit_data_combo_iso_tab_RV_smooth, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = ls_plt_RV$smooth,
+                                 prefix = "combo_fit_isoref_RV_smooth__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV$smooth, 
+                           link_list = ls_link_RV,
+                           chunk_name = "fit_combo_iso_tab_RV_smooth", 
+                           header_level = 5)
+ls_path_RV <- prep_filename_path(plt_list = ls_plt_RV$smooth,
+                                 prefix = "combo_fit_isoref_RV_smooth__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_RV$smooth), function(x) {
+  save_plot(plt = ls_plt_RV$smooth[[x]], 
+            path = ls_path_RV[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+
+#### GR Value {.tabset .tabset-dropdown}
+
+```{r fit_data_combo_iso_tab_GR_smooth, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = ls_plt_GR$smooth,
+                                 prefix = "combo_fit_isoref_GR_smooth__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR$smooth, 
+                           link_list = ls_link_GR,
+                           chunk_name = "fit_combo_iso_tab_GR_smooth", 
+                           header_level = 5)
+ls_path_GR <- prep_filename_path(plt_list = ls_plt_GR$smooth,
+                                 prefix = "combo_fit_isoref_GR_smooth__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_GR$smooth), function(x) {
+  save_plot(plt = ls_plt_GR$smooth[[x]], 
+            path = ls_path_GR[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+
+### HSA Excess {.tabset .tabset-fade .tabset-pills}
+
+::: {.fullwidth}
+
+#### Relative Viability {.tabset .tabset-dropdown}
+
+```{r fit_data_combo_iso_tab_RV_hsa_excess, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = ls_plt_RV$hsa_excess,
+                                 prefix = "combo_fit_isoref_RV_hsa_excess__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV$hsa_excess, 
+                           link_list = ls_link_RV,
+                           chunk_name = "fit_combo_iso_tab_RV_hsa_excess", 
+                           header_level = 5)
+ls_path_RV <- prep_filename_path(plt_list = ls_plt_RV$hsa_excess,
+                                 prefix = "combo_fit_isoref_RV_hsa_excess__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_RV$hsa_excess), function(x) {
+  save_plot(plt = ls_plt_RV$hsa_excess[[x]], 
+            path = ls_path_RV[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+
+#### GR Value {.tabset .tabset-dropdown}
+
+```{r fit_data_combo_iso_tab_GR_hsa_excess, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = ls_plt_GR$hsa_excess,
+                                 prefix = "combo_fit_isoref_GR_hsa_excess__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR$hsa_excess, 
+                           link_list = ls_link_GR,
+                           chunk_name = "fit_combo_iso_tab_GR_hsa_excess", 
+                           header_level = 5)
+ls_path_GR <- prep_filename_path(plt_list = ls_plt_GR$hsa_excess,
+                                 prefix = "combo_fit_isoref_GR_hsa_excess__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_GR$hsa_excess), function(x) {
+  save_plot(plt = ls_plt_GR$hsa_excess[[x]], 
+            path = ls_path_GR[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+
+### Bliss Excess {.tabset .tabset-fade .tabset-pills}
+
+::: {.fullwidth}
+
+#### Relative Viability {.tabset .tabset-dropdown}
+
+```{r fit_data_combo_iso_tab_RV_bliss_excess, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = ls_plt_RV$bliss_excess,
+                                 prefix = "combo_fit_isoref_RV_bliss_excess__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV$bliss_excess, 
+                           link_list = ls_link_RV,
+                           chunk_name = "fit_combo_iso_tab_RV_bliss_excess", 
+                           header_level = 5)
+ls_path_RV <- prep_filename_path(plt_list = ls_plt_RV$bliss_excess,
+                                 prefix = "combo_fit_isoref_RV_bliss_excess__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_RV$bliss_excess), function(x) {
+  save_plot(plt = ls_plt_RV$bliss_excess[[x]], 
+            path = ls_path_RV[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+
+#### GR Value {.tabset .tabset-dropdown}
+
+```{r fit_data_combo_iso_tab_GR_bliss_excess, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = ls_plt_GR$bliss_excess,
+                                 prefix = "combo_fit_isoref_GR_bliss_excess__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR$bliss_excess, 
+                           link_list = ls_link_GR,
+                           chunk_name = "fit_combo_iso_tab_GR_bliss_excess", 
+                           header_level = 5)
+ls_path_GR <- prep_filename_path(plt_list = ls_plt_GR$bliss_excess,
+                                 prefix = "combo_fit_isoref_GR_bliss_excess__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_GR$bliss_excess), function(x) {
+  save_plot(plt = ls_plt_GR$bliss_excess[[x]], 
+            path = ls_path_GR[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+{{/plot_iso}}
+{{/PRISM_excluded}}
+
+## Data Analysis of Fitted Metrics - Combination Data
+
+These plots provide a high-level summary of the final synergy scores (e.g., Bliss Score, HSA Score) to help identify the most interesting combinations and cell lines from the screen.
+
+### Heatmaps {.tabset .tabset-fade .tabset-pills}
+
+These heatmaps show the final synergy score for each drug combination (rows) across all cell lines (columns).
+
+**What to look for:**
+
+* **Overall Patterns:** Look for "hot" blocks (often red/orange), which indicate a group of drug combinations that are synergistic in a group of cell lines. Conversely, "cold" blocks (often blue) indicate antagonism.
+
+* **Specific Hits:** Identify individual bright red cells to find the most synergistic drug-cell line "hits" in the screen.
+
+* **Clustering:** Pay attention to how the rows (drug combinations) and columns (cell lines) are clustered. Do drugs with similar mechanisms of action cluster together? Do cell lines from the same tissue type show similar synergy profiles?
+
+```{r fit_data_combo_viz_RV, warning=FALSE, fig.show="hide"}
+combo_metrics <- data.table(
+  expand.grid(normalization_type = c("GR", "RV"),
+              metric = c("hsa_score", "bliss_score"),
+              stringsAsFactors = FALSE))
+combo_metrics$hm_title <- pmap(combo_metrics, get_hm_title)
+
+annotation_manual_col <-
+  unique(response_metrics_scores[,.SD, .SDcols = c("CellLineName", "Tissue")])
+annotation_manual_row <-
+  unique(response_metrics_scores[,.SD, .SDcols = c("DrugName", "DrugName_2", "drug_moa", "drug_moa_2")])
+annotation_map <- get_ann_color_map(
+  unique(response_metrics_scores[,.SD, .SDcols = c("Tissue", "drug_moa", "drug_moa_2")]))
+
+ls_plt_RV <- pmap(combo_metrics[normalization_type == "RV", ], 
+                  pheatmap_with_anno_combo, 
+                  dt_scores = response_metrics_scores,
+                  annotation_row = annotation_manual_row,
+                  annotation_col = annotation_manual_col,
+                  annotation_colors = annotation_map)
+names(ls_plt_RV) <- combo_metrics[normalization_type == "RV", ]$hm_title
+
+```
+
+{{#plot_GR_values}}
+
+```{r fit_data_combo_viz_GR, warning=FALSE, fig.show="hide"}
+ls_plt_GR <- pmap(combo_metrics[normalization_type == "GR", ], 
+                  pheatmap_with_anno_combo, 
+                  dt_scores = response_metrics_scores,
+                  annotation_row = annotation_manual_row,
+                  annotation_col = annotation_manual_col,
+                  annotation_colors = annotation_map)
+names(ls_plt_GR) <- combo_metrics[normalization_type == "GR", ]$hm_title
+
+```
+
+{{/plot_GR_values}}
+
+#### Relative Viability {.tabset}
+
+```{r fit_data_combo_tab_RV, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = lapply(ls_plt_RV, "[[", "heatmap"),
+                                 prefix = "combo_fit_RV__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+ls_data_RV <- prep_filename_path(plt_list = lapply(ls_plt_RV, "[[", "heatmap"),
+                                 prefix = "data__combo_fit_RV__",
+                                 path_file = file.path(".", "tables"),
+                                 file_format = "xlsx")
+plts_RV <- prep_plot_chunk(plt_list = lapply(ls_plt_RV, "[[", "heatmap"),
+                           link_list = ls_link_RV,
+                           dwn_list = ls_data_RV,
+                           chunk_name = "fit_combo_tab_RV",
+                           header_level = 5)
+ls_path_RV <- prep_filename_path(plt_list = lapply(ls_plt_RV, "[[", "heatmap"),
+                                 prefix = "combo_fit_RV__",
+                                 path_file = file.path(wd, "plots"))
+ls_path_data_RV <- prep_filename_path(plt_list = lapply(ls_plt_RV, "[[", "heatmap"),
+                                      prefix = "data__combo_fit_RV__",
+                                      path_file = file.path(wd, "tables"),
+                                      file_format = "xlsx")
+# Save plots
+invisible(loop(seq_along(ls_plt_RV), function(i) {
+  item <- ls_plt_RV[[i]]
+  name <- names(ls_plt_RV)[[i]]
+  save_plot(
+    plt = item[["heatmap"]], 
+    path = ls_path_RV[[name]],
+    format = "{{viz_format}}"
+  )
+}))
+# Write data to Excel
+invisible(loop(seq_along(ls_plt_RV), function(i) {
+  item <- ls_plt_RV[[i]]
+  name <- names(ls_plt_RV)[[i]]
+  write_xlsx(
+    item[["data"]], 
+    path = ls_path_data_RV[[name]]
+  )
+}))
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+::: {.fullwidth}
+
+#### GR Value {.tabset}
+
+```{r fit_data_combo_tab_GR, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = lapply(ls_plt_GR, "[[", "heatmap"),
+                                 prefix = "combo_fit_GR__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+ls_data_GR <- prep_filename_path(plt_list = lapply(ls_plt_GR, "[[", "heatmap"),
+                                 prefix = "data__combo_fit_GR__",
+                                 path_file = file.path(".", "tables"),
+                                 file_format = "xlsx")
+plts_GR <- prep_plot_chunk(plt_list = lapply(ls_plt_GR, "[[", "heatmap"),
+                           link_list = ls_link_GR,
+                           dwn_list = ls_data_GR,
+                           chunk_name = "fit_combo_tab_GR",
+                           header_level = 5)
+ls_path_GR <- prep_filename_path(plt_list = lapply(ls_plt_GR, "[[", "heatmap"),
+                                 prefix = "combo_fit_GR__",
+                                 path_file = file.path(wd, "plots"))
+ls_path_data_GR <- prep_filename_path(plt_list = lapply(ls_plt_GR, "[[", "heatmap"),
+                                      prefix = "data__combo_fit_GR__",
+                                      path_file = file.path(wd, "tables"),
+                                      file_format = "xlsx")
+# Save plots
+invisible(loop(seq_along(ls_plt_GR), function(i) {
+  item <- ls_plt_GR[[i]]
+  name <- names(ls_plt_GR)[[i]]
+  save_plot(
+    plt = item[["heatmap"]], 
+    path = ls_path_GR[[name]],
+    format = "{{viz_format}}"
+  )
+}))
+# Write data to Excel
+invisible(loop(seq_along(ls_plt_GR), function(i) {
+  item <- ls_plt_GR[[i]]
+  name <- names(ls_plt_GR)[[i]]
+  write_xlsx(
+    item[["data"]], 
+    path = ls_path_data_GR[[name]]
+  )
+}))
+
+```
+
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+
+{{#PRISM_excluded}}
+
+### Boxplots by Cell Lines {.tabset .tabset-fade .tabset-pills}
+
+These boxplots show the distribution of a given metric (i.e., HSA or Bliss score) across all treatments, grouped by each cell line.
+
+**What to look for:**
+
+* **Compare Medians:** Look for cell lines with boxplots that have a significantly lower median value (for metrics like IC50, this indicates overall higher sensitivity) or a higher median value (for synergy scores, this indicates a greater tendency for synergistic responses).
+
+* **Examine Spread (Interquartile Range):** A wide boxplot for a particular cell line means its response to different drugs is highly variable. A narrow boxplot means it responds more uniformly to the drug panel.
+
+* **Identify Outliers:** Individual points outside the whiskers can highlight a specific drug that has an exceptionally strong (or weak) effect on that cell line compared to the others.
+
+```{r fit_data_combo_box_cl_RV, warning=FALSE, fig.show="hide"}
+# metrics
+metrics <- data.table(
+  expand.grid(normalization_type = c("GR", "RV"),
+              metric = c("hsa_score", "bliss_score"),
+              stringsAsFactors = FALSE))
+
+ls_plt_RV <- pmap(metrics[normalization_type == "RV", ], 
+                  plot_boxplot_metric_combo_by_CLs,
+                  dt_scores = response_metrics_scores,
+                  colored_pts_flag = TRUE)
+names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_title))
+
+```
+
+{{#plot_GR_values}}
+
+```{r fit_data_combo_box_cl_GR, warning=FALSE, fig.show="hide"}
+ls_plt_GR <- pmap(metrics[normalization_type == "GR", ], 
+                  plot_boxplot_metric_combo_by_CLs, 
+                  dt_scores = response_metrics_scores,
+                  colored_pts_flag = TRUE)
+names(ls_plt_GR) <- unlist(pmap(metrics[normalization_type == "GR", ], get_hm_title))
+
+```
+
+{{/plot_GR_values}}
+
+#### Relative Viability {.tabset}
+
+```{r fit_data_combo_tab_box_cl_RV, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "combo_fit_box_cl_RV__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV, 
+                           link_list = ls_link_RV,
+                           chunk_name = "fit_combo_box_cl_tab_RV", 
+                           header_level = 5)
+ls_path_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "combo_fit_box_cl_RV__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_RV), function(x) {
+  save_plot(plt = ls_plt_RV[[x]], 
+            path = ls_path_RV[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+
+#### GR Value {.tabset}
+
+```{r fit_data_comb_tab_box_cl_GR, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "combo_fit_box_cl_GR__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR, 
+                           link_list = ls_link_GR,
+                           chunk_name = "fit_combo_box_cl_tab_GR", 
+                           header_level = 5)
+ls_path_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "combo_fit_box_cl_GR__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_GR), function(x) {
+  save_plot(plt = ls_plt_GR[[x]], 
+            path = ls_path_GR[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+{{/PRISM_excluded}}
+
+### Boxplots by Drugs {.tabset .tabset-fade .tabset-pills}
+
+These boxplots show the distribution of a given metric (i.e., HSA or Bliss score) across all cell lines, grouped by each drug or drug combination.
+
+**What to look for:**
+
+* **Compare Medians:** Use these plots to rank the drugs or combinations. A drug with a boxplot shifted to a lower median IC50 is, on average, more potent across the entire cell line panel. For synergy scores, a combination with a boxplot shifted significantly above zero is, on average, more synergistic.
+
+* **Examine Spread (Interquartile Range):** A wide boxplot for a drug means its effectiveness varies greatly across different cell lines (i.e., it has a selective effect). A narrow boxplot means the drug has a similar effect on most cell lines.
+
+* **Identify Outliers:** Outliers can point to specific cell lines that are exceptionally sensitive or resistant to that particular drug.
+
+```{r fit_data_combo_box_d_RV, warning=FALSE, fig.show="hide"}
+# metrics
+metrics <- data.table(
+  expand.grid(normalization_type = c("GR", "RV"),
+              metric = c("hsa_score", "bliss_score"),
+              stringsAsFactors = FALSE))
+
+ls_plt_RV <- pmap(metrics[normalization_type == "RV", ], 
+                  plot_boxplot_metric_combo_by_drugs,
+                  dt_scores = response_metrics_scores,
+                  colored_pts_flag = TRUE)
+names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_title))
+
+```
+
+{{#plot_GR_values}}
+
+```{r fit_data_combo_box_d_GR, warning=FALSE, fig.show="hide"}
+ls_plt_GR <- pmap(metrics[normalization_type == "GR", ], 
+                  plot_boxplot_metric_combo_by_drugs, 
+                  dt_scores = response_metrics_scores,
+                  colored_pts_flag = TRUE)
+names(ls_plt_GR) <- unlist(pmap(metrics[normalization_type == "GR", ], get_hm_title))
+
+```
+
+{{/plot_GR_values}}
+
+#### Relative Viability {.tabset}
+
+```{r fit_data_combo_tab_box_d_RV, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "combo_fit_box_d_RV__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV, 
+                           link_list = ls_link_RV,
+                           chunk_name = "fit_combo_box_d_tab_RV", 
+                           header_level = 5)
+ls_path_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "combo_fit_box_d_RV__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_RV), function(x) {
+  save_plot(plt = ls_plt_RV[[x]], 
+            path = ls_path_RV[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+
+#### GR Value {.tabset}
+
+```{r fit_data_comb_tab_box_d_GR, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "combo_fit_box_d_GR__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR, 
+                           link_list = ls_link_GR,
+                           chunk_name = "fit_combo_box_d_tab_GR", 
+                           header_level = 5)
+ls_path_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "combo_fit_box_d_GR__",
+                                 path_file = file.path(wd, "plots"))
+invisible(loop(seq_along(ls_plt_GR), function(x) {
+  save_plot(plt = ls_plt_GR[[x]], 
+            path = ls_path_GR[[x]],
+            format = "{{viz_format}}")
+}))
+
+```
+
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+
+### Boxplots by Tissue {.tabset .tabset-fade .tabset-pills}
+
+These boxplots show the distribution of a given metric (i.e., HSA or Bliss score) across all treatments, grouped by each tissue.
+
+**What to look for:**
+
+* **Compare Medians:** Look for tissues with boxplots that have a significantly lower median value (for metrics like IC50, this indicates overall higher sensitivity) or a higher median value (for synergy scores, this indicates a greater tendency for synergistic responses).
+
+* **Examine Spread (Interquartile Range):** A wide boxplot for a particular tissue means its response to different drugs is highly variable. A narrow boxplot means it responds more uniformly to the drug panel.
+
+* **Identify Outliers:** Individual points outside the whiskers can highlight a specific drug that has an exceptionally strong (or weak) effect on that tissue compared to the others.
+
+```{r fit_data_combo_box_t_RV, warning=FALSE}
+tab_grid <- 
+  unique(response_metrics_scores[, .SD, .SDcols = c("DrugName", "DrugName_2")])
+setorder(tab_grid)
+
+ls_names <- sprintf("%s x %s", tab_grid$DrugName, tab_grid$DrugName_2)
+ls_names <- vapply(ls_names, function(i) escape_special_characters(i), 
+                   FUN.VALUE = character(1), USE.NAMES = FALSE)
+```
+
+{{#PRISM}}
+```{r fit_data_combo_box_t_RV_vis_PRISM, warning=FALSE, fig.show="hide"}
+# shorten CellLineName
+response_metrics_scores_short <- 
+  copy(response_metrics_scores)[, CellLineName := sub("_.*", "", CellLineName)]
+
+ls_plt_RV <- lapply(c("hsa_score", "bliss_score"), function(metric) {
+  ls_ <- pmap(tab_grid, function(DrugName, DrugName_2) {
+    plot_boxplot_metric_combo_by_grp(
+      dt_scores = response_metrics_scores_short,
+      selection_var = "DrugName",
+      selection_name = c(DrugName, DrugName_2),
+      group_var = "Tissue",
+      normalization_type = "RV",
+      metric = metric,
+      grouped_flag = TRUE,
+      named_n = 15,
+      named_n_mode = "top")
+  })
+  names(ls_) <- ls_names
+  ls_
+})
+names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_title))
+```
+{{/PRISM}}
+
+{{#PRISM_excluded}}
+```{r fit_data_combo_box_t_RV_vis, warning=FALSE, fig.show="hide"}
+ls_plt_RV <- lapply(c("hsa_score", "bliss_score"), function(metric) {
+  ls_ <- pmap(tab_grid, function(DrugName, DrugName_2) {
+    plot_boxplot_metric_combo_by_grp(
+      dt_scores = response_metrics_scores,
+      selection_var = "DrugName",
+      selection_name = c(DrugName, DrugName_2),
+      group_var = "Tissue",
+      normalization_type = "RV",
+      metric = metric,
+      grouped_flag = TRUE,
+      named_n = 15,
+      named_n_mode = "top")
+  })
+  names(ls_) <- ls_names
+  ls_
+})
+names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_title))
+```
+{{/PRISM_excluded}}
+
+
+{{#plot_GR_values}}
+{{#PRISM}}
+```{r fit_data_combo_box_t_GR_vis_PRISM, warning=FALSE, fig.show="hide"}
+# shorten CellLineName
+response_metrics_scores_short <- 
+  copy(response_metrics_scores)[, CellLineName := sub("_.*", "", CellLineName)]
+
+ls_plt_GR <- lapply(c("hsa_score", "bliss_score"), function(metric) {
+  ls_ <- pmap(tab_grid, function(DrugName, DrugName_2) {
+    plot_boxplot_metric_combo_by_grp(
+      dt_scores = response_metrics_scores_short,
+      selection_var = "DrugName",
+      selection_name = c(DrugName, DrugName_2),
+      group_var = "Tissue",
+      normalization_type = "GR",
+      metric = metric,
+      grouped_flag = TRUE,
+      named_n = 15,
+      named_n_mode = "top")
+  })
+  names(ls_) <- ls_names
+  ls_
+})
+names(ls_plt_GR) <- unlist(pmap(metrics[normalization_type == "GR", ], get_hm_title))
+```
+{{/PRISM}}
+
+{{#PRISM_excluded}}
+```{r fit_data_combo_box_t_GR_vis, warning=FALSE, fig.show="hide"}
+ls_plt_GR <- lapply(c("hsa_score", "bliss_score"), function(metric) {
+  ls_ <- pmap(tab_grid, function(DrugName, DrugName_2) {
+    plot_boxplot_metric_combo_by_grp(
+      dt_scores = response_metrics_scores,
+      selection_var = "DrugName",
+      selection_name = c(DrugName, DrugName_2),
+      group_var = "Tissue",
+      normalization_type = "GR",
+      metric = metric,
+      grouped_flag = TRUE,
+      named_n = 15,
+      named_n_mode = "top")
+  })
+  names(ls_) <- ls_names
+  ls_
+})
+names(ls_plt_GR) <- unlist(pmap(metrics[normalization_type == "GR", ], get_hm_title))
+```
+{{/PRISM_excluded}}
+{{/plot_GR_values}}
+
+#### Relative Viability {.tabset}
+
+```{r fit_data_combo_tab_box_t_RV, warning=FALSE, echo=FALSE}
+ls_link_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "combo_fit_box_t_RV__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_RV <- prep_plot_chunk(plt_list = ls_plt_RV, 
+                           link_list = ls_link_RV,
+                           chunk_name = "fit_combo_box_t_tab_RV", 
+                           header_level = 5)
+ls_path_RV <- prep_filename_path(plt_list = ls_plt_RV,
+                                 prefix = "combo_fit_box_t_RV__",
+                                 path_file = file.path(wd, "plots"))
+plot_plan <- list(
+  plt  = unlist(ls_plt_RV),
+  path = unlist(ls_path_RV)
+)
+invisible(loop(seq_along(plot_plan$plt), function(i) {
+  save_plot(plt = plot_plan$plt[[i]], path = plot_plan$path[[i]], format = "{{viz_format}}")
+}))
+```
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_RV))`
+:::
+
+{{#plot_GR_values}}
+#### GR Value {.tabset}
+
+```{r fit_data_comb_tab_box_t_GR, warning=FALSE, echo=FALSE}
+ls_link_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "combo_fit_box_t_GR__",
+                                 path_file = file.path(".", "plots"),
+                                 file_format = "{{viz_format}}")
+plts_GR <- prep_plot_chunk(plt_list = ls_plt_GR, 
+                           link_list = ls_link_GR,
+                           chunk_name = "fit_combo_box_t_tab_GR", 
+                           header_level = 5)
+ls_path_GR <- prep_filename_path(plt_list = ls_plt_GR,
+                                 prefix = "combo_fit_box_t_GR__",
+                                 path_file = file.path(wd, "plots"))
+plot_plan <- list(
+  plt  = unlist(ls_plt_GR),
+  path = unlist(ls_path_GR)
+)
+invisible(loop(seq_along(plot_plan$plt), function(i) {
+  save_plot(plt = plot_plan$plt[[i]], path = plot_plan$path[[i]], format = "{{viz_format}}")
+}))
+```
+::: {.fullwidth}
+`r knitr::knit(text = unlist(plts_GR))`
+:::
+{{/plot_GR_values}}
+{{/has_combo}}
+
+# Conclusion
+
+This report concludes the gDR data analysis workflow. The processed data has been exported to Excel files for external use, and the key results have been visualized through dose-response curves and summary plots of sensitivity metrics. These generated plots and tables form the basis for biological interpretation and further investigation.
+
+<div class="feedback-panel">
+<h3>We Value Your Feedback!</h3>
+<p>Thank you for using gDR! We are always looking to improve, and your feedback is incredibly valuable to us.</p>
+<a href="https://github.com/gdrplatform/gDR/issues" target="_blank" class="btn-feedback">Share feedback or request features on GitHub</a>
+</div>
+
+# gDR session info
+
+```{r, plot_packages}
+gdr_elapsed <- (proc.time() - gdr_start_time)[["elapsed"]]
+message(sprintf("Report generated in %.1f seconds", gdr_elapsed))
+gdr_sdt <- get_gDR_session_info()
+generate_datatable(gdr_sdt)
+
+cat(sprintf("**Report generation time: %.1f seconds**", gdr_elapsed))
+
+```
