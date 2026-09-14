@@ -186,6 +186,13 @@ itself only depends on \code{checkmate}, \code{qs2}, \code{whisker}, \code{rmark
 open-source gDR packages. See \code{run_gDR_with_report()} for a wrapper that supplies
 these hooks for a specific deployment.
 
+The report templates shipped in \code{inst/report_templates} additionally attach
+\code{gDRplots} when they are rendered. That package is deliberately absent from
+\code{Suggests}: it is not released on CRAN or Bioconductor yet, and an unresolvable soft
+dependency breaks dependency resolution for everything that installs this package. Install it
+from \url{https://github.com/gdrplatform/gDRplots} before rendering the bundled templates, or
+point \code{rmd_template_path} at templates that do not need it.
+
 \strong{By default, if the pipeline fails at any point, it will automatically clean up by removing the output
 directory it created for the run. This can be disabled for debugging.}
 }

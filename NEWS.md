@@ -1,3 +1,7 @@
+## gDR 1.11.6 - 2026-09-14
+* drop gDRplots from Suggests, since it has no CRAN or Bioconductor release and blocks dependency resolution
+* document the gDRplots run-time requirement of the bundled report templates in `run_report()`
+
 ## gDR 1.11.5 - 2026-09-11
 * add the five Incucyte helpers the Incucyte report templates call, so those templates run outside a deployment
 
