@@ -4,10 +4,15 @@
 \alias{determine_data_type}
 \title{Determine the data type from provided arguments}
 \usage{
-determine_data_type(args)
+determine_data_type(args, output_dir = args$output_dir)
 }
 \arguments{
 \item{args}{A list of all arguments passed to the main function.}
+
+\item{output_dir}{Character string with the directory holding a previous run's output. Reports
+write into a versioned \code{vN} subdirectory, so this must be the versioned directory returned by
+\code{setup_run_environment()} rather than the unversioned \code{args$output_dir}, which never contains
+\verb{gDR_data/}.}
 }
 \value{
 A character string representing the determined data type.

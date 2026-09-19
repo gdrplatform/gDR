@@ -1,3 +1,6 @@
+## gDR 1.11.7 - 2026-09-19
+* fix detection of an existing report so that push-only runs can start
+
 ## gDR 1.11.6 - 2026-09-14
 * drop gDRplots from Suggests, since it has no CRAN or Bioconductor release and blocks dependency resolution
 * document the gDRplots run-time requirement of the bundled report templates in `run_report()`

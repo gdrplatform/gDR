@@ -612,3 +612,35 @@ test_that("run_report assembles its templates from several directories", {
   )
   expect_length(mockery::mock_args(mock_render), 1)
 })
+
+# --- Tests for the versioned output directory in existing-report detection ---
+
+test_that("determine_data_type finds an existing report in the versioned directory", {
+  det <- gDR:::determine_data_type
+
+  base <- tempfile()
+  versioned <- file.path(base, "v1")
+  dir.create(file.path(versioned, "gDR_data"), recursive = TRUE)
+  file.create(file.path(versioned, "gDR_data", "gDR_mae.qs2"))
+  on.exit(unlink(base, recursive = TRUE))
+
+  expect_equal(det(list(output_dir = base), versioned), "existing")
+
+  # reports never write gDR_data into the unversioned directory, so looking there finds nothing
+  expect_error(det(list(output_dir = base)), "No valid input source provided")
+
+  # an explicit input source still wins over the directory probe
+  expect_equal(det(list(output_dir = base, long_table = "some.csv"), versioned), "long_table")
+})
+
+test_that("validate_and_prepare_inputs requires steps, which makes its existing-report inference dead", {
+  val_func <- gDR:::validate_and_prepare_inputs
+
+  # The "existing" branch infers `steps` when they are absent, but the assertion at the top of the
+  # function rejects a NULL `steps` first, so that inference cannot run. Pinned here so a change to
+  # either end shows up as a test failure rather than as silently revived code.
+  expect_error(
+    val_func(list(output_dir = "."), data_type = "existing"),
+    "Assertion on 'args\\$steps' failed"
+  )
+})
