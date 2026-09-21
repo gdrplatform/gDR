@@ -365,7 +365,7 @@ run_report <- function(
         extra_render_params <- resolved$extra_render_params
       }
 
-      data_type <- determine_data_type(args)
+      data_type <- determine_data_type(args, env$output_dir)
 
       message("Processing data type: ", data_type)
 
@@ -818,12 +818,17 @@ stage_and_update_paths <- function(args, output_dir, extra = list()) {
 #' Identifies the data source type (e.g., "qcs", "prism", "mae") based on the primary input arguments.
 #'
 #' @param args A list of all arguments passed to the main function.
+#' @param output_dir Character string with the directory holding a previous run's output. Reports
+#' write into a versioned `vN` subdirectory, so this must be the versioned directory returned by
+#' `setup_run_environment()` rather than the unversioned `args$output_dir`, which never contains
+#' `gDR_data/`.
 #'
 #' @return A character string representing the determined data type.
 #'
 #' @keywords internal
-determine_data_type <- function(args) {
+determine_data_type <- function(args, output_dir = args$output_dir) {
   checkmate::assert_list(args)
+  checkmate::assert_string(output_dir, null.ok = TRUE)
 
   if (!is_null_or_empty(args$qcs_id)) {
     "qcs"
@@ -845,8 +850,9 @@ determine_data_type <- function(args) {
     }
   } else {
 
-    if (file.exists(file.path(args$output_dir, "gDR_data", "gDR_input.qs2")) ||
-        file.exists(file.path(args$output_dir, "gDR_data", "gDR_mae.qs2"))) {
+    if (!is.null(output_dir) &&
+          (file.exists(file.path(output_dir, "gDR_data", "gDR_input.qs2")) ||
+             file.exists(file.path(output_dir, "gDR_data", "gDR_mae.qs2")))) {
       "existing"
     } else {
       stop("No valid input source provided. Please specify 'qcs_id', ",
@@ -935,6 +941,9 @@ validate_and_prepare_inputs <- function(args, data_type) {
       checkmate::assert_character(args$raw_data, min.len = 1)
     },
     "existing" = {
+      # Unreachable: assert_numeric() above rejects a NULL `steps`, so the inference below never
+      # runs and `mae_path` is never read. Kept as-is rather than repaired or deleted, because
+      # either is a behaviour change beyond the scope of the fix that brought this to light.
       mae_path <- file.path(args$output_dir, "gDR_data", "gDR_mae.qs2")
       if (is.null(args$steps)) {
          # If existing and no steps provided, assume analysis (3)
