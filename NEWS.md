@@ -1,3 +1,6 @@
+## gDR 1.11.9 - 2026-09-24
+* use qualified calls for the fitting-layer functions the Incucyte report templates rely on
+
 ## gDR 1.11.8 - 2026-09-24
 * read the Incucyte analysis configuration from the file supplied for the run instead of a fixed name
 * prevent a run from falling back to generated defaults when its configuration file cannot be staged
@@ -154,4 +157,5 @@
 
 ## gDR 0.0.0.1 - 2021-02-03
 * initial version
+
 
