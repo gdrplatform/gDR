@@ -373,7 +373,7 @@ se <- mae[[get_supported_experiments("time-course")]]
 # convert_se_assay_to_dt automatically merges rowData and colData.
 # The assay name comes from the time-course fit profile rather than a literal,
 # so the report reads whatever gDRcore fits on even if that default changes.
-lfc_assay <- get_fit_profile("time-course")$input_assay
+lfc_assay <- gDRutils::get_fit_profile("time-course")$input_assay
 all_data <- convert_se_assay_to_dt(se, lfc_assay)
 
 # Ensure it is a data.table
@@ -495,10 +495,10 @@ norm_map <- unlist(config$normalization_map)[names(periods_to_process)]
 # own are ambiguous - whether a timepoint sitting exactly on a boundary counts
 # depends on the window convention - and a window can silently hold far fewer
 # points than intended. gDRcore answers this with the same rule it fits on.
-period_timepoints <- get_period_timepoints(se, periods_num)
+period_timepoints <- gDRcore::get_period_timepoints(se, periods_num)
 generate_datatable(period_timepoints)
 
-growth_dt <- compute_growth_rates(
+growth_dt <- gDRcore::compute_growth_rates(
   se,
   periods = periods_num,
   normalization_map = norm_map
