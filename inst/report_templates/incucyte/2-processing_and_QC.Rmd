@@ -215,7 +215,7 @@ Author: <a href="https://github.com/gdrplatform">gDR team</a>
 
 This report documents the core data processing steps of the gDR-Incucyte pipeline.  Starting with the cleaned data from Step 1, this workflow converts the data into a standardized format and maps controls to treatments.
 
-This step is critical as it maps control wells (e.g., DMSO) to their corresponding treatment wells. This file does **not** perform normalization. All normalization and growth rate calculations are handled in Step 3, based on the `time_course_plot_params.yml` config file.
+This step is critical as it maps control wells (e.g., DMSO) to their corresponding treatment wells. This file does **not** perform normalization. All normalization and growth rate calculations are handled in Step 3, based on the YAML configuration file for this run.
 
 ```{r libraries}
 library(qs2)
