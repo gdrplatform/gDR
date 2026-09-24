@@ -1,3 +1,6 @@
+## gDR 1.11.8 - 2026-09-24
+* fix rendering of the rowData and colData tables in the processing report on Bioconductor 3.24
+
 ## gDR 1.11.7 - 2026-09-19
 * fix detection of an existing report so that push-only runs can start
 
