@@ -365,3 +365,68 @@ generate_incucyte_yaml_draft <- function(dt,
 
   invisible(out_file)
 }
+
+
+#' Resolve the configuration file an Incucyte report reads
+#'
+#' An Incucyte run either carries a configuration file supplied by the caller, staged into
+#' \code{raw_data/} under its own name, or none, in which case the first step generates a draft
+#' under a fixed name and that becomes the configuration for the run. This resolves both cases to
+#' one existing file, so that a report can never quietly analyse generated defaults while the
+#' caller believes their own configuration is in force.
+#'
+#' @param configuration_file_path string; staged path of the configuration file supplied by the
+#'   caller, or \code{""} when none was supplied. Inside a rendered template this is the
+#'   \code{configuration_file_path} template value, which renders empty for a run without one.
+#' @param output_dir string; versioned output directory of the run.
+#' @param default_name string; name of the configuration file the first step generates, looked up
+#'   in \code{raw_data/} when the caller supplied none.
+#'
+#' @return Path of an existing configuration file.
+#'
+#' @examples
+#' \dontrun{
+#' resolve_incucyte_config_path("/out/v1/raw_data/my_windows.yml", "/out/v1")
+#' resolve_incucyte_config_path("", "/out/v1")
+#' }
+#'
+#' @keywords incucyte
+#' @export
+resolve_incucyte_config_path <- function(configuration_file_path,
+                                         output_dir,
+                                         default_name = "time_course_plot_params.yml") {
+  checkmate::assert_character(configuration_file_path, max.len = 1, null.ok = TRUE)
+  checkmate::assert_string(output_dir)
+  checkmate::assert_string(default_name)
+
+  raw_data_dir <- file.path(output_dir, "raw_data")
+
+  if (length(configuration_file_path) == 0 || !nzchar(configuration_file_path)) {
+    default_path <- file.path(raw_data_dir, default_name)
+    if (!file.exists(default_path)) {
+      stop(sprintf(
+        paste("No configuration file found for the Incucyte analysis. Expected '%s', which the",
+              "data import step generates when a run is started without one. Run that step first,",
+              "or pass the configuration explicitly ('configuration_file_path', option -C of",
+              "generate_report.sh)."),
+        default_path
+      ))
+    }
+    default_path
+  } else {
+    supplied_path <- configuration_file_path
+    if (!file.exists(supplied_path)) {
+      # Tolerate a bare file name, so that a rendered report stays runnable after its output
+      # directory has been moved.
+      supplied_path <- file.path(raw_data_dir, basename(configuration_file_path))
+    }
+    if (!file.exists(supplied_path)) {
+      stop(sprintf(
+        paste("The configuration file supplied for this run ('%s') cannot be read, and neither",
+              "can a file of that name in '%s', where it should have been staged."),
+        configuration_file_path, raw_data_dir
+      ))
+    }
+    supplied_path
+  }
+}

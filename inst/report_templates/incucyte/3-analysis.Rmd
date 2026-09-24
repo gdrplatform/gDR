@@ -209,7 +209,7 @@ Author: <a href="https://github.com/gdrplatform">gDR team</a>
 
 # Introduction
 
-This report analyzes the processed time-course data from Step 2. Its primary goal is to calculate growth rates over different time periods (defined in the `time_course_plot_params.yml` config) and visualize how different treatments affect cell growth over time.
+This report analyzes the processed time-course data from Step 2. Its primary goal is to calculate growth rates over different time periods (defined in the YAML configuration file for this run, named in the table below) and visualize how different treatments affect cell growth over time.
 
 This analysis helps identify if a drug has an early (cytostatic) vs. late (cytotoxic) effect, or if its effect is constant across the experiment.
 
@@ -241,13 +241,14 @@ library(gDR)
 
 ## Read Plotting Configurations
 
-All parameters for this analysis report are controlled by the **`time_course_plot_params.yml`** file, which was provided in the `raw_data` folder in Step 1.
+All parameters for this analysis report are controlled by the YAML configuration file staged in the `raw_data` folder. The exact file used by *this* run, and whether it came from you or was generated in Step 1, are the first two rows of the table below.
 
 This file defines the time periods, normalization strategy, and plots to be generated. Below is a description of each key parameter, using the file from this run as an example.
 
 ```{r read_config}
 wd <- "{{output_dir}}"
-config_path <- file.path(wd, "raw_data/time_course_plot_params.yml")
+config_arg <- "{{{configuration_file_path}}}"
+config_path <- resolve_incucyte_config_path(config_arg, wd)
 config <- read_yaml(config_path)
 
 # Create a summary table of key config parameters
@@ -262,9 +263,28 @@ config_summary <- data.table(
 x_axis_show_val <- if (is.null(config$x_axis_text_show)) TRUE else as.logical(config$x_axis_text_show)
 x_axis_size_str <- if (is.null(config$x_axis_text_size)) "9 (Default)" else as.character(config$x_axis_text_size)
 
+# Which file these numbers came from. A run started without a configuration is analysed with
+# windows derived from the data, which is a very different claim from the one a reader makes when
+# they supplied their own - so both the file and its origin are stated here rather than assumed.
+if (nzchar(config_arg)) {
+  config_source <- "supplied with the run"
+} else {
+  config_source <- "generated in Step 1 from the data (defaults)"
+}
+
 # Add basic parameters
 config_summary <- rbindlist(list(
   config_summary,
+  data.table(
+    Parameter = "config_file",
+    Description = "Configuration file this report read",
+    Value = sub(paste0("^", wd, "/"), "", config_path)
+  ),
+  data.table(
+    Parameter = "config_source",
+    Description = "Where that file came from",
+    Value = config_source
+  ),
   data.table(
     Parameter = "plot_date",
     Description = "Date string for output file naming",
