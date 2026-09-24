@@ -1,7 +1,7 @@
 ## gDR 1.11.8 - 2026-09-24
 * read the Incucyte analysis configuration from the file supplied for the run instead of a fixed name
-* stop a run whose configuration file cannot be staged, instead of falling back to generated defaults
-* warn instead of silently ignoring a path argument that resolves to no file
+* prevent a run from falling back to generated defaults when its configuration file cannot be staged
+* fix the silent removal of a path argument that resolves to no file
 
 ## gDR 1.11.7 - 2026-09-19
 * fix detection of an existing report so that push-only runs can start
