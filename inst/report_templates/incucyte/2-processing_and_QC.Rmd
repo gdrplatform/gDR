@@ -274,7 +274,7 @@ se_tc <- normalize_SE(se_tc, data_type = tc_type)
 This table shows the metadata for the rows of the SummarizedExperiment, which correspond to the drugs and treatments.
 
 ```{r, create_SE_rowData}
-generate_datatable(as.data.table(rowData(se_tc), keep.rownames = TRUE))
+generate_datatable(as.data.table(as.data.frame(rowData(se_tc)), keep.rownames = TRUE))
 
 ```
 
@@ -283,7 +283,7 @@ generate_datatable(as.data.table(rowData(se_tc), keep.rownames = TRUE))
 This table shows the metadata for the columns of the SummarizedExperiment, which correspond to the cell lines and experimental conditions.
 
 ```{r, create_SE_colData}
-generate_datatable(as.data.table(colData(se_tc), keep.rownames = TRUE))
+generate_datatable(as.data.table(as.data.frame(colData(se_tc)), keep.rownames = TRUE))
 
 ```
 
