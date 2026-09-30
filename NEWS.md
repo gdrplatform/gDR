@@ -1,10 +1,13 @@
-## gDR 1.11.9 - 2026-09-24
+## gDR 1.11.10 - 2026-09-30
 * use qualified calls for the fitting-layer functions the Incucyte report templates rely on
 
-## gDR 1.11.8 - 2026-09-24
+## gDR 1.11.9 - 2026-09-30
 * read the Incucyte analysis configuration from the file supplied for the run instead of a fixed name
 * prevent a run from falling back to generated defaults when its configuration file cannot be staged
 * fix the silent removal of a path argument that resolves to no file
+
+## gDR 1.11.8 - 2026-09-24
+* fix rendering of the rowData and colData tables in the processing report on Bioconductor 3.24
 
 ## gDR 1.11.7 - 2026-09-19
 * fix detection of an existing report so that push-only runs can start
@@ -157,5 +160,3 @@
 
 ## gDR 0.0.0.1 - 2021-02-03
 * initial version
-
-
