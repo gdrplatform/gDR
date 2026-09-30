@@ -289,7 +289,7 @@ A key action in this step is the mapping of control data (e.g., DMSO-treated wel
 
 ```{r, create_SE_sa_rowData}
 se_sa <- create_SE(dt_sa, data_type = sa_name)
-generate_datatable(as.data.table(rowData(se_sa), keep.rownames = TRUE))
+generate_datatable(as.data.table(as.data.frame(rowData(se_sa)), keep.rownames = TRUE))
 
 
 ```
@@ -297,7 +297,7 @@ generate_datatable(as.data.table(rowData(se_sa), keep.rownames = TRUE))
 ## Single-agent experiment - colData
 
 ```{r, create_SE_sa_colData}
-generate_datatable(as.data.table(colData(se_sa), keep.rownames = TRUE))
+generate_datatable(as.data.table(as.data.frame(colData(se_sa)), keep.rownames = TRUE))
 
 
 ```
@@ -308,7 +308,7 @@ generate_datatable(as.data.table(colData(se_sa), keep.rownames = TRUE))
 
 ```{r, create_SE_combo_rowData}
 se_combo <- create_SE(dt_combo, data_type = combo_name)
-generate_datatable(as.data.table(rowData(se_combo), keep.rownames = TRUE))
+generate_datatable(as.data.table(as.data.frame(rowData(se_combo)), keep.rownames = TRUE))
 
 
 ```
@@ -316,7 +316,7 @@ generate_datatable(as.data.table(rowData(se_combo), keep.rownames = TRUE))
 ## Combination experiment - colData
 
 ```{r, create_SE_combo_colData}
-generate_datatable(as.data.table(colData(se_combo), keep.rownames = TRUE))
+generate_datatable(as.data.table(as.data.frame(colData(se_combo)), keep.rownames = TRUE))
 
 
 ```
