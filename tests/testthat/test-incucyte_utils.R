@@ -209,3 +209,47 @@ test_that("apply_custom_metadata_tags handles custom tags correctly", {
   # (drug_moa starts with "drug" but is a core identifier)
   expect_equal(res$drug_moa, c("inhibitor", "inhibitor", "inhibitor"))
 })
+
+test_that("resolve_incucyte_config_path prefers the file supplied with the run", {
+  out <- withr::local_tempdir()
+  raw <- file.path(out, "raw_data")
+  dir.create(raw)
+  supplied <- file.path(raw, "my_windows.yml")
+  writeLines("early_period: [44, 92]", supplied)
+  writeLines("early_period: [24, 48]", file.path(raw, "time_course_plot_params.yml"))
+
+  # The generated default sits right next to it and must not win.
+  expect_equal(resolve_incucyte_config_path(supplied, out), supplied)
+
+  # A bare name is resolved under raw_data/, so a rendered report survives a move of its output.
+  expect_equal(resolve_incucyte_config_path("my_windows.yml", out), supplied)
+})
+
+test_that("resolve_incucyte_config_path falls back to the generated default only without a supplied file", {
+  out <- withr::local_tempdir()
+  raw <- file.path(out, "raw_data")
+  dir.create(raw)
+  default <- file.path(raw, "time_course_plot_params.yml")
+  writeLines("early_period: [24, 48]", default)
+
+  # Whisker renders an absent template value as an empty string.
+  expect_equal(resolve_incucyte_config_path("", out), default)
+  expect_equal(resolve_incucyte_config_path(character(0), out), default)
+  expect_equal(resolve_incucyte_config_path(NULL, out), default)
+})
+
+test_that("resolve_incucyte_config_path refuses to guess", {
+  out <- withr::local_tempdir()
+  dir.create(file.path(out, "raw_data"))
+
+  # A supplied file that cannot be read must never be replaced by the generated default - that
+  # substitution is silent and changes every normalised number in the report.
+  writeLines("early_period: [24, 48]", file.path(out, "raw_data", "time_course_plot_params.yml"))
+  expect_error(resolve_incucyte_config_path("/nowhere/absent.yml", out), "cannot be read")
+
+  out2 <- withr::local_tempdir()
+  dir.create(file.path(out2, "raw_data"))
+  expect_error(resolve_incucyte_config_path("", out2), "-C")
+
+  expect_error(resolve_incucyte_config_path(c("a.yml", "b.yml"), out))
+})

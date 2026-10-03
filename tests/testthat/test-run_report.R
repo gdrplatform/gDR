@@ -644,3 +644,85 @@ test_that("validate_and_prepare_inputs requires steps, which makes its existing-
     "Assertion on 'args\\$steps' failed"
   )
 })
+
+test_that("run_report refuses a configuration file that could not be staged", {
+  dummy_out <- withr::local_tempdir()
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+
+  test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
+  # Staging drops a path argument it cannot resolve; the report must not carry on with the
+  # configuration the templates generate for themselves.
+  mockery::stub(test_fn, "stage_and_update_paths", function(args, ...) {
+    args$configuration_file_path <- NULL
+    args
+  })
+
+  expect_error(
+    test_fn(
+      manifest = "manifest.xlsx",
+      configuration_file_path = "windows.yml",
+      output_dir = dummy_out,
+      rmd_template_path = template_dir,
+      steps = 1,
+      remove_on_failure = FALSE
+    ),
+    "no file could be resolved and staged"
+  )
+})
+
+test_that("run_report passes a staged configuration file through to the templates", {
+  dummy_out <- withr::local_tempdir()
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+
+  test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
+  staged <- file.path(dummy_out, "raw_data", "my_windows.yml")
+  mockery::stub(test_fn, "stage_and_update_paths", function(args, ...) {
+    args$configuration_file_path <- staged
+    args
+  })
+
+  expect_no_error(
+    test_fn(
+      manifest = "manifest.xlsx",
+      configuration_file_path = "windows.yml",
+      output_dir = dummy_out,
+      rmd_template_path = template_dir,
+      steps = 1,
+      remove_on_failure = FALSE
+    )
+  )
+})
+
+test_that("stage_and_update_paths reports a path argument it had to drop", {
+  out <- withr::local_tempdir()
+  for (d in c("raw_data", "data_annotation")) {
+    dir.create(file.path(out, d))
+  }
+
+  expect_warning(
+    res <- stage_and_update_paths(
+      list(manifest = file.path(out, "*.nomatch")),
+      out
+    ),
+    "resolved to no file"
+  )
+  expect_null(res$manifest)
+})
+
+test_that("stage_and_update_paths leaves a file that is already staged intact", {
+  out <- withr::local_tempdir()
+  for (d in c("raw_data", "data_annotation")) {
+    dir.create(file.path(out, d))
+  }
+  staged <- file.path(out, "raw_data", "my_windows.yml")
+  writeLines("early_period: [44, 92]", staged)
+
+  # Re-running with the configuration edited in place is the normal way to iterate; file.copy()
+  # errors when a file is both source and destination, so an unguarded staging step fails the run.
+  res <- stage_and_update_paths(list(configuration_file_path = staged), out)
+
+  expect_equal(res$configuration_file_path, staged)
+  expect_equal(readLines(staged), "early_period: [44, 92]")
+})

@@ -1,3 +1,7 @@
+## gDR 1.11.9 - 2026-09-30
+* read the Incucyte analysis configuration supplied for the run, and fail if it cannot be staged
+* fix the silent removal of a path argument that resolves to no file
+
 ## gDR 1.11.8 - 2026-09-24
 * fix rendering of the rowData and colData tables in the processing report on Bioconductor 3.24
 
