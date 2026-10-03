@@ -209,7 +209,7 @@ Author: <a href="https://github.com/gdrplatform">gDR team</a>
 
 # Introduction
 
-This report analyzes the processed time-course data from Step 2. Its primary goal is to calculate growth rates over different time periods (defined in the YAML configuration file for this run, named in the table below) and visualize how different treatments affect cell growth over time.
+This report analyzes the processed time-course data from report step 2 (`2-processing_and_QC.Rmd`). Its primary goal is to calculate growth rates over different time periods (defined in the YAML configuration file for this run, named in the table below) and visualize how different treatments affect cell growth over time.
 
 This analysis helps identify if a drug has an early (cytostatic) vs. late (cytotoxic) effect, or if its effect is constant across the experiment.
 

@@ -394,12 +394,9 @@ run_report <- function(
       # Stage all input files into their respective directories and update args
       staged_args <- stage_and_update_paths(args, env$output_dir, extra = extra_render_params)
 
-      # A configuration file the caller asked for, but that staging could not resolve, must not be
-      # replaced by the one the templates generate for themselves: the run would finish with exit
-      # status 0 on defaults the caller never chose, and the configuration fixes the time windows
-      # every normalised number depends on. This is the only frame holding both the requested value
-      # and the result of resolving it. It is deliberately not keyed on 'data_type', which is "mae"
-      # for a re-run that analyses an existing MAE while still using the Incucyte templates.
+      # If the caller asked for a configuration but staging could not resolve it, fail loudly
+      # rather than silently falling back to the one the templates generate: the configuration
+      # fixes the time windows every normalised number depends on.
       if (!is_null_or_empty(args$configuration_file_path) &&
             is_null_or_empty(staged_args$configuration_file_path)) {
         stop(sprintf(
@@ -803,8 +800,6 @@ stage_and_update_paths <- function(args, output_dir, extra = list()) {
       original_paths <- resolve_path_spec(path_spec)
 
       if (is_null_or_empty(original_paths)) {
-        # Dropping the argument without a word makes the run look like one the caller never asked
-        # to include the input in.
         warning(sprintf(
           "'%s' was set to '%s' but resolved to no file; the argument is ignored.",
           arg_name, toString(path_spec)
@@ -826,10 +821,8 @@ stage_and_update_paths <- function(args, output_dir, extra = list()) {
 
       # NEW: Copy all resolved files and update argument to a vector of new paths
       new_paths <- file.path(dest_dir, basename(original_paths))
-      # An argument may already point at its staged copy - re-running with the configuration
-      # edited in place inside the output directory is the normal way to iterate. file.copy()
-      # refuses a file as both source and destination ("file can not be copied both 'from' and
-      # 'to'"), so without this the whole run would fail on a no-op.
+      # An argument may already point at its staged copy, which is how a re-run iterates.
+      # file.copy() errors on "file can not be copied both 'from' and 'to'".
       to_copy <- normalizePath(original_paths, mustWork = FALSE) !=
         normalizePath(new_paths, mustWork = FALSE)
       if (any(to_copy)) {
