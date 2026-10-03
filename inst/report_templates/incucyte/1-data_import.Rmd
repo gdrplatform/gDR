@@ -234,7 +234,7 @@ This report generates the following files:
 
 ## Processed gDR Data (in `gDR_data/` folder)
 
-* **`gDR_input.qs2`:** The primary output. This is a single qs2 file containing a data.table with all merged, cleaned, and annotated raw data. This file is the required input for Step 2: Processing and QC.
+* **`gDR_input.qs2`:** The primary output. This is a single qs2 file containing a data.table with all merged, cleaned, and annotated raw data. This file is the required input for report step 2: Processing and QC.
 
 ## Data Annotation Files (in `data_annotation/` folder)
 
