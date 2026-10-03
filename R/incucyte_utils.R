@@ -376,8 +376,7 @@ generate_incucyte_yaml_draft <- function(dt,
 #' caller believes their own configuration is in force.
 #'
 #' @param configuration_file_path string; staged path of the configuration file supplied by the
-#'   caller, or \code{""} when none was supplied. Inside a rendered template this is the
-#'   \code{configuration_file_path} template value, which renders empty for a run without one.
+#'   caller, or \code{""} when none was supplied.
 #' @param output_dir string; versioned output directory of the run.
 #' @param default_name string; name of the configuration file the first step generates, looked up
 #'   in \code{raw_data/} when the caller supplied none.

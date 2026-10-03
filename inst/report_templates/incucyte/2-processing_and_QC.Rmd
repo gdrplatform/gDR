@@ -213,9 +213,9 @@ Author: <a href="https://github.com/gdrplatform">gDR team</a>
 
 # Introduction
 
-This report documents the core data processing steps of the gDR-Incucyte pipeline.  Starting with the cleaned data from Step 1, this workflow converts the data into a standardized format and maps controls to treatments.
+This report documents the core data processing steps of the gDR-Incucyte pipeline.  Starting with the cleaned data from report step 1, this workflow converts the data into a standardized format and maps controls to treatments.
 
-This step is critical as it maps control wells (e.g., DMSO) to their corresponding treatment wells. This file does **not** perform normalization. All normalization and growth rate calculations are handled in Step 3, based on the YAML configuration file for this run.
+This step is critical as it maps control wells (e.g., DMSO) to their corresponding treatment wells. This file does **not** perform normalization. All normalization and growth rate calculations are handled in report step 3, based on the YAML configuration file for this run.
 
 ```{r libraries}
 library(qs2)
@@ -229,11 +229,11 @@ library(gDRplots)
 
 # Key Output File
 
-* **`gDR_data/gDR_mae.qs2`:** The main output of this step. This is a MultiAssayExperiment (MAE) object containing the processed SummarizedExperiment for the time-course data. This file includes all data assays (e.g., RawTreated, Controls, Normalized) and is the required input for Step 3: Analysis.
+* **`gDR_data/gDR_mae.qs2`:** The main output of this step. This is a MultiAssayExperiment (MAE) object containing the processed SummarizedExperiment for the time-course data. This file includes all data assays (e.g., RawTreated, Controls, Normalized) and is the required input for report step 3: Analysis.
 
 # Read Input Data
 
-This section loads the cleaned and annotated `data.table` from Step 1 (`gDR_input.qs`), which contains all the merged information from the manifest, template, and raw Incucyte data files.
+This section loads the cleaned and annotated `data.table` from report step 1 (`gDR_input.qs`), which contains all the merged information from the manifest, template, and raw Incucyte data files.
 
 ```{r drug_dose_layout}
 wd <- "{{output_dir}}"

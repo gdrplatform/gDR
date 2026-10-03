@@ -2,8 +2,7 @@
 * use qualified calls for the fitting-layer functions the Incucyte report templates rely on
 
 ## gDR 1.11.9 - 2026-09-30
-* read the Incucyte analysis configuration from the file supplied for the run instead of a fixed name
-* prevent a run from falling back to generated defaults when its configuration file cannot be staged
+* read the Incucyte analysis configuration supplied for the run, and fail if it cannot be staged
 * fix the silent removal of a path argument that resolves to no file
 
 ## gDR 1.11.8 - 2026-09-24
