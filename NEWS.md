@@ -1,4 +1,4 @@
-## gDR 1.11.10 - 2026-09-30
+## gDR 1.11.10 - 2026-10-03
 * use qualified calls for the fitting-layer functions the Incucyte report templates rely on
 
 ## gDR 1.11.9 - 2026-09-30
