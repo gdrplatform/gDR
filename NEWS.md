@@ -1,3 +1,6 @@
+## gDR 1.11.10 - 2026-10-03
+* use qualified calls for the fitting-layer functions the Incucyte report templates rely on
+
 ## gDR 1.11.9 - 2026-09-30
 * read the Incucyte analysis configuration supplied for the run, and fail if it cannot be staged
 * fix the silent removal of a path argument that resolves to no file
