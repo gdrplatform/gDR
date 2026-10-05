@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.11.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.11.10</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,9 @@
 <span>  <span class="va">manifest_file</span>,</span>
 <span>  <span class="va">template_file</span>,</span>
 <span>  <span class="va">results_file</span>,</span>
-<span>  instrument <span class="op">=</span> <span class="st">"EnVision"</span></span>
+<span>  instrument <span class="op">=</span> <span class="st">"EnVision"</span>,</span>
+<span>  cell_line_annotation <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  drug_annotation <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -69,6 +71,16 @@ or character with file path of results file(s)</p></dd>
 <dt id="arg-instrument">instrument<a class="anchor" aria-label="anchor" href="#arg-instrument"></a></dt>
 <dd><p>string with type of instrument used</p></dd>
 
+
+<dt id="arg-cell-line-annotation">cell_line_annotation<a class="anchor" aria-label="anchor" href="#arg-cell-line-annotation"></a></dt>
+<dd><p>optional data.table with cell line annotations;
+if NULL (default), annotations are looked up from gDRinternal or gDRtestData</p></dd>
+
+
+<dt id="arg-drug-annotation">drug_annotation<a class="anchor" aria-label="anchor" href="#arg-drug-annotation"></a></dt>
+<dd><p>optional data.table with drug annotations;
+if NULL (default), annotations are looked up from gDRinternal or gDRtestData</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -79,13 +91,13 @@ or character with file path of results file(s)</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">td</span> <span class="op">&lt;-</span> <span class="fu">get_test_data</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">i_df</span> <span class="op">&lt;-</span> <span class="fu">import_data</span><span class="op">(</span><span class="fu">manifest_path</span><span class="op">(</span><span class="va">td</span><span class="op">)</span>, <span class="fu">template_path</span><span class="op">(</span><span class="va">td</span><span class="op">)</span>, <span class="fu">result_path</span><span class="op">(</span><span class="va">td</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Manifest loaded successfully</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Reading Template_7daytreated.xlsx with load_templates_xlsx</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Reading Template_Untreated.xlsx with load_templates_xlsx</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Loading Template_7daytreated.xlsx</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Loading Template_Untreated.xlsx</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Templates loaded successfully!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Reading file /home/runner/work/_temp/Library/gDRimport/extdata/data1/RawData_day0.xlsx, sheet Readout_0077vs0068_day7</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Manifest loaded successfully</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Reading Template_7daytreated.xlsx with load_templates_xlsx</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Reading Template_Untreated.xlsx with load_templates_xlsx</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Loading Template_7daytreated.xlsx</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Loading Template_Untreated.xlsx</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Templates loaded successfully!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Reading file /home/runner/work/_temp/Library/gDRimport/extdata/data1/RawData_day0.xlsx, sheet Readout_0077vs0068_day7</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> New names:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...1`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...2`</span>
@@ -112,14 +124,14 @@ or character with file path of results file(s)</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...23`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...24`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...25`</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Plate 201904190a read; 384 wells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Plate 201904190b read; 384 wells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Plate 201904190c read; 384 wells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Plate 201904190d read; 384 wells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Plate 201904190e read; 384 wells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Plate 201904190f read; 384 wells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] File done</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:17] Reading file /home/runner/work/_temp/Library/gDRimport/extdata/data1/RawData_day7.xlsx, sheet Readout_0077vs0068_day7</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Plate 201904190a read; 384 wells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Plate 201904190b read; 384 wells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Plate 201904190c read; 384 wells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Plate 201904190d read; 384 wells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Plate 201904190e read; 384 wells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Plate 201904190f read; 384 wells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] File done</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Reading file /home/runner/work/_temp/Library/gDRimport/extdata/data1/RawData_day7.xlsx, sheet Readout_0077vs0068_day7</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> New names:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...1`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...2`</span>
@@ -146,16 +158,16 @@ or character with file path of results file(s)</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...23`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...24`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...25`</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:18] Plate 201904197a read; 384 wells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:18] Plate 201904197b read; 384 wells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:18] Plate 201904197c read; 384 wells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:18] Plate 201904197d read; 384 wells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:18] Plate 201904197e read; 384 wells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:18] Plate 201904197f read; 384 wells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:18] File done</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:18] Merging data</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-06-02 11:40:18] Merging the metadata (manifest and treatment files)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> WARN [2026-06-02 11:40:18] 4608 well loaded, 768 wells discarded for lack of annotation, </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Plate 201904197a read; 384 wells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Plate 201904197b read; 384 wells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Plate 201904197c read; 384 wells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Plate 201904197d read; 384 wells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Plate 201904197e read; 384 wells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Plate 201904197f read; 384 wells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] File done</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Merging data</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-10-05 06:37:03] Merging the metadata (manifest and treatment files)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> WARN [2026-10-05 06:37:03] 4608 well loaded, 768 wells discarded for lack of annotation,</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     3840 data point selected</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -169,7 +181,7 @@ or character with file path of results file(s)</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

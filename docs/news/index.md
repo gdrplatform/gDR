@@ -1,5 +1,49 @@
 # Changelog
 
+## gDR 1.11.10 - 2026-10-03
+
+- use qualified calls for the fitting-layer functions the Incucyte
+  report templates rely on
+
+## gDR 1.11.9 - 2026-09-30
+
+- read the Incucyte analysis configuration supplied for the run, and
+  fail if it cannot be staged
+- fix the silent removal of a path argument that resolves to no file
+
+## gDR 1.11.8 - 2026-09-24
+
+- fix rendering of the rowData and colData tables in the processing
+  report on Bioconductor 3.24
+
+## gDR 1.11.7 - 2026-09-19
+
+- fix detection of an existing report so that push-only runs can start
+
+## gDR 1.11.6 - 2026-09-14
+
+- drop gDRplots from Suggests, since it has no CRAN or Bioconductor
+  release and blocks dependency resolution
+- document the gDRplots run-time requirement of the bundled report
+  templates in
+  [`run_report()`](https://gdrplatform.github.io/gDR/reference/run_report.md)
+
+## gDR 1.11.5 - 2026-09-11
+
+- add the five Incucyte helpers the Incucyte report templates call, so
+  those templates run outside a deployment
+
+## gDR 1.11.4 - 2026-09-01
+
+- add
+  [`run_report()`](https://gdrplatform.github.io/gDR/reference/run_report.md),
+  a deployment-agnostic driver for the report pipeline, together with
+  its report templates
+
+## gDR 1.11.3 - 2026-06-08
+
+- add custom annotation support to `import_data`
+
 ## gDR 1.11.2 - 2026-05-26
 
 - apply updated gDRstyle rules

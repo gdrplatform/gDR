@@ -31,7 +31,7 @@ and processing the data.
 gDR suite consists of a few packages that power our app and make it a
 comprehensive tool. All the packages under the gDR umbrella are stored
 in the [gDR platform GitHub
-organization](https://github.roche.com/gdrplatform/).
+organization](https://github.com/gdrplatform).
 
 We are happy to share with you our packages for importing, processing
 and managing gDR data: - gDRimport - gDRcore - gDRutils - gDRtestData
@@ -264,8 +264,8 @@ names(mae)
 #> [1] "combination"  "single-agent"
 SummarizedExperiment::assayNames(mae[[1]])
 #> [1] "RawTreated"     "Controls"       "Normalized"     "Averaged"      
-#> [5] "excess"         "all_iso_points" "isobolograms"   "scores"        
-#> [9] "Metrics"
+#> [5] "Metrics"        "excess"         "isobolograms"   "all_iso_points"
+#> [9] "scores"
 ```
 
 Each assay from each experiment can be easily transformed to
@@ -283,46 +283,46 @@ head(convert_se_assay_to_dt(se, "Metrics"))
 #> 4: G00004_drug_004_moa_A_168 CL00011_cellline_BA_breast_cellline_BA_unknown_26
 #> 5: G00011_drug_011_moa_B_168 CL00011_cellline_BA_breast_cellline_BA_unknown_26
 #> 6: G00011_drug_011_moa_B_168 CL00011_cellline_BA_breast_cellline_BA_unknown_26
-#>       x_mean      x_AOC x_AOC_range      xc50      x_max        ec50
-#>        <num>      <num>       <num>     <num>      <num>       <num>
-#> 1: 0.9157913 0.08420865  0.05733832 7.4683485  0.4225500   5.7741811
-#> 2: 0.7420679 0.25793215  0.25820178 4.1712724  0.3065500 100.0000000
-#> 3: 0.6675856 0.33241443  0.32656451 0.4942034  0.0260500   0.4793539
-#> 4: 0.5092443 0.49075566  0.48159819 0.3199532 -0.4177500   0.5757493
-#> 5: 0.3225188 0.67748125          NA      -Inf  0.3225188          NA
-#> 6: 0.2600750 0.73992500          NA      -Inf  0.2600750          NA
-#>          x_inf   x_0         h        r2         p_value        rss
-#>          <num> <num>     <num>     <num>           <num>      <num>
-#> 1:  0.14499197     1 1.3311221 0.9199573 0.0001450862960 0.03159935
-#> 2: -0.76364407     1 0.2918356 0.7732475 0.0055517820959 0.06111735
-#> 3:  0.04254419     1 2.9149107 0.9751992 0.0000024023028 0.04890734
-#> 4: -0.48824612     1 1.1597048 0.9858751 0.0000003349268 0.03576754
-#> 5:          NA    NA        NA        NA              NA         NA
-#> 6:          NA    NA        NA        NA              NA         NA
-#>    maxlog10Concentration N_conc  x_sd_avg               fit_type
-#>                    <num>  <int>     <num>                 <char>
-#> 1:              1.000000      9 0.8794050 DRC3pHillFitModelFixS0
-#> 2:              1.000000      9 0.7276889 DRC3pHillFitModelFixS0
-#> 3:              1.000000      9 0.7335509 DRC3pHillFitModelFixS0
-#> 4:              1.000000      9 0.5983619 DRC3pHillFitModelFixS0
-#> 5:             -0.823909      1 0.2540203   DRCTooFewPointsToFit
-#> 6:             -0.823909      1 0.3936048   DRCTooFewPointsToFit
-#>    normalization_type fit_source Gnumber DrugName drug_moa Duration    clid
-#>                <char>     <char>  <char>   <char>   <char>    <num>  <char>
-#> 1:                 RV        gDR  G00002 drug_002    moa_A      168 CL00011
-#> 2:                 GR        gDR  G00002 drug_002    moa_A      168 CL00011
-#> 3:                 RV        gDR  G00004 drug_004    moa_A      168 CL00011
-#> 4:                 GR        gDR  G00004 drug_004    moa_A      168 CL00011
-#> 5:                 RV        gDR  G00011 drug_011    moa_B      168 CL00011
-#> 6:                 GR        gDR  G00011 drug_011    moa_B      168 CL00011
-#>    CellLineName Tissue parental_identifier subtype ReferenceDivisionTime
-#>          <char> <char>              <char>  <char>                 <num>
-#> 1:  cellline_BA breast         cellline_BA unknown                    26
-#> 2:  cellline_BA breast         cellline_BA unknown                    26
-#> 3:  cellline_BA breast         cellline_BA unknown                    26
-#> 4:  cellline_BA breast         cellline_BA unknown                    26
-#> 5:  cellline_BA breast         cellline_BA unknown                    26
-#> 6:  cellline_BA breast         cellline_BA unknown                    26
+#>    normalization_type    x_mean      x_AOC x_AOC_range      x_max  x_sd_avg
+#>                <char>     <num>      <num>       <num>      <num>     <num>
+#> 1:                 GR 0.7420730 0.25792698  0.25819628  0.3065500 0.7276889
+#> 2:                 RV 0.9157913 0.08420865  0.05733832  0.4225500 0.8794050
+#> 3:                 GR 0.5092443 0.49075566  0.48159819 -0.4177500 0.5983619
+#> 4:                 RV 0.6675856 0.33241443  0.32656451  0.0260500 0.7335509
+#> 5:                 GR 0.2600750 0.73992500  0.73992500  0.2600750 0.3936048
+#> 6:                 RV 0.3225188 0.67748125  0.67748125  0.3225188 0.2540203
+#>    N_conc maxlog10Concentration        ec50      xc50         h        r2
+#>     <int>                 <num>       <num>     <num>     <num>     <num>
+#> 1:      9              1.000000 100.0000000 4.1714810 0.2918402 0.7732475
+#> 2:      9              1.000000   5.7741811 7.4683485 1.3311221 0.9199573
+#> 3:      9              1.000000   0.5757493 0.3199532 1.1597048 0.9858751
+#> 4:      9              1.000000   0.4793539 0.4942034 2.9149107 0.9751992
+#> 5:      1             -0.823909   0.0000000      -Inf 0.0001000 0.0000000
+#> 6:      1             -0.823909   0.0000000      -Inf 0.0001000 0.0000000
+#>           rss         p_value   x_0       x_inf               fit_type
+#>         <num>           <num> <num>       <num>                 <char>
+#> 1: 0.06111736 0.0055517824350     1 -0.76364407 DRC3pHillFitModelFixS0
+#> 2: 0.03159935 0.0001450862960     1  0.14499197 DRC3pHillFitModelFixS0
+#> 3: 0.03576754 0.0000003349268     1 -0.48824612 DRC3pHillFitModelFixS0
+#> 4: 0.04890734 0.0000024023028     1  0.04254419 DRC3pHillFitModelFixS0
+#> 5:         NA              NA     1  0.26007500   DRCConstantFitResult
+#> 6:         NA              NA     1  0.32251875   DRCConstantFitResult
+#>    fit_source Gnumber DrugName drug_moa Duration    clid CellLineName Tissue
+#>        <char>  <char>   <char>   <char>    <num>  <char>       <char> <char>
+#> 1:        gDR  G00002 drug_002    moa_A      168 CL00011  cellline_BA breast
+#> 2:        gDR  G00002 drug_002    moa_A      168 CL00011  cellline_BA breast
+#> 3:        gDR  G00004 drug_004    moa_A      168 CL00011  cellline_BA breast
+#> 4:        gDR  G00004 drug_004    moa_A      168 CL00011  cellline_BA breast
+#> 5:        gDR  G00011 drug_011    moa_B      168 CL00011  cellline_BA breast
+#> 6:        gDR  G00011 drug_011    moa_B      168 CL00011  cellline_BA breast
+#>    parental_identifier subtype ReferenceDivisionTime
+#>                 <char>  <char>                 <num>
+#> 1:         cellline_BA unknown                    26
+#> 2:         cellline_BA unknown                    26
+#> 3:         cellline_BA unknown                    26
+#> 4:         cellline_BA unknown                    26
+#> 5:         cellline_BA unknown                    26
+#> 6:         cellline_BA unknown                    26
 ```
 
 ## Appendix
@@ -338,9 +338,9 @@ heatmaps, etc.
 
 ``` r
 sessionInfo()
-#> R version 4.6.0 (2026-04-24)
+#> R version 4.6.1 (2026-06-24)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.4 LTS
+#> Running under: Ubuntu 24.04.5 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -359,56 +359,56 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] kableExtra_1.4.0 gDR_1.11.2       gDRutils_1.10.0  gDRimport_1.10.0
-#> [5] gDRcore_1.10.0   BiocStyle_2.40.0
+#> [1] kableExtra_1.4.1 gDR_1.11.10      gDRutils_1.11.14 gDRimport_1.11.7
+#> [5] gDRcore_1.11.16  BiocStyle_2.41.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] viridisLite_0.4.3           farver_2.1.2               
-#>  [3] fastmap_1.2.0               BumpyMatrix_1.20.0         
+#>  [3] fastmap_1.2.0               BumpyMatrix_1.21.0         
 #>  [5] TH.data_1.1-5               digest_0.6.39              
 #>  [7] lifecycle_1.0.5             survival_3.8-6             
-#>  [9] magrittr_2.0.5              compiler_4.6.0             
-#> [11] rlang_1.2.0                 sass_0.4.10                
-#> [13] drc_3.0-1                   tools_4.6.0                
+#>  [9] magrittr_2.0.5              compiler_4.6.1             
+#> [11] rlang_1.3.0                 sass_0.4.10                
+#> [13] drc_4.0-0                   tools_4.6.1                
 #> [15] plotrix_3.8-14              yaml_2.3.12                
-#> [17] data.table_1.18.4           knitr_1.51                 
-#> [19] lambda.r_1.2.4              S4Arrays_1.12.0            
-#> [21] htmlwidgets_1.6.4           DelayedArray_0.38.2        
-#> [23] xml2_1.5.2                  RColorBrewer_1.1-3         
-#> [25] abind_1.4-8                 multcomp_1.4-30            
-#> [27] BiocParallel_1.46.0         purrr_1.2.2                
-#> [29] BiocGenerics_0.58.1         desc_1.4.3                 
-#> [31] grid_4.6.0                  stats4_4.6.0               
-#> [33] scales_1.4.0                MASS_7.3-65                
-#> [35] gtools_3.9.5                MultiAssayExperiment_1.38.0
-#> [37] SummarizedExperiment_1.42.0 cli_3.6.6                  
-#> [39] mvtnorm_1.4-0               rmarkdown_2.31             
-#> [41] ragg_1.5.2                  generics_0.1.4             
-#> [43] otel_0.2.0                  rstudioapi_0.18.0          
-#> [45] readxl_1.5.0                cachem_1.1.0               
-#> [47] stringr_1.6.0               splines_4.6.0              
-#> [49] assertthat_0.2.1            parallel_4.6.0             
-#> [51] BiocManager_1.30.27         formatR_1.14               
-#> [53] cellranger_1.1.0            XVector_0.52.0             
-#> [55] matrixStats_1.5.0           vctrs_0.7.3                
-#> [57] Matrix_1.7-5                sandwich_3.1-1             
-#> [59] jsonlite_2.0.0              carData_3.0-6              
-#> [61] bookdown_0.46               car_3.1-5                  
-#> [63] IRanges_2.46.0              S4Vectors_0.50.1           
-#> [65] Formula_1.2-5               systemfonts_1.3.2          
-#> [67] testthat_3.3.2              jquerylib_0.1.4            
-#> [69] rematch_2.0.0               glue_1.8.1                 
-#> [71] pkgdown_2.2.0               codetools_0.2-20           
-#> [73] stringi_1.8.7               futile.logger_1.4.9        
-#> [75] GenomicRanges_1.64.0        tibble_3.3.1               
-#> [77] pillar_1.11.1               htmltools_0.5.9            
-#> [79] Seqinfo_1.2.0               brio_1.1.5                 
-#> [81] R6_2.6.1                    textshaping_1.0.5          
-#> [83] evaluate_1.0.5              lattice_0.22-9             
-#> [85] Biobase_2.72.0              futile.options_1.0.1       
-#> [87] backports_1.5.1             bslib_0.11.0               
-#> [89] svglite_2.2.2               SparseArray_1.12.2         
-#> [91] checkmate_2.3.4             xfun_0.58                  
-#> [93] fs_2.1.0                    MatrixGenerics_1.24.0      
-#> [95] zoo_1.8-15                  pkgconfig_2.0.3
+#> [17] data.table_1.18.6.1         knitr_1.52                 
+#> [19] lambda.r_1.2.4              S4Arrays_1.13.2            
+#> [21] DelayedArray_0.39.8         xml2_1.6.0                 
+#> [23] RColorBrewer_1.1-3          abind_1.4-8                
+#> [25] multcomp_1.4-32             BiocParallel_1.47.0        
+#> [27] purrr_1.2.2                 BiocGenerics_0.59.12       
+#> [29] desc_1.4.3                  grid_4.6.1                 
+#> [31] stats4_4.6.1                scales_1.4.0               
+#> [33] gtools_3.9.5                MASS_7.3-65                
+#> [35] MultiAssayExperiment_1.39.1 SummarizedExperiment_1.43.0
+#> [37] cli_3.6.6                   mvtnorm_1.4-2              
+#> [39] rmarkdown_2.32              ragg_1.5.2                 
+#> [41] generics_0.1.4              otel_0.2.0                 
+#> [43] rstudioapi_0.19.0           readxl_1.5.0.1             
+#> [45] cachem_1.1.0                stringr_1.6.0              
+#> [47] splines_4.6.1               assertthat_0.2.1           
+#> [49] parallel_4.6.1              BiocManager_1.30.27        
+#> [51] formatR_1.14                cellranger_1.1.0           
+#> [53] XVector_0.53.0              matrixStats_1.5.0          
+#> [55] vctrs_0.7.3                 Matrix_1.7-5               
+#> [57] sandwich_3.1-3              jsonlite_2.0.0             
+#> [59] carData_3.0-6               bookdown_0.48              
+#> [61] car_3.1-5                   IRanges_2.47.5             
+#> [63] S4Vectors_0.51.10           Formula_1.2-6              
+#> [65] systemfonts_1.3.2           testthat_3.3.2             
+#> [67] jquerylib_0.1.4             rematch_2.0.0              
+#> [69] glue_1.8.1                  pkgdown_2.2.1              
+#> [71] codetools_0.2-20            stringi_1.8.9              
+#> [73] futile.logger_1.4.9         GenomicRanges_1.65.4       
+#> [75] tibble_3.3.1                pillar_1.11.1              
+#> [77] htmltools_0.5.9             Seqinfo_1.3.2              
+#> [79] brio_1.1.5                  R6_2.6.1                   
+#> [81] textshaping_1.0.5           evaluate_1.0.5             
+#> [83] lattice_0.22-9              Biobase_2.73.2             
+#> [85] futile.options_1.0.1        backports_1.5.1            
+#> [87] bslib_0.12.0                svglite_2.2.2              
+#> [89] SparseArray_1.13.4          checkmate_2.3.4            
+#> [91] xfun_0.61                   fs_2.1.0                   
+#> [93] MatrixGenerics_1.25.0       zoo_1.9-1                  
+#> [95] pkgconfig_2.0.3
 ```

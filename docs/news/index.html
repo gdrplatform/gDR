@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.11.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.11.10</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,42 @@
       <small>Source: <a href="https://github.com/gdrplatform/gDR/blob/test_ci_pkgdown/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.11.10" id="gdr-11110---2026-10-03">gDR 1.11.10 - 2026-10-03<a class="anchor" aria-label="anchor" href="#gdr-11110---2026-10-03"></a></h2>
+<ul><li>use qualified calls for the fitting-layer functions the Incucyte report templates rely on</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.11.9" id="gdr-1119---2026-09-30">gDR 1.11.9 - 2026-09-30<a class="anchor" aria-label="anchor" href="#gdr-1119---2026-09-30"></a></h2>
+<ul><li>read the Incucyte analysis configuration supplied for the run, and fail if it cannot be staged</li>
+<li>fix the silent removal of a path argument that resolves to no file</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.11.8" id="gdr-1118---2026-09-24">gDR 1.11.8 - 2026-09-24<a class="anchor" aria-label="anchor" href="#gdr-1118---2026-09-24"></a></h2>
+<ul><li>fix rendering of the rowData and colData tables in the processing report on Bioconductor 3.24</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.11.7" id="gdr-1117---2026-09-19">gDR 1.11.7 - 2026-09-19<a class="anchor" aria-label="anchor" href="#gdr-1117---2026-09-19"></a></h2>
+<ul><li>fix detection of an existing report so that push-only runs can start</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.11.6" id="gdr-1116---2026-09-14">gDR 1.11.6 - 2026-09-14<a class="anchor" aria-label="anchor" href="#gdr-1116---2026-09-14"></a></h2>
+<ul><li>drop gDRplots from Suggests, since it has no CRAN or Bioconductor release and blocks dependency resolution</li>
+<li>document the gDRplots run-time requirement of the bundled report templates in <code><a href="../reference/run_report.html">run_report()</a></code>
+</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.11.5" id="gdr-1115---2026-09-11">gDR 1.11.5 - 2026-09-11<a class="anchor" aria-label="anchor" href="#gdr-1115---2026-09-11"></a></h2>
+<ul><li>add the five Incucyte helpers the Incucyte report templates call, so those templates run outside a deployment</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.11.4" id="gdr-1114---2026-09-01">gDR 1.11.4 - 2026-09-01<a class="anchor" aria-label="anchor" href="#gdr-1114---2026-09-01"></a></h2>
+<ul><li>add <code><a href="../reference/run_report.html">run_report()</a></code>, a deployment-agnostic driver for the report pipeline, together with its report templates</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.11.3" id="gdr-1113---2026-06-08">gDR 1.11.3 - 2026-06-08<a class="anchor" aria-label="anchor" href="#gdr-1113---2026-06-08"></a></h2>
+<ul><li>add custom annotation support to <code>import_data</code>
+</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.11.2" id="gdr-1112---2026-05-26">gDR 1.11.2 - 2026-05-26<a class="anchor" aria-label="anchor" href="#gdr-1112---2026-05-26"></a></h2>
 <ul><li>apply updated gDRstyle rules</li>
@@ -223,7 +259,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>
