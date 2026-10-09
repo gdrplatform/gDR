@@ -1,8 +1,8 @@
 Type: Package
 Package: gDR
 Title: Umbrella package for R packages in the gDR suite
-Version: 1.11.10
-Date: 2026-10-03
+Version: 1.11.11
+Date: 2026-10-08
 Authors@R: c(
     person("Allison", "Vuong", , "vuong.allison@gene.com", role = "aut"),
     person("Bartosz", "Czech", role = "aut",
@@ -12,7 +12,8 @@ Authors@R: c(
     person("Marc", "Hafner", role = "aut",
            comment = c(ORCID = "0000-0003-1337-7598")),
     person("Dariusz", "Scigocki", role = "aut"),
-    person("Janina", "Smola", role = "aut"),
+    person("Janina", "Smola", role=c("aut"),
+           comment = c(ORCID = "0009-0007-4347-7748")),
     person("Sergiu", "Mocanu", role = "aut")
   )
 Description: Package is a part of the gDR suite. It reexports functions from other packages
@@ -63,7 +64,7 @@ VignetteBuilder: knitr
 ByteCompile: TRUE
 LazyLoad: yes
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 SwitchrLibrary: gDR
 DeploySubPath: gDR
 Encoding: UTF-8
+Config/roxygen2/version: 8.0.0

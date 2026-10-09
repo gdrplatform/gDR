@@ -25,25 +25,18 @@ Useful links:
   \item Report bugs at \url{https://github.com/gdrplatform/gDR/issues}
 }
 
-
-Useful links:
-\itemize{
-  \item \url{https://github.com/gdrplatform/gDR}
-  \item \url{https://gdrplatform.github.io/gDR/}
-  \item Report bugs at \url{https://github.com/gdrplatform/gDR/issues}
-}
-
 }
 \author{
 \strong{Maintainer}: Arkadiusz Gladki \email{gladki.arkadiusz@gmail.com} (\href{https://orcid.org/0000-0002-7059-6378}{ORCID})
 
 Authors:
 \itemize{
+  \item Arkadiusz Gladki \email{gladki.arkadiusz@gmail.com} (\href{https://orcid.org/0000-0002-7059-6378}{ORCID})
   \item Allison Vuong \email{vuong.allison@gene.com}
   \item Bartosz Czech (\href{https://orcid.org/0000-0002-9908-3007}{ORCID})
   \item Marc Hafner (\href{https://orcid.org/0000-0003-1337-7598}{ORCID})
   \item Dariusz Scigocki
-  \item Janina Smola
+  \item Janina Smola (\href{https://orcid.org/0009-0007-4347-7748}{ORCID})
   \item Sergiu Mocanu
 }
 
