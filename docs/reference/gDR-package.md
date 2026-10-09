@@ -31,20 +31,15 @@ Useful links:
 
 - Report bugs at <https://github.com/gdrplatform/gDR/issues>
 
-Useful links:
-
-- <https://github.com/gdrplatform/gDR>
-
-- <https://gdrplatform.github.io/gDR/>
-
-- Report bugs at <https://github.com/gdrplatform/gDR/issues>
-
 ## Author
 
 **Maintainer**: Arkadiusz Gladki <gladki.arkadiusz@gmail.com>
 ([ORCID](https://orcid.org/0000-0002-7059-6378))
 
 Authors:
+
+- Arkadiusz Gladki <gladki.arkadiusz@gmail.com>
+  ([ORCID](https://orcid.org/0000-0002-7059-6378))
 
 - Allison Vuong <vuong.allison@gene.com>
 
@@ -54,6 +49,6 @@ Authors:
 
 - Dariusz Scigocki
 
-- Janina Smola
+- Janina Smola ([ORCID](https://orcid.org/0009-0007-4347-7748))
 
 - Sergiu Mocanu

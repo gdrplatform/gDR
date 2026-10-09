@@ -359,8 +359,8 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] kableExtra_1.4.1 gDR_1.11.10      gDRutils_1.11.14 gDRimport_1.11.7
-#> [5] gDRcore_1.11.16  BiocStyle_2.41.0
+#> [1] kableExtra_1.4.1 gDR_1.11.11      gDRutils_1.11.15 gDRimport_1.11.7
+#> [5] gDRcore_1.11.17  BiocStyle_2.41.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] viridisLite_0.4.3           farver_2.1.2               

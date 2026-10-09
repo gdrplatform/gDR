@@ -13,23 +13,23 @@
 
 - **Dariusz Scigocki**. Author.
 
-- **Janina Smola**. Author.
+- **Janina Smola**. Author. [](https://orcid.org/0009-0007-4347-7748)
 
 - **Sergiu Mocanu**. Author.
 
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/gdrplatform/gDR/blob/test_ci_pkgdown/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/gdrplatform/gDR/blob/main/DESCRIPTION)
 
 Vuong A, Czech B, Gladki A, Hafner M, Scigocki D, Smola J, Mocanu S
 (2026). *gDR: Umbrella package for R packages in the gDR suite*. R
-package version 1.11.10, <https://github.com/gdrplatform/gDR>.
+package version 1.11.11, <https://github.com/gdrplatform/gDR>.
 
     @Manual{,
       title = {gDR: Umbrella package for R packages in the gDR suite},
       author = {Allison Vuong and Bartosz Czech and Arkadiusz Gladki and Marc Hafner and Dariusz Scigocki and Janina Smola and Sergiu Mocanu},
       year = {2026},
-      note = {R package version 1.11.10},
+      note = {R package version 1.11.11},
       url = {https://github.com/gdrplatform/gDR},
     }
