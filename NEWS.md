@@ -1,3 +1,6 @@
+## gDR 1.11.12 - 2026-10-15
+* add a "How These Numbers Were Produced" section to the processing reports, listing the recorded fits and steps
+
 ## gDR 1.11.11 - 2026-10-08
 * update authors data
 
