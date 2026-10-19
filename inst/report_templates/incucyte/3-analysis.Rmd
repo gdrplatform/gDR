@@ -866,8 +866,9 @@ for (current_cell_line in config$cell_lines) {
                                     ymax = plot_value + plot_sd), 
                       width = .3) +
         
-        theme(legend.position = "none") +
         theme_bw() +
+        # after theme_bw(), which would reset it; the curves above carry the legend
+        theme(legend.position = "none") +
         scale_colour_grey(guide = "none") +
         scale_fill_manual(values = trt_colors)
         
@@ -903,7 +904,8 @@ for (current_cell_line in config$cell_lines) {
     }
         
     # 5. Arrange the plots
-    print(patchwork::wrap_plots(p1, p2, ncol = 1))
+    # one legend over the full page height, so long dose series are not clipped
+    print(patchwork::wrap_plots(p1, p2, ncol = 1, guides = "collect"))
   }
   invisible(dev.off())
   

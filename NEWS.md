@@ -1,3 +1,6 @@
+## gDR 1.11.12 - 2026-10-19
+* fix the clipped legend on Incucyte analysis pages with many doses by showing one legend per page
+
 ## gDR 1.11.11 - 2026-10-08
 * update authors data
 
