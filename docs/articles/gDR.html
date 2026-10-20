@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gDR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.11.11</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.11.12</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -256,7 +256,7 @@ specifying the <code>nested_keys</code> argument within
 <code class="sourceCode R"><span><span class="va">se</span></span>
 <span><span class="co">#&gt; class: SummarizedExperiment </span></span>
 <span><span class="co">#&gt; dim: 3 6 </span></span>
-<span><span class="co">#&gt; metadata(5): identifiers experiment_metadata Keys fit_parameters</span></span>
+<span><span class="co">#&gt; metadata(6): identifiers experiment_metadata ... fit_parameters</span></span>
 <span><span class="co">#&gt;   .internal</span></span>
 <span><span class="co">#&gt; assays(5): RawTreated Controls Normalized Averaged Metrics</span></span>
 <span><span class="co">#&gt; rownames(3): G00002_drug_002_moa_A_168 G00004_drug_004_moa_A_168</span></span>
@@ -322,7 +322,7 @@ function:</p>
 <span><span class="co">#&gt; 6: G00011_drug_011_moa_B_168 CL00011_cellline_BA_breast_cellline_BA_unknown_26</span></span>
 <span><span class="co">#&gt;    normalization_type    x_mean      x_AOC x_AOC_range      x_max  x_sd_avg</span></span>
 <span><span class="co">#&gt;                &lt;char&gt;     &lt;num&gt;      &lt;num&gt;       &lt;num&gt;      &lt;num&gt;     &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1:                 GR 0.7420730 0.25792698  0.25819628  0.3065500 0.7276889</span></span>
+<span><span class="co">#&gt; 1:                 GR 0.7420679 0.25793215  0.25820178  0.3065500 0.7276889</span></span>
 <span><span class="co">#&gt; 2:                 RV 0.9157913 0.08420865  0.05733832  0.4225500 0.8794050</span></span>
 <span><span class="co">#&gt; 3:                 GR 0.5092443 0.49075566  0.48159819 -0.4177500 0.5983619</span></span>
 <span><span class="co">#&gt; 4:                 RV 0.6675856 0.33241443  0.32656451  0.0260500 0.7335509</span></span>
@@ -330,7 +330,7 @@ function:</p>
 <span><span class="co">#&gt; 6:                 RV 0.3225188 0.67748125  0.67748125  0.3225188 0.2540203</span></span>
 <span><span class="co">#&gt;    N_conc maxlog10Concentration        ec50      xc50         h        r2</span></span>
 <span><span class="co">#&gt;     &lt;int&gt;                 &lt;num&gt;       &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1:      9              1.000000 100.0000000 4.1714810 0.2918402 0.7732475</span></span>
+<span><span class="co">#&gt; 1:      9              1.000000 100.0000000 4.1712724 0.2918356 0.7732475</span></span>
 <span><span class="co">#&gt; 2:      9              1.000000   5.7741811 7.4683485 1.3311221 0.9199573</span></span>
 <span><span class="co">#&gt; 3:      9              1.000000   0.5757493 0.3199532 1.1597048 0.9858751</span></span>
 <span><span class="co">#&gt; 4:      9              1.000000   0.4793539 0.4942034 2.9149107 0.9751992</span></span>
@@ -338,7 +338,7 @@ function:</p>
 <span><span class="co">#&gt; 6:      1             -0.823909   0.0000000      -Inf 0.0001000 0.0000000</span></span>
 <span><span class="co">#&gt;           rss         p_value   x_0       x_inf               fit_type</span></span>
 <span><span class="co">#&gt;         &lt;num&gt;           &lt;num&gt; &lt;num&gt;       &lt;num&gt;                 &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1: 0.06111736 0.0055517824350     1 -0.76364407 DRC3pHillFitModelFixS0</span></span>
+<span><span class="co">#&gt; 1: 0.06111735 0.0055517820959     1 -0.76364407 DRC3pHillFitModelFixS0</span></span>
 <span><span class="co">#&gt; 2: 0.03159935 0.0001450862960     1  0.14499197 DRC3pHillFitModelFixS0</span></span>
 <span><span class="co">#&gt; 3: 0.03576754 0.0000003349268     1 -0.48824612 DRC3pHillFitModelFixS0</span></span>
 <span><span class="co">#&gt; 4: 0.04890734 0.0000024023028     1  0.04254419 DRC3pHillFitModelFixS0</span></span>
@@ -398,8 +398,8 @@ heatmaps, etc.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] kableExtra_1.4.1 gDR_1.11.11      gDRutils_1.11.15 gDRimport_1.11.7</span></span>
-<span><span class="co">#&gt; [5] gDRcore_1.11.17  BiocStyle_2.41.0</span></span>
+<span><span class="co">#&gt; [1] kableExtra_1.4.1 gDR_1.11.12      gDRutils_1.11.18 gDRimport_1.11.8</span></span>
+<span><span class="co">#&gt; [5] gDRcore_1.11.19  BiocStyle_2.41.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] viridisLite_0.4.3           farver_2.1.2               </span></span>
@@ -411,7 +411,7 @@ heatmaps, etc.</p>
 <span><span class="co">#&gt; [13] drc_4.0-0                   tools_4.6.1                </span></span>
 <span><span class="co">#&gt; [15] plotrix_3.8-14              yaml_2.3.12                </span></span>
 <span><span class="co">#&gt; [17] data.table_1.18.6.1         knitr_1.52                 </span></span>
-<span><span class="co">#&gt; [19] lambda.r_1.2.4              S4Arrays_1.13.2            </span></span>
+<span><span class="co">#&gt; [19] lambda.r_1.2.6              S4Arrays_1.13.2            </span></span>
 <span><span class="co">#&gt; [21] DelayedArray_0.39.8         xml2_1.6.0                 </span></span>
 <span><span class="co">#&gt; [23] RColorBrewer_1.1-3          abind_1.4-8                </span></span>
 <span><span class="co">#&gt; [25] multcomp_1.4-32             BiocParallel_1.47.0        </span></span>
@@ -423,7 +423,7 @@ heatmaps, etc.</p>
 <span><span class="co">#&gt; [37] cli_3.6.6                   mvtnorm_1.4-2              </span></span>
 <span><span class="co">#&gt; [39] rmarkdown_2.32              ragg_1.5.2                 </span></span>
 <span><span class="co">#&gt; [41] generics_0.1.4              otel_0.2.0                 </span></span>
-<span><span class="co">#&gt; [43] rstudioapi_0.19.0           readxl_1.5.0.1             </span></span>
+<span><span class="co">#&gt; [43] rstudioapi_0.19.0           readxl_1.6.0               </span></span>
 <span><span class="co">#&gt; [45] cachem_1.1.0                stringr_1.6.0              </span></span>
 <span><span class="co">#&gt; [47] splines_4.6.1               assertthat_0.2.1           </span></span>
 <span><span class="co">#&gt; [49] parallel_4.6.1              BiocManager_1.30.27        </span></span>
@@ -447,7 +447,7 @@ heatmaps, etc.</p>
 <span><span class="co">#&gt; [85] futile.options_1.0.1        backports_1.5.1            </span></span>
 <span><span class="co">#&gt; [87] bslib_0.12.0                svglite_2.2.2              </span></span>
 <span><span class="co">#&gt; [89] SparseArray_1.13.4          checkmate_2.3.4            </span></span>
-<span><span class="co">#&gt; [91] xfun_0.61                   fs_2.1.0                   </span></span>
+<span><span class="co">#&gt; [91] xfun_0.62                   fs_2.1.0                   </span></span>
 <span><span class="co">#&gt; [93] MatrixGenerics_1.25.0       zoo_1.9-1                  </span></span>
 <span><span class="co">#&gt; [95] pkgconfig_2.0.3</span></span></code></pre></div>
 </div>
