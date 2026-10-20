@@ -1,3 +1,6 @@
+## gDR 1.11.13 - 2026-10-20
+* keep the rendered report and point `current` to it when only the publication step fails
+
 ## gDR 1.11.12 - 2026-10-19
 * fix the clipped legend on Incucyte analysis pages with many doses by showing one legend per page
 
