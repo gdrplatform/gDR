@@ -54,3 +54,13 @@ test_that("the analysis pages carry one legend over the full page height", {
   expect_length(page, 1L)
   expect_match(page, 'guides = "collect"', fixed = TRUE)
 })
+
+
+test_that("the analysis template shows normalized periods in the configured growth metric", {
+  lines <- .incucyte_template_lines("3-analysis.Rmd")
+
+  default <- grep("growth_metric <- if (is.null(config$growth_metric))", lines, fixed = TRUE, value = TRUE)
+  expect_length(default, 1L)
+  expect_match(default, '"NormalizedGrowthRate"', fixed = TRUE)
+  expect_length(grep("convert_growth_metric(av_rates$rel_rates", lines, fixed = TRUE), 1L)
+})

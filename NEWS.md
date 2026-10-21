@@ -1,3 +1,6 @@
+## gDR 1.11.13 - 2026-10-21
+* add a growth_metric key to the Incucyte analysis config to plot GR values instead of normalized growth rates
+
 ## gDR 1.11.12 - 2026-10-19
 * fix the clipped legend on Incucyte analysis pages with many doses by showing one legend per page
 

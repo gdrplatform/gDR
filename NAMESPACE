@@ -3,6 +3,7 @@
 export(add_treatment_column)
 export(apply_custom_metadata_tags)
 export(cast_to_wide)
+export(convert_growth_metric)
 export(create_symlink_to_current)
 export(filter_treatments)
 export(generate_incucyte_yaml_draft)
