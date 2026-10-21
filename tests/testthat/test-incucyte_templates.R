@@ -38,3 +38,19 @@ test_that("the Incucyte templates say which step numbering they mean", {
     expect_length(bare, 0L)
   }
 })
+
+test_that("the analysis pages carry one legend over the full page height", {
+  # Pages with many doses clipped the legend: the bars repeated the curves' legend because
+  # theme_bw() came after the line hiding it, and each legend got half the page.
+  lines <- .incucyte_template_lines("3-analysis.Rmd")
+
+  bars <- grep("p2 <- ggplot(", lines, fixed = TRUE)
+  expect_length(bars, 1L)
+  bw <- grep("theme_bw()", lines, fixed = TRUE)
+  hide <- grep('theme(legend.position = "none")', lines, fixed = TRUE)
+  expect_true(any(hide > min(bw[bw > bars])))
+
+  page <- grep("wrap_plots(", lines, fixed = TRUE, value = TRUE)
+  expect_length(page, 1L)
+  expect_match(page, 'guides = "collect"', fixed = TRUE)
+})
