@@ -338,6 +338,16 @@ qs_save(mae, file.path(wd, "gDR_data", "gDR_mae.qs2"))
 
 ```
 
+# How These Numbers Were Produced
+
+Each processing step above recorded how it was done in the `provenance` metadata of the experiment, so the processing can be reproduced from `gDR_data/gDR_mae.qs2`.
+
+```{r provenance_tables}
+prov <- get_provenance_tables(mae)
+generate_datatable(prov$steps)
+
+```
+
 <div class="feedback-panel">
 <h3>We Value Your Feedback!</h3>
 <p>Thank you for using gDR! We are always looking to improve, and your feedback is incredibly valuable to us.</p>
