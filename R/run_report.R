@@ -20,6 +20,10 @@
   "remove_on_failure"
 )
 
+# Template of the publication step. When only this step fails, the rendered report is kept (see
+# the clean-up in run_report()), so that publishing alone can be retried in resume mode.
+.PUBLICATION_STEP <- "4-publish_results.Rmd"
+
 #' Run a gDR report pipeline
 #'
 #' Infrastructure-agnostic driver for the gDR reporting pipeline. It stages all input files into
@@ -106,7 +110,10 @@
 #'  Currently, required only for Incucyte data
 #' @param remove_on_failure Logical. Whether to remove the output directory if the
 #'   pipeline fails. Default is \code{TRUE}. If set to \code{FALSE}, incomplete
-#'   output will be kept for debugging.
+#'   output will be kept for debugging. A failure in the publication step alone
+#'   (\code{4-publish_results.Rmd}) never removes the directory when earlier steps were
+#'   rendered in the same run: the report is complete, so it is kept and \code{current}
+#'   points to it, and publishing can be retried with \code{steps = 4, resume = TRUE}.
 #' @param resume Logical. Whether to resume execution in the existing 'current' output directory
 #'   instead of creating a new version. Default is \code{FALSE}.
 #' @param extra_render_params Named list. Additional parameters injected into every RMarkdown
@@ -285,6 +292,9 @@ run_report <- function(
   state <- new.env(parent = emptyenv())
   state$success <- FALSE
   state$error_for_mail <- NULL
+  # The step being rendered when the run stopped, and the steps rendered before it.
+  state$failed_step <- NULL
+  state$rendered_steps <- character(0)
   on.exit({
     if (!state$success) {
       # The failure hook runs before any clean-up, so that it can still read the log files
@@ -300,11 +310,27 @@ run_report <- function(
         })
       }
 
+      # Only the publication failed: the report itself is complete, and removing it would force
+      # a full re-run just to retry the upload.
+      publication_failed <- identical(state$failed_step, .PUBLICATION_STEP) &&
+        length(state$rendered_steps) > 0
+
       # In RESUME mode, we generally do NOT want to delete the directory on failure
       # as it contains valuable data from previous steps.
       if (!resume && !is.null(env$output_dir) && dir.exists(env$output_dir)) {
 
-        if (remove_on_failure) {
+        if (publication_failed) {
+          tryCatch({
+            create_symlink_to_current(dirname(env$output_dir), env$output_dir, verbose_mode)
+          }, error = function(e_link) {
+            message(sprintf("Could not point 'current' at '%s': %s", env$output_dir, e_link$message))
+          })
+          message(sprintf(
+            paste("\nPublication failed, but the report was rendered. Keeping '%s' as 'current';",
+                  "retry the publication alone with steps = 4 and resume = TRUE."),
+            env$output_dir
+          ))
+        } else if (remove_on_failure) {
           message(sprintf("\nExecution failed. Removing incomplete output directory: '%s'.", env$output_dir))
           unlink(env$output_dir, recursive = TRUE, force = TRUE)
         } else {
@@ -536,7 +562,10 @@ run_report <- function(
         rendered_content <- whisker::whisker.render(readLines(template_paths[[i]]), render_params)
         writeLines(rendered_content, output_paths[[i]])
 
+        state$failed_step <- rmd_files[[i]]
         rmarkdown::render(input = output_paths[[i]], output_file = gsub(".Rmd$", ".html", output_paths[[i]]))
+        state$failed_step <- NULL
+        state$rendered_steps <- c(state$rendered_steps, rmd_files[[i]])
       }
 
     }, file = env$stdout_con)

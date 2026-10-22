@@ -226,6 +226,96 @@ test_that("run_report runs on_failure before the output directory is removed", {
   expect_false(dir.exists(dummy_out))
 })
 
+test_that("run_report keeps the rendered report when only the publication step fails", {
+
+  dummy_out <- tempfile()
+  dir.create(dummy_out)
+  template_dir <- .setup_dummy_templates()
+  on.exit({
+    unlink(dummy_out, recursive = TRUE)
+    unlink(template_dir, recursive = TRUE)
+  })
+
+  # Steps 1-3 render, the upload in step 4 fails.
+  mock_render <- mockery::mock(TRUE, TRUE, TRUE, stop("upload failed"))
+  mock_symlink <- mockery::mock(NULL)
+  test_fn <- .stub_run_report_io(run_report, dummy_out, mock_render)
+  mockery::stub(test_fn, "create_symlink_to_current", mock_symlink)
+
+  failure_seen <- FALSE
+  expect_error(
+    test_fn(
+      manifest = "manifest.xlsx",
+      output_dir = dummy_out,
+      rmd_template_path = template_dir,
+      steps = 1:4,
+      on_failure = function(output_dir, error_message) failure_seen <<- TRUE
+    ),
+    "upload failed"
+  )
+
+  # The run still counts as failed, ...
+  expect_true(failure_seen)
+  # ... but the report stays and becomes 'current', so that step 4 can be resumed.
+  expect_true(dir.exists(dummy_out))
+  expect_length(mockery::mock_args(mock_symlink), 1)
+  expect_equal(mockery::mock_args(mock_symlink)[[1]][[2]], dummy_out)
+})
+
+test_that("run_report still removes the output directory when a step before publication fails", {
+
+  dummy_out <- tempfile()
+  dir.create(dummy_out)
+  template_dir <- .setup_dummy_templates()
+  on.exit({
+    unlink(dummy_out, recursive = TRUE)
+    unlink(template_dir, recursive = TRUE)
+  })
+
+  mock_symlink <- mockery::mock(NULL)
+  test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, stop("QC failed")))
+  mockery::stub(test_fn, "create_symlink_to_current", mock_symlink)
+
+  expect_error(
+    test_fn(
+      manifest = "manifest.xlsx",
+      output_dir = dummy_out,
+      rmd_template_path = template_dir,
+      steps = 1:4
+    ),
+    "QC failed"
+  )
+
+  expect_false(dir.exists(dummy_out))
+  expect_length(mockery::mock_args(mock_symlink), 0)
+})
+
+test_that("run_report removes the output directory when a publication-only run fails", {
+
+  dummy_out <- tempfile()
+  dir.create(dummy_out)
+  template_dir <- .setup_dummy_templates()
+  on.exit({
+    unlink(dummy_out, recursive = TRUE)
+    unlink(template_dir, recursive = TRUE)
+  })
+
+  # Nothing was rendered in this run, so there is no report worth keeping.
+  test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(stop("upload failed")))
+
+  expect_error(
+    test_fn(
+      manifest = "manifest.xlsx",
+      output_dir = dummy_out,
+      rmd_template_path = template_dir,
+      steps = 4
+    ),
+    "upload failed"
+  )
+
+  expect_false(dir.exists(dummy_out))
+})
+
 test_that("run_report injects extra_render_params into the template data", {
 
   dummy_out <- tempfile()
