@@ -862,14 +862,15 @@ for (current_cell_line in config$cell_lines) {
     # Add vlines and text (which use the dynamic 'events' data.table)
     p1 <- p1 +
       geom_vline(xintercept = events$Duration) + # Dynamically plots all vlines
-      geom_text(data = events, 
-                aes(y = y_max + .1, label = name, x = Duration), # Explicitly set aes
-                color = 'black', angle = 90, vjust = 1, hjust = 1, 
-                inherit.aes = FALSE) + # Disable aes inheritance
       scale_color_manual(values = trt_colors)+
       # use dynamic y_min_limit
       coord_cartesian(ylim = c(y_min_limit, y_max+.3), xlim = c(0, 1.001 * x_max))+
       geom_line(linewidth = 2) +
+      # after the curves, so a label inside the data range is not drawn over
+      geom_text(data = events,
+                aes(y = y_max + .1, label = name, x = Duration), # Explicitly set aes
+                color = 'black', angle = 90, vjust = 1, hjust = 1,
+                inherit.aes = FALSE) + # Disable aes inheritance
       ylab('log2(Cell count fold-change)')+
       xlab('Time (h)')+
       ggtitle(metadata(se)$CellLineName) +
