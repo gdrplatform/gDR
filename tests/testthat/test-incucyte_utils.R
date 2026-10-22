@@ -268,3 +268,17 @@ test_that("convert_growth_metric returns normalized growth rates or GR values", 
   expect_error(convert_growth_metric(ngr, sd, "RV"), "should be one of")
   expect_error(convert_growth_metric(ngr, sd[-1]), "length")
 })
+
+
+test_that("label_periods keeps the period names unless the config labels them", {
+  expect_identical(label_periods(c("early", "late")), c(early = "early", late = "late"))
+  expect_identical(
+    label_periods(c("early", "mid", "late"), list(early = "24h", late = "48h")),
+    c(early = "24h", mid = "mid", late = "48h")
+  )
+
+  expect_error(label_periods(c("early", "late"), list(mid = "36h")), "names\\(period_labels\\)")
+  expect_error(label_periods(c("early", "late"), list(early = "")), "period_labels")
+  expect_error(label_periods(c("early", "late"), list(early = "late")), "period labels")
+  expect_error(label_periods("final"), "subset")
+})

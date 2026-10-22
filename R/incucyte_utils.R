@@ -456,3 +456,34 @@ convert_growth_metric <- function(ngr, ngr_sd, metric = c("NormalizedGrowthRate"
   }
   list(value = 2^ngr - 1, sd = log(2) * 2^ngr * ngr_sd)
 }
+
+
+#' Display labels for the growth-rate periods of the Incucyte analysis
+#'
+#' @param periods character; period names defined in the config, a subset of
+#'   \code{"early"}, \code{"mid"} and \code{"late"}.
+#' @param period_labels named list or character vector mapping period names to labels,
+#'   or \code{NULL}. Periods without a label keep their name.
+#'
+#' @return A character vector of labels named by period.
+#'
+#' @examples
+#' label_periods(c("early", "late"), list(early = "24h", late = "48h"))
+#'
+#' @keywords incucyte
+#' @export
+label_periods <- function(periods, period_labels = NULL) {
+  checkmate::assert_subset(periods, c("early", "mid", "late"))
+  labels <- stats::setNames(periods, periods)
+  if (is.null(period_labels)) {
+    return(labels)
+  }
+
+  period_labels <- unlist(period_labels)
+  checkmate::assert_character(period_labels, min.chars = 1, any.missing = FALSE, names = "unique",
+                              .var.name = "period_labels")
+  checkmate::assert_subset(names(period_labels), periods, .var.name = "names(period_labels)")
+  labels[names(period_labels)] <- period_labels
+  checkmate::assert_character(labels, unique = TRUE, .var.name = "period labels")
+  labels
+}
