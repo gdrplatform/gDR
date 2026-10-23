@@ -130,7 +130,10 @@ Currently, required only for Incucyte data}
 
 \item{remove_on_failure}{Logical. Whether to remove the output directory if the
 pipeline fails. Default is \code{TRUE}. If set to \code{FALSE}, incomplete
-output will be kept for debugging.}
+output will be kept for debugging. A failure in the publication step alone
+(\code{4-publish_results.Rmd}) never removes the directory when earlier steps were
+rendered in the same run: the report is complete, so it is kept and \code{current}
+points to it, and publishing can be retried with \code{steps = 4, resume = TRUE}.}
 
 \item{resume}{Logical. Whether to resume execution in the existing 'current' output directory
 instead of creating a new version. Default is \code{FALSE}.}
