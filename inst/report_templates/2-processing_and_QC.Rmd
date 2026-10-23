@@ -1096,6 +1096,32 @@ qs_save(mae, file.path(wd, "gDR_data", "gDR_mae.qs2"))
 
 Please note: Steps 5 through 9 can be automatically executed using the runDrugResponseProcessingPipeline function, which handles all stages of the pipeline for all identified data types."
 
+# How These Numbers Were Produced
+
+Every fit and processing step above recorded how it was done in the `provenance` metadata of its experiment. The tables below list the function, version and settings behind each result, and what each processing step did to the data, so the analysis can be reproduced from `gDR_data/gDR_mae.qs2`.
+
+```{r provenance_tables}
+prov <- get_provenance_tables(mae)
+
+
+```
+
+## Fits
+
+```{r provenance_fits, echo=FALSE}
+generate_datatable(prov$fits)
+
+
+```
+
+## Processing Steps
+
+```{r provenance_steps, echo=FALSE}
+generate_datatable(prov$steps)
+
+
+```
+
 {{{extra_sections_qc}}}
 
 # Conclusion
