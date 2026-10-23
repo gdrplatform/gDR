@@ -64,3 +64,23 @@ test_that("the analysis template shows normalized periods in the configured grow
   expect_match(default, '"NormalizedGrowthRate"', fixed = TRUE)
   expect_length(grep("convert_growth_metric(av_rates$rel_rates", lines, fixed = TRUE), 1L)
 })
+
+
+test_that("the analysis template labels periods in the plots but keys the tables by period", {
+  lines <- .incucyte_template_lines("3-analysis.Rmd")
+
+  expect_length(grep("label_periods(defined_periods, config$period_labels)", lines, fixed = TRUE), 1L)
+  expect_length(grep("labeller = as_labeller(period_labels)", lines, fixed = TRUE), 1L)
+  expect_length(grep("range := factor(range, levels = names(periods_to_process))", lines, fixed = TRUE), 1L)
+})
+
+
+test_that("the analysis template draws the period labels over the curves", {
+  lines <- .incucyte_template_lines("3-analysis.Rmd")
+
+  curves <- grep("geom_line(linewidth = 2)", lines, fixed = TRUE)
+  labels <- grep("geom_text(data = events", lines, fixed = TRUE)
+  expect_length(curves, 1L)
+  expect_length(labels, 1L)
+  expect_gt(labels, curves)
+})

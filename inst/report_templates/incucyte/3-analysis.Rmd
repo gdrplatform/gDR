@@ -267,6 +267,10 @@ x_axis_size_str <- if (is.null(config$x_axis_text_size)) "9 (Default)" else as.c
 growth_metric <- if (is.null(config$growth_metric)) "NormalizedGrowthRate" else config$growth_metric
 checkmate::assert_choice(growth_metric, c("NormalizedGrowthRate", "GR"), .var.name = "growth_metric")
 
+# Labels the plots show for the periods; the tables keep early/mid/late
+defined_periods <- Filter(function(p) !is.null(config[[paste0(p, "_period")]]), c("early", "mid", "late"))
+period_labels <- label_periods(defined_periods, config$period_labels)
+
 # Which file these numbers came from. A run started without a configuration is analysed with
 # windows derived from the data, which is a very different claim from the one a reader makes when
 # they supplied their own - so both the file and its origin are stated here rather than assumed.
@@ -359,6 +363,17 @@ if (!is.null(config$growth_metric)) {
   ))
 }
 
+if (!is.null(config$period_labels)) {
+  config_summary <- rbindlist(list(
+    config_summary,
+    data.table(
+      Parameter = "period_labels",
+      Description = "Labels shown for the periods in the plots",
+      Value = paste(names(period_labels), period_labels, sep = " = ", collapse = ", ")
+    )
+  ))
+}
+
 generate_datatable(config_summary, options = list(pageLength = 20))
 
 ```
@@ -372,6 +387,8 @@ The table above shows the key parameters from your configuration file. Below is 
 * **`"early"`**: Normalize by the **'early' DMSO** growth rate (relative value where 1.0 = DMSO control).
 
 * **`growth_metric`** (optional): How normalized periods are shown. **`"NormalizedGrowthRate"`** (the default) is the treated rate divided by the control rate; **`"GR"`** is the GR value, `2^(rate / rate_0) - 1`, which is 1 at the control rate, 0 when the cells stop growing and negative when they die.
+
+* **`period_labels`** (optional): Labels the plots show for the periods, e.g. `early: "24h"`. Periods without a label keep their name, and the tables and `normalization_map` always use `early`, `mid` and `late`.
 
 
 * **`treatment_comparisons`**: Defines which treatments to plot side-by-side (one page per comparison in the output PDF).
@@ -454,7 +471,7 @@ if (!is.null(config$late_period)) {
 # Bind the new periods to the events data.frame
 if (length(period_names) > 0) {
   events <- rbindlist(list(events,
-                 data.table(name = period_names, Duration = period_durations)))
+                 data.table(name = unname(period_labels[period_names]), Duration = period_durations)))
 }
 
 ```
@@ -823,14 +840,14 @@ for (current_cell_line in config$cell_lines) {
       fill = character()
     )
     if (!is.null(config$early_period)) {
-      period_df <- rbindlist(list(period_df, data.table(name = "early", xmin = config$early_period[1], xmax = config$early_period[2], fill = "#ffffdd")))
+      period_df <- rbindlist(list(period_df, data.table(name = period_labels[["early"]], xmin = config$early_period[1], xmax = config$early_period[2], fill = "#ffffdd")))
     }
     if (!is.null(config$mid_period)) {
       # Add a new color for the mid period
-      period_df <- rbindlist(list(period_df, data.table(name = "mid", xmin = config$mid_period[1], xmax = config$mid_period[2], fill = "#ddffff"))) # light cyan
+      period_df <- rbindlist(list(period_df, data.table(name = period_labels[["mid"]], xmin = config$mid_period[1], xmax = config$mid_period[2], fill = "#ddffff"))) # light cyan
     }
     if (!is.null(config$late_period)) {
-      period_df <- rbindlist(list(period_df, data.table(name = "late", xmin = config$late_period[1], xmax = config$late_period[2], fill = "#ffddff")))
+      period_df <- rbindlist(list(period_df, data.table(name = period_labels[["late"]], xmin = config$late_period[1], xmax = config$late_period[2], fill = "#ffddff")))
     }
     
     # 3. Add dynamic layers
@@ -845,14 +862,15 @@ for (current_cell_line in config$cell_lines) {
     # Add vlines and text (which use the dynamic 'events' data.table)
     p1 <- p1 +
       geom_vline(xintercept = events$Duration) + # Dynamically plots all vlines
-      geom_text(data = events, 
-                aes(y = y_max + .1, label = name, x = Duration), # Explicitly set aes
-                color = 'black', angle = 90, vjust = 1, hjust = 1, 
-                inherit.aes = FALSE) + # Disable aes inheritance
       scale_color_manual(values = trt_colors)+
       # use dynamic y_min_limit
       coord_cartesian(ylim = c(y_min_limit, y_max+.3), xlim = c(0, 1.001 * x_max))+
       geom_line(linewidth = 2) +
+      # after the curves, so a label inside the data range is not drawn over
+      geom_text(data = events,
+                aes(y = y_max + .1, label = name, x = Duration), # Explicitly set aes
+                color = 'black', angle = 90, vjust = 1, hjust = 1,
+                inherit.aes = FALSE) + # Disable aes inheritance
       ylab('log2(Cell count fold-change)')+
       xlab('Time (h)')+
       ggtitle(metadata(se)$CellLineName) +
@@ -906,7 +924,7 @@ for (current_cell_line in config$cell_lines) {
     
     p2 <- p2 + 
         # The 'scales' argument is controlled by the config variable
-        facet_wrap(vars(range), scales = y_axis_scales) +
+        facet_wrap(vars(range), scales = y_axis_scales, labeller = as_labeller(period_labels)) +
         
         # A generic y-axis label, as units may be mixed
         ylab(if (growth_metric == "GR") "GR value (or Raw Rate)" else "Value (Normalized or Raw Rate)")
