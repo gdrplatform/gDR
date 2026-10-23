@@ -1,3 +1,6 @@
+## gDR 1.11.15 - 2026-10-23
+* fix the Incucyte error bars to use the SD of growth rates normalized to the control of the same plate
+
 ## gDR 1.11.14 - 2026-10-22
 * add a period_labels key to the Incucyte analysis config to name the growth-rate periods in the plots
 * fix Incucyte period labels hidden behind the curves in the time-course plots

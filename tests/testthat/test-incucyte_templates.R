@@ -84,3 +84,12 @@ test_that("the analysis template draws the period labels over the curves", {
   expect_length(labels, 1L)
   expect_gt(labels, curves)
 })
+
+
+test_that("the analysis template takes the error bars from the normalized wells", {
+  lines <- .incucyte_template_lines("3-analysis.Rmd")
+
+  expect_length(grep("rel_rates_sd := ifelse(is_normalized, sd_NormalizedGrowthRate", lines, fixed = TRUE), 1L)
+  # older gDRcore returns no sd_NormalizedGrowthRate; the template estimates it from the raw rates
+  expect_length(grep('if (!"sd_NormalizedGrowthRate" %in% names(growth_dt))', lines, fixed = TRUE), 1L)
+})

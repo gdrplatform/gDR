@@ -555,6 +555,12 @@ if (anyNA(growth_dt$treatment)) {
   stop("Error: could not resolve a treatment label for every growth rate row.")
 }
 
+# gDRcore normalizes each well to the control of its own plate and returns the SD of the
+# normalized wells; an older gDRcore does not, and its SD is estimated from the raw rates
+if (!"sd_NormalizedGrowthRate" %in% names(growth_dt)) {
+  growth_dt[, sd_NormalizedGrowthRate := sd_GrowthRate / abs(rate_0)]
+}
+
 # rate_0 is guaranteed by compute_growth_rates() on every path, controls or not.
 setnames(growth_dt,
          c("period", "GrowthRate", "sd_GrowthRate"),
@@ -569,7 +575,8 @@ if (anyDuplicated(growth_dt, by = key_cols) > 0) {
   growth_dt <- growth_dt[, .(rate = mean(rate, na.rm = TRUE),
                              sd_rate = mean(sd_rate, na.rm = TRUE),
                              rate_0 = mean(rate_0, na.rm = TRUE),
-                             NormalizedGrowthRate = mean(NormalizedGrowthRate, na.rm = TRUE)),
+                             NormalizedGrowthRate = mean(NormalizedGrowthRate, na.rm = TRUE),
+                             sd_NormalizedGrowthRate = mean(sd_NormalizedGrowthRate, na.rm = TRUE)),
                          by = key_cols]
 }
 
@@ -583,18 +590,18 @@ cat("\n--- Applying Normalization Map ---\n")
 print(norm_df)
 
 av_rates <- merge(growth_dt[, c(key_cols, "rate", "sd_rate", "rate_0",
-                                "NormalizedGrowthRate"), with = FALSE],
+                                "NormalizedGrowthRate", "sd_NormalizedGrowthRate"), with = FALSE],
                   norm_df, by = "range")
 
 av_rates[, is_normalized := norm_target != "None"]
 av_rates[, rel_rates := ifelse(is_normalized, NormalizedGrowthRate, NA_real_)]
-av_rates[, rel_rates_sd := ifelse(is_normalized, sd_rate / abs(rate_0), NA_real_)]
+av_rates[, rel_rates_sd := ifelse(is_normalized, sd_NormalizedGrowthRate, NA_real_)]
 metric <- convert_growth_metric(av_rates$rel_rates, av_rates$rel_rates_sd, growth_metric)
 av_rates[, `:=`(rel_rates = metric$value, rel_rates_sd = metric$sd)]
 av_rates[, plot_value := ifelse(is_normalized, rel_rates, rate)]
 av_rates[, plot_sd := ifelse(is_normalized, rel_rates_sd, sd_rate)]
 av_rates[, rate_0 := ifelse(is_normalized, rate_0, NA_real_)]
-av_rates[, NormalizedGrowthRate := NULL]
+av_rates[, c("NormalizedGrowthRate", "sd_NormalizedGrowthRate") := NULL]
 
 cat("--- Control Baseline Rates (for normalization lookup) ---\n")
 print(unique(av_rates[is_normalized == TRUE, .(CellLineName, norm_target, rate_0)]))
