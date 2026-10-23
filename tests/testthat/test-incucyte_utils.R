@@ -253,3 +253,18 @@ test_that("resolve_incucyte_config_path refuses to guess", {
 
   expect_error(resolve_incucyte_config_path(c("a.yml", "b.yml"), out))
 })
+
+
+test_that("convert_growth_metric returns normalized growth rates or GR values", {
+  ngr <- c(1, 0.5, 0, -1, NA)
+  sd <- c(0.1, 0.1, 0.1, 0.1, 0.1)
+
+  expect_identical(convert_growth_metric(ngr, sd), list(value = ngr, sd = sd))
+
+  gr <- convert_growth_metric(ngr, sd, "GR")
+  expect_equal(gr$value, c(1, sqrt(2) - 1, 0, -0.5, NA))
+  expect_equal(gr$sd, log(2) * 2^ngr * sd)
+
+  expect_error(convert_growth_metric(ngr, sd, "RV"), "should be one of")
+  expect_error(convert_growth_metric(ngr, sd[-1]), "length")
+})

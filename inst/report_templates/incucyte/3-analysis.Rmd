@@ -217,7 +217,7 @@ This analysis helps identify if a drug has an early (cytostatic) vs. late (cytot
 
 This report generates both data tables and plots:
 
-* **`tables/grow_rates.csv`:** A long-format table with the calculated growth rate (`rate`, `sd_rate`) for every treatment, cell line, and time period (`range`). It also includes the normalized `plot_value` used for the bar plots.
+* **`tables/grow_rates.csv`:** A long-format table with the calculated growth rate (`rate`, `sd_rate`) for every treatment, cell line, and time period (`range`). It also includes the normalized `plot_value` used for the bar plots, in the metric set by `growth_metric`.
 * **`tables/grow_rates_wide.csv`:** The same growth rate data, but pivoted to a wide format where columns are cell lines.
 * **`plots/cell_count_curves_...pdf`:** A multi-page PDF document containing the final time-series and growth-rate bar plots for each cell line and treatment comparison, as defined in the config file.
 
@@ -262,6 +262,10 @@ config_summary <- data.table(
 # Default theme_bw() axis text size is approx 9pt (base_size 11 * 0.8)
 x_axis_show_val <- if (is.null(config$x_axis_text_show)) TRUE else as.logical(config$x_axis_text_show)
 x_axis_size_str <- if (is.null(config$x_axis_text_size)) "9 (Default)" else as.character(config$x_axis_text_size)
+
+# The metric normalized phases are shown in: the normalized growth rate unless the config asks for GR
+growth_metric <- if (is.null(config$growth_metric)) "NormalizedGrowthRate" else config$growth_metric
+checkmate::assert_choice(growth_metric, c("NormalizedGrowthRate", "GR"), .var.name = "growth_metric")
 
 # Which file these numbers came from. A run started without a configuration is analysed with
 # windows derived from the data, which is a very different claim from the one a reader makes when
@@ -344,6 +348,17 @@ config_summary <- rbindlist(list(
   )
 ))
 
+if (!is.null(config$growth_metric)) {
+  config_summary <- rbindlist(list(
+    config_summary,
+    data.table(
+      Parameter = "growth_metric",
+      Description = "Metric plotted for normalized periods",
+      Value = growth_metric
+    )
+  ))
+}
+
 generate_datatable(config_summary, options = list(pageLength = 20))
 
 ```
@@ -355,6 +370,8 @@ The table above shows the key parameters from your configuration file. Below is 
 * **`normalization_map`**: Controls normalization for bar plots. For each period (`early`, `mid`, `late`), you specify a `norm_target`:
 * **`"None"`**: Use the raw log2 growth rate.
 * **`"early"`**: Normalize by the **'early' DMSO** growth rate (relative value where 1.0 = DMSO control).
+
+* **`growth_metric`** (optional): How normalized periods are shown. **`"NormalizedGrowthRate"`** (the default) is the treated rate divided by the control rate; **`"GR"`** is the GR value, `2^(rate / rate_0) - 1`, which is 1 at the control rate, 0 when the cells stop growing and negative when they die.
 
 
 * **`treatment_comparisons`**: Defines which treatments to plot side-by-side (one page per comparison in the output PDF).
@@ -555,6 +572,8 @@ av_rates <- merge(growth_dt[, c(key_cols, "rate", "sd_rate", "rate_0",
 av_rates[, is_normalized := norm_target != "None"]
 av_rates[, rel_rates := ifelse(is_normalized, NormalizedGrowthRate, NA_real_)]
 av_rates[, rel_rates_sd := ifelse(is_normalized, sd_rate / abs(rate_0), NA_real_)]
+metric <- convert_growth_metric(av_rates$rel_rates, av_rates$rel_rates_sd, growth_metric)
+av_rates[, `:=`(rel_rates = metric$value, rel_rates_sd = metric$sd)]
 av_rates[, plot_value := ifelse(is_normalized, rel_rates, rate)]
 av_rates[, plot_sd := ifelse(is_normalized, rel_rates_sd, sd_rate)]
 av_rates[, rate_0 := ifelse(is_normalized, rate_0, NA_real_)]
@@ -597,7 +616,7 @@ fwrite(av_rates, gr_fpath)
 **What to look for in the table: Scan the `av_rates` table above.**
 
 * Check the `plot_value` column. For 'Raw' phases (`is_normalized: FALSE`), this is the raw log2 growth rate.
-* For normalized phases (`is_normalized: TRUE`), a value of 1.0 means the growth rate is identical to the control (e.g., 'early' DMSO). A value < 1.0 indicates growth inhibition, and < 0 indicates cell death.
+* For normalized phases (`is_normalized: TRUE`), `r if (growth_metric == "GR") "the value is GR: 1.0 means the cells grow as fast as the control (e.g., 'early' DMSO), 0 means they stop growing, and < 0 indicates cell death, down to -1." else "a value of 1.0 means the growth rate is identical to the control (e.g., 'early' DMSO). A value < 1.0 indicates growth inhibition, and < 0 indicates cell death."`
 
 ## Wide format
 
@@ -890,7 +909,7 @@ for (current_cell_line in config$cell_lines) {
         facet_wrap(vars(range), scales = y_axis_scales) +
         
         # A generic y-axis label, as units may be mixed
-        ylab("Value (Normalized or Raw Rate)")
+        ylab(if (growth_metric == "GR") "GR value (or Raw Rate)" else "Value (Normalized or Raw Rate)")
         
 
     # 2. Conditionally add the y=1 hline

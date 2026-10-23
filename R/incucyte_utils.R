@@ -429,3 +429,30 @@ resolve_incucyte_config_path <- function(configuration_file_path,
     supplied_path
   }
 }
+
+
+#' Express normalized growth rates in a chosen growth metric
+#'
+#' @param ngr numeric; normalized growth rates, the treated rate divided by the control rate.
+#' @param ngr_sd numeric; their standard deviations, the same length as \code{ngr}.
+#' @param metric string; \code{"NormalizedGrowthRate"} returns the input unchanged,
+#'   \code{"GR"} the GR value \code{2^ngr - 1} with the standard deviation propagated to
+#'   first order.
+#'
+#' @return A list with elements \code{value} and \code{sd}.
+#'
+#' @examples
+#' convert_growth_metric(c(1, 0.5, 0), c(0.1, 0.1, 0.1), "GR")
+#'
+#' @keywords incucyte
+#' @export
+convert_growth_metric <- function(ngr, ngr_sd, metric = c("NormalizedGrowthRate", "GR")) {
+  checkmate::assert_numeric(ngr)
+  checkmate::assert_numeric(ngr_sd, len = length(ngr))
+  metric <- match.arg(metric)
+
+  if (metric == "NormalizedGrowthRate") {
+    return(list(value = ngr, sd = ngr_sd))
+  }
+  list(value = 2^ngr - 1, sd = log(2) * 2^ngr * ngr_sd)
+}
