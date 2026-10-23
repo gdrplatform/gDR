@@ -203,7 +203,11 @@ run_report(
 
   Logical. Whether to remove the output directory if the pipeline fails.
   Default is `TRUE`. If set to `FALSE`, incomplete output will be kept
-  for debugging.
+  for debugging. A failure in the publication step alone
+  (`4-publish_results.Rmd`) never removes the directory when earlier
+  steps were rendered in the same run: the report is complete, so it is
+  kept and `current` points to it, and publishing can be retried with
+  `steps = 4, resume = TRUE`.
 
 - resume:
 

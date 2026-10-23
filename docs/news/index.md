@@ -1,5 +1,10 @@
 # Changelog
 
+## gDR 1.11.14 - 2026-10-23
+
+- prevent the removal of the rendered report when only the publication
+  step fails, and point `current` to it
+
 ## gDR 1.11.13 - 2026-10-21
 
 - add a “How These Numbers Were Produced” section to the processing

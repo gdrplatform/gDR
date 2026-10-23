@@ -15,7 +15,7 @@ object or a path to a .qs2 file containing an MAE object."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">gDR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.11.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.11.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -233,7 +233,10 @@ Currently, required only for Incucyte data</p></dd>
 <dt id="arg-remove-on-failure">remove_on_failure<a class="anchor" aria-label="anchor" href="#arg-remove-on-failure"></a></dt>
 <dd><p>Logical. Whether to remove the output directory if the
 pipeline fails. Default is <code>TRUE</code>. If set to <code>FALSE</code>, incomplete
-output will be kept for debugging.</p></dd>
+output will be kept for debugging. A failure in the publication step alone
+(<code>4-publish_results.Rmd</code>) never removes the directory when earlier steps were
+rendered in the same run: the report is complete, so it is kept and <code>current</code>
+points to it, and publishing can be retried with <code>steps = 4, resume = TRUE</code>.</p></dd>
 
 
 <dt id="arg-resume">resume<a class="anchor" aria-label="anchor" href="#arg-resume"></a></dt>
