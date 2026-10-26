@@ -1,3 +1,6 @@
+## gDR 1.11.15 - 2026-10-23
+* add a growth_metric key to the Incucyte analysis config to plot GR values instead of normalized growth rates
+
 ## gDR 1.11.14 - 2026-10-23
 * prevent the removal of the rendered report when only the publication step fails, and point `current` to it
 
@@ -171,3 +174,4 @@
 
 ## gDR 0.0.0.1 - 2021-02-03
 * initial version
+
