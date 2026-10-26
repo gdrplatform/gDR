@@ -285,7 +285,7 @@ head(convert_se_assay_to_dt(se, "Metrics"))
 #> 6: G00011_drug_011_moa_B_168 CL00011_cellline_BA_breast_cellline_BA_unknown_26
 #>    normalization_type    x_mean      x_AOC x_AOC_range      x_max  x_sd_avg
 #>                <char>     <num>      <num>       <num>      <num>     <num>
-#> 1:                 GR 0.7420730 0.25792698  0.25819628  0.3065500 0.7276889
+#> 1:                 GR 0.7420679 0.25793215  0.25820178  0.3065500 0.7276889
 #> 2:                 RV 0.9157913 0.08420865  0.05733832  0.4225500 0.8794050
 #> 3:                 GR 0.5092443 0.49075566  0.48159819 -0.4177500 0.5983619
 #> 4:                 RV 0.6675856 0.33241443  0.32656451  0.0260500 0.7335509
@@ -293,7 +293,7 @@ head(convert_se_assay_to_dt(se, "Metrics"))
 #> 6:                 RV 0.3225188 0.67748125  0.67748125  0.3225188 0.2540203
 #>    N_conc maxlog10Concentration        ec50      xc50         h        r2
 #>     <int>                 <num>       <num>     <num>     <num>     <num>
-#> 1:      9              1.000000 100.0000000 4.1714810 0.2918402 0.7732475
+#> 1:      9              1.000000 100.0000000 4.1712724 0.2918356 0.7732475
 #> 2:      9              1.000000   5.7741811 7.4683485 1.3311221 0.9199573
 #> 3:      9              1.000000   0.5757493 0.3199532 1.1597048 0.9858751
 #> 4:      9              1.000000   0.4793539 0.4942034 2.9149107 0.9751992
@@ -301,7 +301,7 @@ head(convert_se_assay_to_dt(se, "Metrics"))
 #> 6:      1             -0.823909   0.0000000      -Inf 0.0001000 0.0000000
 #>           rss         p_value   x_0       x_inf               fit_type
 #>         <num>           <num> <num>       <num>                 <char>
-#> 1: 0.06111736 0.0055517824350     1 -0.76364407 DRC3pHillFitModelFixS0
+#> 1: 0.06111735 0.0055517820959     1 -0.76364407 DRC3pHillFitModelFixS0
 #> 2: 0.03159935 0.0001450862960     1  0.14499197 DRC3pHillFitModelFixS0
 #> 3: 0.03576754 0.0000003349268     1 -0.48824612 DRC3pHillFitModelFixS0
 #> 4: 0.04890734 0.0000024023028     1  0.04254419 DRC3pHillFitModelFixS0
@@ -359,7 +359,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] kableExtra_1.4.1  gDR_1.11.15       gDRutils_1.11.20  gDRimport_1.11.12
+#> [1] kableExtra_1.4.1  gDR_1.11.16       gDRutils_1.11.20  gDRimport_1.11.12
 #> [5] gDRcore_1.11.24   BiocStyle_2.41.0 
 #> 
 #> loaded via a namespace (and not attached):

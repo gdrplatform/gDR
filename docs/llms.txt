@@ -84,6 +84,8 @@ style conventions in
   : Filter Treatments from SummarizedExperiment
 - [`generate_incucyte_yaml_draft()`](https://gdrplatform.github.io/gDR/reference/generate_incucyte_yaml_draft.md)
   : Generate a Draft YAML Configuration for Incucyte Analysis
+- [`label_periods()`](https://gdrplatform.github.io/gDR/reference/label_periods.md)
+  : Display labels for the growth-rate periods of the Incucyte analysis
 - [`resolve_incucyte_config_path()`](https://gdrplatform.github.io/gDR/reference/resolve_incucyte_config_path.md)
   : Resolve the configuration file an Incucyte report reads
 
