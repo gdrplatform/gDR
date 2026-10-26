@@ -1,3 +1,7 @@
+## gDR 1.11.16 - 2026-10-23
+* add a period_labels key to the Incucyte analysis config to name the growth-rate periods in the plots
+* fix Incucyte period labels hidden behind the curves in the time-course plots
+
 ## gDR 1.11.15 - 2026-10-23
 * add a growth_metric key to the Incucyte analysis config to plot GR values instead of normalized growth rates
 
