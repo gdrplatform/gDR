@@ -217,7 +217,7 @@ This analysis helps identify if a drug has an early (cytostatic) vs. late (cytot
 
 This report generates both data tables and plots:
 
-* **`tables/grow_rates.csv`:** A long-format table with the calculated growth rate (`rate`, `sd_rate`) for every treatment, cell line, and time period (`range`). It also includes the normalized `plot_value` used for the bar plots, in the metric set by `growth_metric`.
+* **`tables/grow_rates.csv`:** A long-format table with the calculated growth rate (`rate`, `sd_rate`) for every treatment, cell line, and time period (`range`). It also includes the normalized `plot_value` used for the bar plots, in the metric set by `growth_metric`, and `rate_0`, the control rate pooled over all plates. Normalized values use the control of each well's own plate, so `rate / rate_0` reproduces them only when the experiment has a single plate.
 * **`tables/grow_rates_wide.csv`:** The same growth rate data, but pivoted to a wide format where columns are cell lines.
 * **`plots/cell_count_curves_...pdf`:** A multi-page PDF document containing the final time-series and growth-rate bar plots for each cell line and treatment comparison, as defined in the config file.
 
@@ -386,7 +386,7 @@ The table above shows the key parameters from your configuration file. Below is 
 * **`"None"`**: Use the raw log2 growth rate.
 * **`"early"`**: Normalize by the **'early' DMSO** growth rate (relative value where 1.0 = DMSO control).
 
-* **`growth_metric`** (optional): How normalized periods are shown. **`"NormalizedGrowthRate"`** (the default) is the treated rate divided by the control rate; **`"GR"`** is the GR value, `2^(rate / rate_0) - 1`, which is 1 at the control rate, 0 when the cells stop growing and negative when they die.
+* **`growth_metric`** (optional): How normalized periods are shown. **`"NormalizedGrowthRate"`** (the default) is the rate of each treated well divided by the control rate of its own plate, averaged over replicate wells; **`"GR"`** is the GR value, `2^NormalizedGrowthRate - 1`, which is 1 at the control rate, 0 when the cells stop growing and negative when they die.
 
 * **`period_labels`** (optional): Labels the plots show for the periods, e.g. `early: "24h"`. Periods without a label keep their name, and the tables and `normalization_map` always use `early`, `mid` and `late`.
 
@@ -582,8 +582,8 @@ if (anyDuplicated(growth_dt, by = key_cols) > 0) {
 
 # --- PER-PHASE NORMALIZATION ---
 # compute_growth_rates() already applied normalization_map: NormalizedGrowthRate
-# is the raw rate for "None" periods and rate / control rate otherwise, with
-# rate_0 holding the control baseline that was used.
+# is the raw rate for "None" periods and otherwise the mean of each well divided by
+# the control of its own plate; rate_0 is the control pooled over all plates.
 norm_df <- data.table(range = names(norm_map), norm_target = unname(norm_map))
 
 cat("\n--- Applying Normalization Map ---\n")
@@ -603,7 +603,7 @@ av_rates[, plot_sd := ifelse(is_normalized, rel_rates_sd, sd_rate)]
 av_rates[, rate_0 := ifelse(is_normalized, rate_0, NA_real_)]
 av_rates[, c("NormalizedGrowthRate", "sd_NormalizedGrowthRate") := NULL]
 
-cat("--- Control Baseline Rates (for normalization lookup) ---\n")
+cat("--- Control Rates, Pooled Over Plates ---\n")
 print(unique(av_rates[is_normalized == TRUE, .(CellLineName, norm_target, rate_0)]))
 
 # Restore the plotting order of periods and treatments
