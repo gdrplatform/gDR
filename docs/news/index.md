@@ -1,5 +1,10 @@
 # Changelog
 
+## gDR 1.11.17 - 2026-10-23
+
+- fix the Incucyte error bars to use the SD of growth rates normalized
+  to the control of the same plate
+
 ## gDR 1.11.16 - 2026-10-23
 
 - add a period_labels key to the Incucyte analysis config to name the
