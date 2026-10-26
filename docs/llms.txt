@@ -78,6 +78,8 @@ style conventions in
   : Apply Custom Metadata Tags to Drug Names
 - [`cast_to_wide()`](https://gdrplatform.github.io/gDR/reference/cast_to_wide.md)
   : Reshape a data.table from long to wide format
+- [`convert_growth_metric()`](https://gdrplatform.github.io/gDR/reference/convert_growth_metric.md)
+  : Express normalized growth rates in a chosen growth metric
 - [`filter_treatments()`](https://gdrplatform.github.io/gDR/reference/filter_treatments.md)
   : Filter Treatments from SummarizedExperiment
 - [`generate_incucyte_yaml_draft()`](https://gdrplatform.github.io/gDR/reference/generate_incucyte_yaml_draft.md)
