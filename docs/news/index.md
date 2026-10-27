@@ -1,5 +1,10 @@
 # Changelog
 
+## gDR 1.11.18 - 2026-10-26
+
+- correct the Incucyte report wording on `rate_0`, the control rate
+  pooled over all plates
+
 ## gDR 1.11.17 - 2026-10-23
 
 - fix the Incucyte error bars to use the SD of growth rates normalized
