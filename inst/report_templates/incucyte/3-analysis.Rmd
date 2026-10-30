@@ -267,6 +267,10 @@ x_axis_size_str <- if (is.null(config$x_axis_text_size)) "9 (Default)" else as.c
 growth_metric <- if (is.null(config$growth_metric)) "NormalizedGrowthRate" else config$growth_metric
 checkmate::assert_choice(growth_metric, c("NormalizedGrowthRate", "GR"), .var.name = "growth_metric")
 
+# Hour the treatment marker is drawn at; 10 h unless the config says otherwise
+treatment_time <- if (is.null(config$treatment_time)) 10 else config$treatment_time
+checkmate::assert_number(treatment_time, finite = TRUE, .var.name = "treatment_time")
+
 # Labels the plots show for the periods; the tables keep early/mid/late
 defined_periods <- Filter(function(p) !is.null(config[[paste0(p, "_period")]]), c("early", "mid", "late"))
 period_labels <- label_periods(defined_periods, config$period_labels)
@@ -363,6 +367,17 @@ if (!is.null(config$growth_metric)) {
   ))
 }
 
+if (!is.null(config$treatment_time)) {
+  config_summary <- rbindlist(list(
+    config_summary,
+    data.table(
+      Parameter = "treatment_time",
+      Description = "Hour the treatment marker is drawn at",
+      Value = as.character(treatment_time)
+    )
+  ))
+}
+
 if (!is.null(config$period_labels)) {
   config_summary <- rbindlist(list(
     config_summary,
@@ -389,6 +404,8 @@ The table above shows the key parameters from your configuration file. Below is 
 * **`growth_metric`** (optional): How normalized periods are shown. **`"NormalizedGrowthRate"`** (the default) is the rate of each treated well divided by the control rate of its own plate, averaged over replicate wells; **`"GR"`** is the GR value, `2^NormalizedGrowthRate - 1`, which is 1 at the control rate, 0 when the cells stop growing and negative when they die.
 
 * **`period_labels`** (optional): Labels the plots show for the periods, e.g. `early: "24h"`. Periods without a label keep their name, and the tables and `normalization_map` always use `early`, `mid` and `late`.
+
+* **`treatment_time`** (optional): Hour at which the `treatment` marker is drawn on the curves, 10 by default. Set it to 0 when the time axis has been rebased onto treatment.
 
 
 * **`treatment_comparisons`**: Defines which treatments to plot side-by-side (one page per comparison in the output PDF).
@@ -448,7 +465,7 @@ Defining the periods from the config file to be used for calculation and plottin
 # Start with the baseline 'treatment' event
 events <- data.table(
   name = c("treatment"),
-  Duration = c(10))
+  Duration = c(treatment_time))
 
 # Dynamically add periods from config
 period_names <- c()

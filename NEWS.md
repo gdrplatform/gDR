@@ -1,3 +1,6 @@
+## gDR 1.11.20 - 2026-10-30
+* add the optional `treatment_time` config key to the Incucyte report, the hour the treatment marker is drawn at
+
 ## gDR 1.11.18 - 2026-10-26
 * correct the Incucyte report wording on `rate_0`, the control rate pooled over all plates
 
