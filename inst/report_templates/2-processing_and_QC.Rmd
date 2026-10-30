@@ -279,6 +279,23 @@ dt_combo <- dt_list[[combo_name]]
 
 {{/has_combo}}
 
+# Run the Processing Pipeline
+
+All processing is done by a single call to `runDrugResponseProcessingPipeline()`, the same function used outside the report. It runs the four steps described below on the single-agent and combination data, the types this report covers, and saves the `SummarizedExperiment` after each step in `gDR_data/intermediate/`. The sections that follow read those saved objects, so the quality control shows exactly the data the final results were computed from.
+
+```{r run_pipeline}
+inter_dir <- file.path(wd, "gDR_data", "intermediate")
+dir.create(inter_dir, recursive = TRUE, showWarnings = FALSE)
+# keep the types the report covers with their controls; subsetting drops the import record, so carry it over
+report_types <- c("control", sa_name, get_supported_experiments("combo"))
+dt_report <- dt_[dt_$type %in% report_types]
+data.table::setattr(dt_report, "gDR_import", attr(data_imported, "gDR_import", exact = TRUE))
+mae_pipeline <- runDrugResponseProcessingPipeline(dt_report, data_dir = inter_dir)
+read_step <- function(step, experiment) read_intermediate_data(inter_dir, step, experiment)
+
+
+```
+
 # Structure Data into SummarizedExperiment Objects
 
 The data for each experiment type is now structured into `SummarizedExperiment` (SE) objects. The SE is a core data structure from Bioconductor that efficiently organizes experimental data and metadata.
@@ -288,7 +305,7 @@ A key action in this step is the mapping of control data (e.g., DMSO-treated wel
 ## Single-agent experiment - rowData
 
 ```{r, create_SE_sa_rowData}
-se_sa <- create_SE(dt_sa, data_type = sa_name)
+se_sa <- read_step("create_SE", sa_name)
 generate_datatable(as.data.table(as.data.frame(rowData(se_sa)), keep.rownames = TRUE))
 
 
@@ -307,7 +324,7 @@ generate_datatable(as.data.table(as.data.frame(colData(se_sa)), keep.rownames = 
 ## Combination experiment - rowData
 
 ```{r, create_SE_combo_rowData}
-se_combo <- create_SE(dt_combo, data_type = combo_name)
+se_combo <- read_step("create_SE", combo_name)
 generate_datatable(as.data.table(as.data.frame(rowData(se_combo)), keep.rownames = TRUE))
 
 
@@ -408,7 +425,7 @@ save_plot(plt = p, path = file.path(wd, "plots", "combo_map_controls_to_treated"
 The raw readout values are converted to normalized values (Relative Viability or GR values) by comparing them to the mapped controls. This step creates the `Normalized` assay in the `SummarizedExperiment` object.
 
 ```{r normalize_data_sa, warning=FALSE}
-se_sa <- normalize_SE(se_sa, data_type = sa_name)
+se_sa <- read_step("normalize_SE", sa_name)
 
 
 ```
@@ -416,7 +433,7 @@ se_sa <- normalize_SE(se_sa, data_type = sa_name)
 {{#has_combo}}
 
 ```{r normalize_data_combo, warning=FALSE}
-se_combo <- normalize_SE(se_combo, data_type = combo_name)
+se_combo <- read_step("normalize_SE", combo_name)
 
 
 ```
@@ -639,7 +656,7 @@ invisible(loop(seq_along(ls_plt_GR), function(x) {
 Technical replicates are averaged to produce a single dose-response data point for each unique treatment condition. This step also calculates the standard deviation for the replicates and creates the `Averaged` assay.
 
 ```{r, average_data_sa}
-se_sa <- average_SE(se_sa, data_type = sa_name)
+se_sa <- read_step("average_SE", sa_name)
 
 
 ```
@@ -647,7 +664,7 @@ se_sa <- average_SE(se_sa, data_type = sa_name)
 {{#has_combo}}
 
 ```{r average_data_combo}
-se_combo <- average_SE(se_combo, data_type = combo_name)
+se_combo <- read_step("average_SE", combo_name)
 
 
 ```
@@ -860,7 +877,7 @@ A sigmoidal dose-response model is fitted to the averaged data for each drug and
 * For **combination data**, this step generates a richer set of assays. In addition to the `Metrics` assay for each drug, it creates assays to describe synergy, such as `excess` (for Bliss/HSA excess calculations), `isobolograms`, and the final synergy `score`.
 
 ```{r fit_data_sa, warning=FALSE}
-se_sa <- fit_SE(se_sa, data_type = sa_name)
+se_sa <- read_step("fit_SE", sa_name)
 
 
 ```
@@ -868,7 +885,7 @@ se_sa <- fit_SE(se_sa, data_type = sa_name)
 {{#has_combo}}
 
 ```{r fit_data_combo, warning=FALSE}
-se_combo <- fit_SE.combinations(se_combo, data_type = combo_name)
+se_combo <- read_step("fit_SE", combo_name)
 
 
 ```
@@ -1083,18 +1100,13 @@ invisible(loop(seq_along(ls_plt_GR), function(x) {
 Finally, all processed data and results are combined into a single `MultiAssayExperiment` (MAE) object. The MAE is a flexible container that holds all `SummarizedExperiment` objects, ensuring all data and metadata are stored together in an organized and accessible format.
 
 ```{r create_mae}
-mae <- if (exists("se_combo") && !is.null(se_combo)) {
-  MultiAssayExperiment(experiments = setNames(list(se_sa, se_combo), c(sa_name, combo_name)))
-} else {
-  MultiAssayExperiment(experiments = setNames(list(se_sa), c(sa_name)))
-}
+# single-agent first, as before
+mae <- mae_pipeline[, , intersect(c(sa_name, get_supported_experiments("combo")), names(mae_pipeline))]
 mae <- standardize_mae(mae)
 qs_save(mae, file.path(wd, "gDR_data", "gDR_mae.qs2"))
 
 
 ```
-
-Please note: Steps 5 through 9 can be automatically executed using the runDrugResponseProcessingPipeline function, which handles all stages of the pipeline for all identified data types."
 
 # How These Numbers Were Produced
 
