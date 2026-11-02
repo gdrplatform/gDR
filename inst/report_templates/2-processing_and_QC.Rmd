@@ -259,11 +259,10 @@ dt_list <- split_raw_data(dt_)
 
 Names of identified data types `r names(dt_list)`.
 
-This step involves extracting identified data into separate variables, enabling computations to be conducted independently for each data type.
+This report processes the single-agent and combination types; their names are set here.
 
 ```{r, extract_data_sa}
 sa_name <- get_supported_experiments("sa")
-dt_sa <- dt_list[[sa_name]]
 
 
 ```
@@ -289,7 +288,7 @@ dir.create(inter_dir, recursive = TRUE, showWarnings = FALSE)
 # keep the types the report covers with their controls; subsetting drops the import record, so carry it over
 report_types <- c("control", sa_name, get_supported_experiments("combo"))
 dt_report <- dt_[dt_$type %in% report_types]
-data.table::setattr(dt_report, "gDR_import", attr(data_imported, "gDR_import", exact = TRUE))
+setattr(dt_report, "gDR_import", attr(data_imported, "gDR_import", exact = TRUE))
 mae_pipeline <- runDrugResponseProcessingPipeline(dt_report, data_dir = inter_dir)
 read_step <- function(step, experiment) read_intermediate_data(inter_dir, step, experiment)
 
