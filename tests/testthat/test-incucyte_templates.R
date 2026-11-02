@@ -93,3 +93,14 @@ test_that("the analysis template takes the error bars from the normalized wells"
   # older gDRcore returns no sd_NormalizedGrowthRate; the template estimates it from the raw rates
   expect_length(grep('if (!"sd_NormalizedGrowthRate" %in% names(growth_dt))', lines, fixed = TRUE), 1L)
 })
+
+test_that("the analysis template draws the treatment marker where the config puts it", {
+  # The marker sat at a fixed 10 h, so on data rebased onto treatment it landed next to the
+  # early window instead of at 0.
+  lines <- .incucyte_template_lines("3-analysis.Rmd")
+
+  marker <- grep("name = c(\"treatment\")", lines, fixed = TRUE)
+  expect_length(marker, 1L)
+  expect_match(lines[marker + 1L], "Duration = c(treatment_time)", fixed = TRUE)
+  expect_true(any(grepl("config$treatment_time", lines, fixed = TRUE)))
+})
