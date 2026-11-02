@@ -1,3 +1,8 @@
+## gDR 1.11.19 - 2026-10-30
+* use `runDrugResponseProcessingPipeline()` in the processing report and read its saved steps for the quality control
+* fix the missing import step in the provenance of the processing report's MAE
+* bump the gDRcore requirement to 1.11.29, which exports `read_intermediate_data()`
+
 ## gDR 1.11.18 - 2026-10-26
 * correct the Incucyte report wording on `rate_0`, the control rate pooled over all plates
 
