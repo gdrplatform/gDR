@@ -1,3 +1,6 @@
+## gDR 1.11.20 - 2026-11-02
+* add a `report` step to the provenance from `extra_render_params$report_inputs_file`, a list of the run's inputs
+
 ## gDR 1.11.19 - 2026-10-30
 * use `runDrugResponseProcessingPipeline()` in the processing report and read its saved steps for the quality control
 * fix the missing import step in the provenance of the processing report's MAE

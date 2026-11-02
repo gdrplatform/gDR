@@ -120,7 +120,10 @@
 #'   template alongside the ones derived from the arguments above. Use it to pass values that are
 #'   specific to a given deployment (e.g. dataset registry metadata) without adding them to the
 #'   signature of this function. Values are also persisted in \code{args.qs2}. Names colliding
-#'   with parameters computed by this function are dropped with a warning. Default is an empty list.
+#'   with parameters computed by this function are dropped with a warning. One entry is read by
+#'   the templates themselves: \code{report_inputs_file}, the path to a qs2 file with a named list
+#'   of plain data describing the inputs of the run, which the processing step records as the
+#'   \code{"report"} step in the provenance of every experiment. Default is an empty list.
 #' @param on_resolve_inputs Function or NULL. Hook called before the data type is determined,
 #'   used to resolve input paths from an external source. It receives \code{args} (the list of
 #'   input arguments) and \code{extra_render_params}, and must return a list with exactly these
