@@ -1,3 +1,6 @@
+## gDR 1.11.20 - 2026-11-02
+* add a note to the processing report when it leaves out data types it does not process, such as co-dilution
+
 ## gDR 1.11.19 - 2026-10-30
 * use `runDrugResponseProcessingPipeline()` in the processing report and read its saved steps for the quality control
 * fix the missing import step in the provenance of the processing report's MAE
