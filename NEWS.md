@@ -1,3 +1,6 @@
+## gDR 1.11.21 - 2026-11-02
+* add a note to the processing report when it leaves out data types it does not process, such as co-dilution
+
 ## gDR 1.11.20 - 2026-11-02
 * add the optional `treatment_time` config key to the Incucyte report, the hour the treatment marker is drawn at
 

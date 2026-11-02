@@ -30,3 +30,16 @@ test_that("the processing template keeps the import record when it narrows the i
 
   expect_true(any(grepl('setattr(dt_report, "gDR_import"', code, fixed = TRUE)))
 })
+
+test_that("the processing template says which data types it leaves out", {
+  # co-dilution and time-course rows used to be dropped before the pipeline without a word
+  code <- .template_code("2-processing_and_QC.Rmd")
+
+  defined <- grep("report_types <- ", code, fixed = TRUE)
+  left_out <- grep("!dt_$type %in% report_types", code, fixed = TRUE)
+  narrowed <- grep("dt_report <- dt_[dt_$type %in% report_types]", code, fixed = TRUE)
+  expect_length(defined, 1L)
+  expect_length(left_out, 1L)
+  expect_true(defined < left_out && left_out < narrowed)
+  expect_true(any(grepl("Not in this report", code, fixed = TRUE)))
+})
