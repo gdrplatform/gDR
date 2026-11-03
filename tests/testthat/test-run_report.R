@@ -816,3 +816,26 @@ test_that("stage_and_update_paths leaves a file that is already staged intact", 
   expect_equal(res$configuration_file_path, staged)
   expect_equal(readLines(staged), "early_period: [44, 92]")
 })
+
+test_that("prepare_dynamic_render_params handles input without durations, as in PRISM level 6", {
+  td <- function(f) system.file("testdata", f, package = "gDRimport")
+  raw_data <- purrr::quietly(gDRimport::convert_LEVEL6_prism_to_gDR_input)(
+    td("prism_collapsed_LOGFC.csv"), td("prism_cell_lines.csv"), td("prism_treatment.csv"), td("prism_model.csv")
+  )$result
+  expect_true(all(is.na(raw_data[[gDRutils::get_env_identifiers("duration")]])))
+
+  output_dir <- tempfile()
+  dir.create(file.path(output_dir, "gDR_data"), recursive = TRUE)
+  on.exit(unlink(output_dir, recursive = TRUE))
+  qs2::qs_save(raw_data, file.path(output_dir, "gDR_data", "gDR_input.qs2"))
+
+  params <- gDR:::prepare_dynamic_render_params("prism_6", NULL, output_dir, c(1, 2, 3))
+  expect_false(params$plot_GR_values)
+  expect_false(params$has_combo)
+
+  # a division time alone does not give GR values when the duration is missing
+  raw_data[[gDRutils::get_env_identifiers("cellline_ref_div_time")]] <- 30
+  qs2::qs_save(raw_data, file.path(output_dir, "gDR_data", "gDR_input.qs2"))
+  params <- gDR:::prepare_dynamic_render_params("prism_6", NULL, output_dir, c(1, 2, 3))
+  expect_false(params$plot_GR_values)
+})
