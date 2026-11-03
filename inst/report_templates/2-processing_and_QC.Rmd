@@ -263,6 +263,25 @@ This report processes the single-agent and combination types; their names are se
 
 ```{r, extract_data_sa}
 sa_name <- get_supported_experiments("sa")
+report_types <- c("control", sa_name, get_supported_experiments("combo"))
+
+
+```
+
+```{r, left_out_types, results="asis"}
+# rows of other types (e.g. co-dilution, time-course) do not reach any result below; say so
+# here and in the render log instead of dropping them without a word
+left_out <- dt_[!dt_$type %in% report_types, .N, by = "type"]
+if (NROW(left_out) > 0L) {
+  left_out_text <- toString(sprintf("%s (%d rows)", left_out$type, left_out$N))
+  cat("Warning: this report leaves out data it does not process:", left_out_text, "\n", file = stderr())
+  cat(
+    "\n> **Not in this report:** the input also has ", left_out_text, ". ",
+    "This report processes single-agent and combination data only, so these rows are left out ",
+    "of every result below. They are still in `gDR_data/gDR_input.qs2`.\n\n",
+    sep = ""
+  )
+}
 
 
 ```
@@ -286,7 +305,6 @@ All processing is done by a single call to `runDrugResponseProcessingPipeline()`
 inter_dir <- file.path(wd, "gDR_data", "intermediate")
 dir.create(inter_dir, recursive = TRUE, showWarnings = FALSE)
 # keep the types the report covers with their controls; subsetting drops the import record, so carry it over
-report_types <- c("control", sa_name, get_supported_experiments("combo"))
 dt_report <- dt_[dt_$type %in% report_types]
 setattr(dt_report, "gDR_import", attr(data_imported, "gDR_import", exact = TRUE))
 mae_pipeline <- runDrugResponseProcessingPipeline(dt_report, data_dir = inter_dir)
