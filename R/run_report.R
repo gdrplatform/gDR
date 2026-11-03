@@ -1092,9 +1092,11 @@ prepare_dynamic_render_params <- function(data_type, mae, output_dir, steps) {
     ids <- gDRutils::get_env_identifiers()
     params$has_combo <-
       gDRutils::get_supported_experiments("combo") %in% gDRcore::identify_data_type(raw_data)$type
-    # PRISM level 6 input has no durations, and an NA here breaks the template rendering
+    # PRISM level 6 input has no durations, and an NA here breaks the template rendering;
+    # without a duration gDRcore computes no GR values from the division time either
     params$plot_GR_values <-
-      any(raw_data[[ids$duration]] == 0, na.rm = TRUE) || any(!is.na(raw_data[[ids$cellline_ref_div_time]]))
+      any(raw_data[[ids$duration]] == 0, na.rm = TRUE) ||
+        any(!is.na(raw_data[[ids$cellline_ref_div_time]]) & !is.na(raw_data[[ids$duration]]))
   }
 
   if (file.exists(mae_path_final)) {
