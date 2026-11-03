@@ -31,6 +31,39 @@ test_that("the processing template keeps the import record when it narrows the i
   expect_true(any(grepl('setattr(dt_report, "gDR_import"', code, fixed = TRUE)))
 })
 
+test_that("the processing template records the report inputs a caller passes", {
+  path <- system.file("report_templates", "2-processing_and_QC.Rmd", package = "gDR")
+  testthat::skip_if(path == "", "template not installed")
+  lines <- readLines(path, warn = FALSE)
+  start <- grep("^report_inputs_file <- ", lines)
+  end <- start - 1L + which(grepl("^\\}", lines[start:length(lines)]))[1]
+  block <- paste(lines[start:end], collapse = "\n")
+
+  run_block <- function(params) {
+    env <- new.env()
+    env$mae <- gDRutils::get_synthetic_data("finalMAE_combo_2dose_nonoise.qs2")
+    env$qs_read <- qs2::qs_read
+    env$record_processing_step <- gDRutils::record_processing_step
+    eval(parse(text = whisker::whisker.render(block, params)), envir = env)
+    env$mae
+  }
+
+  inputs_file <- tempfile(fileext = ".qs2")
+  on.exit(unlink(inputs_file))
+  qs2::qs_save(list(source_id = "AS-1", files = data.frame(path = "manifest.xlsx", md5 = "abc")), inputs_file)
+
+  mae <- run_block(list(report_inputs_file = inputs_file))
+  for (experiment in names(mae)) {
+    step <- gDRutils::get_SE_provenance(mae[[experiment]])$steps$report
+    expect_equal(step$settings$source_id, "AS-1", info = experiment)
+    expect_equal(step$settings$files$md5, "abc", info = experiment)
+  }
+
+  # without the parameter the template records nothing
+  untouched <- run_block(list())
+  expect_null(gDRutils::get_SE_provenance(untouched[[1]])$steps$report)
+})
+
 test_that("the processing template says which data types it leaves out", {
   # co-dilution and time-course rows used to be dropped before the pipeline without a word
   code <- .template_code("2-processing_and_QC.Rmd")

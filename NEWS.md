@@ -1,3 +1,6 @@
+## gDR 1.11.22 - 2026-11-03
+* add a `report` step to the provenance from `extra_render_params$report_inputs_file`, a list of the run's inputs
+
 ## gDR 1.11.21 - 2026-11-02
 * add a note to the processing report when it leaves out data types it does not process, such as co-dilution
 

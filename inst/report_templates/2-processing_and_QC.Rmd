@@ -1120,6 +1120,16 @@ Finally, all processed data and results are combined into a single `MultiAssayEx
 # single-agent first, as before
 mae <- mae_pipeline[, , intersect(c(sa_name, get_supported_experiments("combo")), names(mae_pipeline))]
 mae <- standardize_mae(mae)
+# What a caller of run_report() recorded about its inputs (extra_render_params$report_inputs_file,
+# a qs2 file with a named list), kept as the "report" step of every experiment
+report_inputs_file <- "{{report_inputs_file}}"
+if (nzchar(report_inputs_file)) {
+  report_inputs <- qs_read(report_inputs_file)
+  for (experiment in names(mae)) {
+    mae[[experiment]] <- record_processing_step(mae[[experiment]], "report", settings = report_inputs,
+                                                max_bytes = 1e6)
+  }
+}
 qs_save(mae, file.path(wd, "gDR_data", "gDR_mae.qs2"))
 
 
