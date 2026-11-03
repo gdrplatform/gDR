@@ -1,3 +1,6 @@
+## gDR 1.11.23 - 2026-11-03
+* fix the processing step of PRISM level 6 reports, which failed on input without durations
+
 ## gDR 1.11.22 - 2026-11-03
 * add a `report` step to the provenance from `extra_render_params$report_inputs_file`, a list of the run's inputs
 
