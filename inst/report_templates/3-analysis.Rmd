@@ -741,7 +741,7 @@ The heatmaps display a selected metric for every drug (row) against every cell l
 # metrics
 metrics <- data.table(
   expand.grid(normalization_type = c("GR", "RV"),
-              metric = c("xc50", "x_max", "x_mean", "x_AOC", "x_AOC_range"),
+              metric = c({{{sa_metrics}}}),
               stringsAsFactors = FALSE))
 metrics$hm_title <- pmap(metrics, get_hm_title)
 
@@ -789,8 +789,10 @@ ls_data_RV <- prep_filename_path(plt_list = lapply(ls_plt_RV, "[[", "heatmap"),
                                  prefix = "data__sa_fit_heat_RV__",
                                  path_file = file.path(".", "tables"),
                                  file_format = "xlsx")
-# Since the data in the table for xc10 is not log10
-ls_data_RV[["log10(IC50)"]] <- gsub("log10\\(IC50\\)", "IC50", ls_data_RV[["log10(IC50)"]])
+# Since the data in the table for xc50 is not log10, when xc50 is drawn
+if ("log10(IC50)" %in% names(ls_data_RV)) {
+  ls_data_RV[["log10(IC50)"]] <- gsub("log10\\(IC50\\)", "IC50", ls_data_RV[["log10(IC50)"]])
+}
 plts_RV <- prep_plot_chunk(plt_list = lapply(ls_plt_RV, "[[", "heatmap"),
                            link_list = ls_link_RV,
                            dwn_list = ls_data_RV,
@@ -803,8 +805,10 @@ ls_path_data_RV <- prep_filename_path(plt_list = lapply(ls_plt_RV, "[[", "heatma
                                       prefix = "data__sa_fit_heat_RV__",
                                       path_file = file.path(wd, "tables"),
                                       file_format = "xlsx")
-# Since the data in the table for xc10 is not log10
-ls_path_data_RV[["log10(IC50)"]] <- gsub("log10\\(IC50\\)", "IC50", ls_path_data_RV[["log10(IC50)"]])
+# Since the data in the table for xc50 is not log10, when xc50 is drawn
+if ("log10(IC50)" %in% names(ls_path_data_RV)) {
+  ls_path_data_RV[["log10(IC50)"]] <- gsub("log10\\(IC50\\)", "IC50", ls_path_data_RV[["log10(IC50)"]])
+}
 # Save plots
 invisible(loop(seq_along(ls_plt_RV), function(i) {
   item <- ls_plt_RV[[i]]
@@ -844,8 +848,10 @@ ls_data_GR <- prep_filename_path(plt_list = lapply(ls_plt_GR, "[[", "heatmap"),
                                  prefix = "data__sa_fit_heat_GR__",
                                  path_file = file.path(".", "tables"),
                                  file_format = "xlsx")
-# Since the data in the table for xc10 is not log10
-ls_data_GR[["log10(GR50)"]] <- gsub("log10\\(GR50\\)", "GR50", ls_data_GR[["log10(GR50)"]])
+# Since the data in the table for xc50 is not log10, when xc50 is drawn
+if ("log10(GR50)" %in% names(ls_data_GR)) {
+  ls_data_GR[["log10(GR50)"]] <- gsub("log10\\(GR50\\)", "GR50", ls_data_GR[["log10(GR50)"]])
+}
 plts_GR <- prep_plot_chunk(plt_list = lapply(ls_plt_GR, "[[", "heatmap"),
                            link_list = ls_link_GR,
                            dwn_list = ls_data_GR,
@@ -858,8 +864,10 @@ ls_path_data_GR <- prep_filename_path(plt_list = lapply(ls_plt_GR, "[[", "heatma
                                       prefix = "data__sa_fit_heat_GR__",
                                       path_file = file.path(wd, "tables"),
                                       file_format = "xlsx")
-# Since the data in the table for xc10 is not log10
-ls_path_data_GR[["log10(GR50)"]] <- gsub("log10\\(GR50\\)", "GR50", ls_path_data_GR[["log10(GR50)"]])
+# Since the data in the table for xc50 is not log10, when xc50 is drawn
+if ("log10(GR50)" %in% names(ls_path_data_GR)) {
+  ls_path_data_GR[["log10(GR50)"]] <- gsub("log10\\(GR50\\)", "GR50", ls_path_data_GR[["log10(GR50)"]])
+}
 # Save plots
 invisible(loop(seq_along(ls_plt_GR), function(i) {
   item <- ls_plt_GR[[i]]
@@ -899,7 +907,7 @@ The boxplots show the distribution of a given metric, grouped by cell line.
 # metrics
 metrics <- data.table(
   expand.grid(normalization_type = c("GR", "RV"),
-              metric = c("xc50", "x_max", "x_mean", "x_AOC", "x_AOC_range"),
+              metric = c({{{sa_metrics}}}),
               stringsAsFactors = FALSE))
 
 ls_plt_RV <- pmap(metrics[normalization_type == "RV", ], 
@@ -989,7 +997,7 @@ These boxplots show the distribution of a given metric, grouped by drug.
 ```{r fit_data_box_d_RV, warning=FALSE, fig.show="hide"}
 metrics <- data.table(
   expand.grid(normalization_type = c("GR", "RV"),
-              metric = c("xc50", "x_max", "x_mean", "x_AOC", "x_AOC_range"),
+              metric = c({{{sa_metrics}}}),
               stringsAsFactors = FALSE))
 
 ls_plt_RV <- pmap(metrics[normalization_type == "RV", ], 
@@ -1084,7 +1092,7 @@ ls_names <-
 
 metrics <- data.table(
   expand.grid(normalization_type = c("GR", "RV"),
-              metric = c("xc50", "x_max", "x_mean", "x_AOC", "x_AOC_range"),
+              metric = c({{{sa_metrics}}}),
               stringsAsFactors = FALSE),
   named_n_mode = rep(c("bottom", "bottom", "bottom", "top", "top"), each = 2))
 ```
@@ -1437,7 +1445,7 @@ ls_plt_RV <- pmap(tab_grid,
                   heatmap_combo_metrics_panel,
                   dt_excess = response_metrics_excess,
                   dt_isobolograms = response_metrics_isobolograms,
-                  iso_levels = "0.5",
+                  iso_levels = c({{{iso_levels}}}),
                   normalization_type = "RV")
 names(ls_plt_RV) <- ls_names
 
@@ -1450,7 +1458,7 @@ ls_plt_GR <- pmap(tab_grid,
                   heatmap_combo_metrics_panel,
                   dt_excess = response_metrics_excess,
                   dt_isobolograms = response_metrics_isobolograms,
-                  iso_levels = "0.5",
+                  iso_levels = c({{{iso_levels}}}),
                   normalization_type = "GR")
 names(ls_plt_GR) <- ls_names
 
@@ -1554,7 +1562,7 @@ ls_plt_RV <- lapply(names(get_combo_excess_field_names()), function(metric) {
                  dt_excess = response_metrics_excess,
                  dt_isobolograms = response_metrics_isobolograms,
                  cl_names = cellline_name_vec,
-                 iso_levels = "0.5",
+                 iso_levels = c({{{iso_levels}}}),
                  metric = metric,
                  normalization_type = "RV")
   names(ls_plt) <- ls_names
@@ -1573,7 +1581,7 @@ ls_plt_GR <- lapply(names(get_combo_excess_field_names()), function(metric) {
                  dt_excess = response_metrics_excess,
                  dt_isobolograms = response_metrics_isobolograms,
                  cl_names = cellline_name_vec,
-                 iso_levels = "0.5",
+                 iso_levels = c({{{iso_levels}}}),
                  metric = metric,
                  normalization_type = "GR")
   names(ls_plt) <- ls_names
@@ -1780,7 +1788,7 @@ These heatmaps show the final synergy score for each drug combination (rows) acr
 ```{r fit_data_combo_viz_RV, warning=FALSE, fig.show="hide"}
 combo_metrics <- data.table(
   expand.grid(normalization_type = c("GR", "RV"),
-              metric = c("hsa_score", "bliss_score"),
+              metric = c({{{combo_score_metrics}}}),
               stringsAsFactors = FALSE))
 combo_metrics$hm_title <- pmap(combo_metrics, get_hm_title)
 
@@ -1935,7 +1943,7 @@ These boxplots show the distribution of a given metric (i.e., HSA or Bliss score
 # metrics
 metrics <- data.table(
   expand.grid(normalization_type = c("GR", "RV"),
-              metric = c("hsa_score", "bliss_score"),
+              metric = c({{{combo_score_metrics}}}),
               stringsAsFactors = FALSE))
 
 ls_plt_RV <- pmap(metrics[normalization_type == "RV", ], 
@@ -2031,7 +2039,7 @@ These boxplots show the distribution of a given metric (i.e., HSA or Bliss score
 # metrics
 metrics <- data.table(
   expand.grid(normalization_type = c("GR", "RV"),
-              metric = c("hsa_score", "bliss_score"),
+              metric = c({{{combo_score_metrics}}}),
               stringsAsFactors = FALSE))
 
 ls_plt_RV <- pmap(metrics[normalization_type == "RV", ], 
@@ -2138,7 +2146,7 @@ ls_names <- vapply(ls_names, function(i) escape_special_characters(i),
 response_metrics_scores_short <- 
   copy(response_metrics_scores)[, CellLineName := sub("_.*", "", CellLineName)]
 
-ls_plt_RV <- lapply(c("hsa_score", "bliss_score"), function(metric) {
+ls_plt_RV <- lapply(c({{{combo_score_metrics}}}), function(metric) {
   ls_ <- pmap(tab_grid, function(DrugName, DrugName_2) {
     plot_boxplot_metric_combo_by_grp(
       dt_scores = response_metrics_scores_short,
@@ -2160,7 +2168,7 @@ names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_ti
 
 {{#PRISM_excluded}}
 ```{r fit_data_combo_box_t_RV_vis, warning=FALSE, fig.show="hide"}
-ls_plt_RV <- lapply(c("hsa_score", "bliss_score"), function(metric) {
+ls_plt_RV <- lapply(c({{{combo_score_metrics}}}), function(metric) {
   ls_ <- pmap(tab_grid, function(DrugName, DrugName_2) {
     plot_boxplot_metric_combo_by_grp(
       dt_scores = response_metrics_scores,
@@ -2188,7 +2196,7 @@ names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_ti
 response_metrics_scores_short <- 
   copy(response_metrics_scores)[, CellLineName := sub("_.*", "", CellLineName)]
 
-ls_plt_GR <- lapply(c("hsa_score", "bliss_score"), function(metric) {
+ls_plt_GR <- lapply(c({{{combo_score_metrics}}}), function(metric) {
   ls_ <- pmap(tab_grid, function(DrugName, DrugName_2) {
     plot_boxplot_metric_combo_by_grp(
       dt_scores = response_metrics_scores_short,
@@ -2210,7 +2218,7 @@ names(ls_plt_GR) <- unlist(pmap(metrics[normalization_type == "GR", ], get_hm_ti
 
 {{#PRISM_excluded}}
 ```{r fit_data_combo_box_t_GR_vis, warning=FALSE, fig.show="hide"}
-ls_plt_GR <- lapply(c("hsa_score", "bliss_score"), function(metric) {
+ls_plt_GR <- lapply(c({{{combo_score_metrics}}}), function(metric) {
   ls_ <- pmap(tab_grid, function(DrugName, DrugName_2) {
     plot_boxplot_metric_combo_by_grp(
       dt_scores = response_metrics_scores,

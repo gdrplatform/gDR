@@ -145,7 +145,16 @@ signature of this function. Values are also persisted in \code{args.qs2}. Names 
 with parameters computed by this function are dropped with a warning. One entry is read by
 the templates themselves: \code{report_inputs_file}, the path to a qs2 file with a named list
 of plain data describing the inputs of the run, which the processing step records as the
-\code{"report"} step in the provenance of every experiment. Default is an empty list.}
+\code{"report"} step in the provenance of every experiment. Others select what the analysis
+step draws; each one left out keeps everything:
+\itemize{
+\item \code{sa_metrics}: single-agent metrics of the heatmaps and boxplots, from
+\code{"xc50"}, \code{"x_max"}, \code{"x_mean"}, \code{"x_AOC"}, \code{"x_AOC_range"};
+\item \code{combo_score_metrics}: combination scores of the heatmaps and boxplots, from
+\code{"hsa_score"}, \code{"bliss_score"};
+\item \code{iso_levels}: effect levels of the isobolograms, default \code{"0.5"}.
+}
+Default is an empty list.}
 
 \item{on_resolve_inputs}{Function or NULL. Hook called before the data type is determined,
 used to resolve input paths from an external source. It receives \code{args} (the list of

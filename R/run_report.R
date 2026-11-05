@@ -123,7 +123,16 @@
 #'   with parameters computed by this function are dropped with a warning. One entry is read by
 #'   the templates themselves: \code{report_inputs_file}, the path to a qs2 file with a named list
 #'   of plain data describing the inputs of the run, which the processing step records as the
-#'   \code{"report"} step in the provenance of every experiment. Default is an empty list.
+#'   \code{"report"} step in the provenance of every experiment. Others select what the analysis
+#'   step draws; each one left out keeps everything:
+#'   \itemize{
+#'     \item \code{sa_metrics}: single-agent metrics of the heatmaps and boxplots, from
+#'       \code{"xc50"}, \code{"x_max"}, \code{"x_mean"}, \code{"x_AOC"}, \code{"x_AOC_range"};
+#'     \item \code{combo_score_metrics}: combination scores of the heatmaps and boxplots, from
+#'       \code{"hsa_score"}, \code{"bliss_score"};
+#'     \item \code{iso_levels}: effect levels of the isobolograms, default \code{"0.5"}.
+#'   }
+#'   Default is an empty list.
 #' @param on_resolve_inputs Function or NULL. Hook called before the data type is determined,
 #'   used to resolve input paths from an external source. It receives \code{args} (the list of
 #'   input arguments) and \code{extra_render_params}, and must return a list with exactly these
@@ -595,7 +604,8 @@ assert_report_args <- function(args) {
 #' @param on_resolve_inputs,on_before_render Function or NULL, as in \code{run_report()}.
 #'
 #' @return A list with the validated arguments (\code{args}), the resolved
-#'   \code{extra_render_params}, \code{data_type}, \code{steps}, \code{mae}, \code{mae_path},
+#'   \code{extra_render_params} without the analysis selections, the resolved
+#'   \code{analysis_params}, \code{data_type}, \code{steps}, \code{mae}, \code{mae_path},
 #'   \code{is_prism_data}, and the step files in render order (\code{rmd_files}) with their
 #'   \code{template_paths} and \code{output_paths}.
 #' @keywords internal
@@ -626,6 +636,10 @@ prepare_report_steps <- function(args,
     args <- resolved$args
     extra_render_params <- resolved$extra_render_params
   }
+
+  # Validated before anything is staged; they reach the templates as computed parameters, so
+  # they are taken out of the deployment-specific ones
+  analysis_params <- resolve_analysis_params(extra_render_params)
 
   data_type <- determine_data_type(args, output_dir)
 
@@ -742,7 +756,8 @@ prepare_report_steps <- function(args,
 
   list(
     args = processed_args,
-    extra_render_params = extra_render_params,
+    extra_render_params = extra_render_params[setdiff(names(extra_render_params), names(analysis_params))],
+    analysis_params = analysis_params,
     data_type = data_type,
     steps = steps,
     mae = mae,
@@ -799,6 +814,7 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
       PRISM_excluded = !plan$is_prism_data,
       MAE = (data_type == "mae")
     ),
+    lapply(plan$analysis_params, format_vector_for_rmd),
     prepare_dynamic_render_params(data_type, plan$mae, output_dir, plan$steps)
   )
 
