@@ -1,3 +1,6 @@
+## gDR 1.11.25 - 2026-11-05
+* add selections of metrics, synergy scores, isobologram levels, sections and normalization types to the report
+
 ## gDR 1.11.24 - 2026-11-05
 * add `build_report_rmd()`, which writes the `.Rmd` files of a report without rendering them
 
