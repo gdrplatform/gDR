@@ -843,3 +843,84 @@ test_that("prepare_dynamic_render_params handles input without durations, as in 
   params <- gDR:::prepare_dynamic_render_params("prism_6", NULL, output_dir, c(1, 2, 3))
   expect_false(params$plot_GR_values)
 })
+
+# --- Tests for build_report_rmd ---
+
+# Runs run_report() with the render call stubbed out and returns the .Rmd files it wrote.
+.rmd_written_by_run_report <- function(output_dir, ...) {
+  test_fn <- run_report
+  mockery::stub(test_fn, "rmarkdown::render", TRUE)
+  test_fn(output_dir = output_dir, ...)
+  list.files(file.path(output_dir, "current"), pattern = "\\.Rmd$", full.names = TRUE)
+}
+
+test_that("build_report_rmd writes the same .Rmd files as run_report", {
+  templates <- system.file("report_templates", package = "gDR")
+  mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small.qs2")
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  cases <- list(
+    mae = list(mae = mae, steps = 3),
+    long_table = list(long_table = long_table, steps = 1)
+  )
+  for (case in names(cases)) {
+    out <- withr::local_tempdir()
+    expected <- do.call(.rmd_written_by_run_report, c(list(out, rmd_template_path = templates), cases[[case]]))
+    expected <- stats::setNames(lapply(expected, readLines), basename(expected))
+
+    # resume writes into the directory run_report() used, so the paths in the documents match
+    rmd <- do.call(
+      build_report_rmd,
+      c(list(output_dir = out, rmd_template_path = templates, resume = TRUE), cases[[case]])
+    )
+    expect_length(rmd, length(expected))
+    expect_equal(stats::setNames(lapply(rmd, readLines), basename(rmd)), expected, info = case)
+  }
+})
+
+test_that("build_report_rmd returns the written steps in render order and renders nothing", {
+  out <- withr::local_tempdir()
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  expect_warning(
+    rmd <- build_report_rmd(long_table = long_table, output_dir = out, rmd_template_path = template_dir),
+    "Write one step at a time"
+  )
+  expect_named(rmd, c("1-data_import", "2-processing_and_QC", "3-analysis"))
+  expect_equal(dirname(rmd), rep(file.path(out, "v1"), 3), ignore_attr = TRUE)
+  expect_true(all(file.exists(rmd)))
+  expect_length(list.files(out, pattern = "\\.html$", recursive = TRUE), 0)
+  # 'current' is left to the run that renders the report
+  expect_false(file.exists(file.path(out, "current")))
+})
+
+test_that("build_report_rmd refuses the publication step", {
+  out <- withr::local_tempdir()
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+
+  expect_error(
+    build_report_rmd(manifest = "manifest.xlsx", output_dir = out, rmd_template_path = template_dir, steps = 3:4),
+    "steps 1 to 3 only"
+  )
+  expect_length(list.files(out), 0)
+})
+
+test_that("build_report_rmd removes the output directory it created when it fails", {
+  out <- withr::local_tempdir()
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+  unlink(file.path(template_dir, "1-data_import.Rmd"))
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  expect_error(
+    build_report_rmd(long_table = long_table, output_dir = out, rmd_template_path = template_dir, steps = 1),
+    "not available in this installation"
+  )
+  expect_false(dir.exists(file.path(out, "v1")))
+})

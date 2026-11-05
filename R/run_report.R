@@ -418,6 +418,125 @@ run_report <- function(
   })
 }
 
+#' Write the RMarkdown documents of a gDR report without rendering them
+#'
+#' Does everything \code{run_report()} does up to the render call: it creates the versioned
+#' output directory, stages and validates the inputs, and writes the parameterised \code{.Rmd} of
+#' each requested step into that directory. The documents are self-contained, so rendering one
+#' with \code{rmarkdown::render()} gives the same report as \code{run_report()}. Use it to inspect
+#' or edit a report before a long render, or to render it elsewhere.
+#'
+#' Only steps 1 to 3 are written. The publication step publishes when it is rendered, and the
+#' checks that guard it belong to the caller that runs it, so it is left to \code{run_report()}.
+#'
+#' The parameters of a step are partly read from the data that rendering the previous step
+#' writes. With several steps requested, the documents after the first are written before that
+#' data exists and can differ from what \code{run_report()} renders; write one step at a time,
+#' rendering each before writing the next, or use \code{run_report()}.
+#'
+#' @inheritParams run_report
+#' @param steps Integer vector. Steps to write, within \code{1:3}:
+#'  1: data import, 2: processing and QC, 3: analysis. Default is \code{1:3}.
+#'  If \code{mae} is provided, steps 1 and 2 are skipped.
+#' @param resume Logical. Whether to write into the existing 'current' output directory instead of
+#'   creating a new version, e.g. to write step 3 after step 2 was rendered. Default is \code{FALSE}.
+#'
+#' @return Named character vector of the paths of the written \code{.Rmd} files, in render order,
+#'   named after the steps (e.g. \code{"3-analysis"}).
+#' @keywords report
+#' @export
+#' @examples
+#'
+#' \dontrun{
+#' rmd <- build_report_rmd(
+#'   mae = "path/to/mae.qs2",
+#'   output_dir = "~/test_report_mae",
+#'   rmd_template_path = "path/to/report_templates"
+#' )
+#' rmarkdown::render(rmd[["3-analysis"]])
+#' }
+build_report_rmd <- function(
+    qcs_id = NULL,
+    long_table = NULL,
+    manifest = NULL,
+    treatment = NULL,
+    raw_data = NULL,
+    prism_data_path = NULL,
+    cell_line_data_path = NULL,
+    treatment_data_path = NULL,
+    drug_annotation_path = NULL,
+    cell_line_annotation_path = NULL,
+    meta_data_path = NULL,
+    feat_data_path = NULL,
+    feature_sets = c(
+      "CRISPRGeneEffect",
+      "OmicsExpressionProteinCodingGenesTPMLogp1",
+      "OmicsSomaticMutationsMatrixHotspot",
+      "OmicsSomaticMutationsMatrixDamaging",
+      "OmicsCNGene"
+    ),
+    metadata_columns = c(
+      "OncotreeLineage",
+      "PatientRace"
+    ),
+    output_dir,
+    viz_format = "svg",
+    rmd_template_path,
+    steps = seq_len(3),
+    mae = NULL,
+    special_sections = NULL,
+    verbose_mode = FALSE,
+    with_decoding = TRUE,
+    dpi = 96,
+    embed = TRUE,
+    configuration_file_path = NULL,
+    resume = FALSE,
+    extra_render_params = list(),
+    on_resolve_inputs = NULL
+) {
+  checkmate::assert_list(extra_render_params, names = "unique")
+  checkmate::assert_function(on_resolve_inputs, null.ok = TRUE)
+
+  args <- as.list(environment())
+  args[c("extra_render_params", "on_resolve_inputs")] <- NULL
+  assert_report_args(args)
+  if (!all(steps %in% 1:3)) {
+    stop(
+      "build_report_rmd() writes steps 1 to 3 only. The publication step (4) publishes when it is ",
+      "rendered; run it with run_report()."
+    )
+  }
+
+  env <- setup_run_environment(output_dir, verbose_mode, resume)
+  # nothing is rendered, so nothing is logged
+  close(env$stdout_con)
+  close(env$stderr_con)
+
+  done <- FALSE
+  on.exit({
+    if (!done && !resume) {
+      unlink(env$output_dir, recursive = TRUE, force = TRUE)
+    }
+  })
+
+  plan <- prepare_report_steps(args, extra_render_params, env$output_dir, on_resolve_inputs = on_resolve_inputs)
+  if (length(plan$steps) > 1) {
+    warning(
+      "Steps after the first are written before the earlier steps have been rendered, so their ",
+      "parameters can differ from what run_report() renders. Write one step at a time, or use ",
+      "run_report()."
+    )
+  }
+
+  warned_shadowed <- character(0)
+  for (i in seq_along(plan$template_paths)) {
+    warned_shadowed <- write_report_step(plan, i, env$output_dir, warned_shadowed)
+  }
+
+  done <- TRUE
+  stats::setNames(plan$output_paths, tools::file_path_sans_ext(plan$rmd_files))
+}
+
 #' Assert the input arguments of a report run
 #'
 #' @param args Named list of the input arguments of \code{run_report()}.
