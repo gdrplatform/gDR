@@ -41,3 +41,48 @@ test_that("the analysis selections reach the templates without a shadowing warni
     c('sa <- c("x_mean"); combo <- c("hsa_score",', '  "bliss_score"); iso <- c("0.25")')
   )
 })
+
+test_that("resolve_analysis_params lets the report leave out GR but not RV", {
+  expect_equal(resolve_analysis_params(list(norm_types = "RV"))$norm_types, "RV")
+  expect_error(resolve_analysis_params(list(norm_types = "GR")), "must include \"RV\"")
+})
+
+test_that("analysis_section_flags shows the selected sections and GR only with GR data", {
+  all_on <- analysis_section_flags(resolve_analysis_params(list()), plot_GR_values = TRUE)
+  expect_true(all(unlist(all_on)))
+  expect_false(analysis_section_flags(resolve_analysis_params(list()), plot_GR_values = NULL)$plot_GR)
+
+  flags <- analysis_section_flags(
+    resolve_analysis_params(list(plots_to_generate = "combo_boxplot_cl", norm_types = "RV")),
+    plot_GR_values = TRUE
+  )
+  expect_true(flags$show_combo_boxplot_cl)
+  expect_true(flags$show_combo_fitted_metrics)
+  expect_false(flags$show_sa_fitted_metrics)
+  expect_false(flags$show_sa_heatmap)
+  expect_false(flags$plot_GR)
+})
+
+test_that("each section flag of the analysis template removes its own section", {
+  template <- readLines(system.file("report_templates", "3-analysis.Rmd", package = "gDR"))
+  tags <- unique(gsub("\\{\\{\\{?[#^/]?|\\}?\\}\\}", "",
+                      unlist(regmatches(template, gregexpr("\\{\\{\\{?[#^/]?[A-Za-z_]+\\}?\\}\\}", template)))))
+  all_on <- as.list(stats::setNames(rep(TRUE, length(tags)), tags))
+  full <- whisker::whisker.render(template, all_on)
+
+  headings <- c(
+    show_sa_drc_by_cl = "## Data Analysis - Dose-response Curves by Cell Lines - Single-Agent Data",
+    show_combo_metrics_panel = "## Data Analysis - Metrics Heatmap for Combination Data",
+    show_combo_isoref = "## Data Analysis - Reference Isobolograms for Combination Data"
+  )
+  for (flag in names(headings)) {
+    expect_true(grepl(headings[[flag]], full, fixed = TRUE))
+    off <- all_on
+    off[[flag]] <- FALSE
+    expect_false(grepl(headings[[flag]], whisker::whisker.render(template, off), fixed = TRUE), info = flag)
+  }
+  # every section flag the code computes is used by the template, and the other way round
+  shows <- grep("^show_", tags, value = TRUE)
+  expect_setequal(shows, grep("^show_", names(analysis_section_flags(resolve_analysis_params(list()), TRUE)),
+                              value = TRUE))
+})

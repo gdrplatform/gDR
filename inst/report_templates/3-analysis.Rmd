@@ -393,6 +393,7 @@ response_metrics_combo_capped <-
 
 {{/has_combo}}
 
+{{#show_sa_drc_by_drug}}
 {{#PRISM_excluded}}
 
 ## Data Analysis - Dose-response Curves by Drugs - Single-Agent Data {.tabset .tabset-fade .tabset-pills}
@@ -430,7 +431,7 @@ if ({{verbose_mode}}) {
 
 ```
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r fit_data_curv_cl_viz_GR, warning=FALSE, fig.show="hide"}
 if ({{verbose_mode}}) {
@@ -456,7 +457,7 @@ if ({{verbose_mode}}) {
 
 ```
 
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 ::: {.fullwidth}
 
@@ -494,7 +495,7 @@ invisible(loop(seq_along(ls_plts), function(x) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 ::: {.fullwidth}
 
 ### GR Value {.tabset .tabset-dropdown}
@@ -530,7 +531,7 @@ invisible(loop(seq_along(ls_plts), function(x) {
 
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
 {{/PRISM_excluded}}
 
 {{#PRISM}}
@@ -557,7 +558,7 @@ names(ls_heat_d_RV) <- vapply(drug_name_vec, function(i) escape_special_characte
 
 ```
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r fit_data_curv_cl_viz_GR, warning=FALSE, fig.show="hide"}
 ls_heat_d_GR <- loop(drug_name_vec, function(nm) {
@@ -572,7 +573,7 @@ names(ls_heat_d_GR) <- vapply(drug_name_vec, function(i) escape_special_characte
 
 ```
 
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 ::: {.fullwidth}
 
@@ -601,7 +602,7 @@ invisible(loop(seq_along(ls_heat_d_RV), function(x) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 ::: {.fullwidth}
 
 ### GR Value {.tabset .tabset-dropdown}
@@ -628,9 +629,11 @@ invisible(loop(seq_along(ls_heat_d_GR), function(x) {
 
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
 {{/PRISM}}
+{{/show_sa_drc_by_drug}}
 
+{{#show_sa_drc_by_cl}}
 ## Data Analysis - Dose-response Curves by Cell Lines - Single-Agent Data {.tabset .tabset-fade .tabset-pills}
 
 Here, each plot displays a single **cell line** tested against all **drugs**. This format is useful for understanding the sensitivity profile of a particular cell line and identifying its vulnerabilities.
@@ -655,7 +658,7 @@ names(ls_curv_RV) <- vapply(names(ls_curv_RV), function(i) escape_special_charac
 
 ```
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r fit_data_curv_d_viz_GR, warning=FALSE, fig.show="hide"}
 ls_curv_GR <- plot_dose_response_sa_by_drugs(dt_metrics = response_metrics_sa, 
@@ -668,7 +671,7 @@ names(ls_curv_GR) <- vapply(names(ls_curv_GR), function(i) escape_special_charac
 
 ```
 
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 ::: {.fullwidth}
 
@@ -697,7 +700,7 @@ invisible(loop(seq_along(ls_curv_RV), function(x) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 ::: {.fullwidth}
 
 ### GR Value {.tabset .tabset-dropdown}
@@ -724,13 +727,17 @@ invisible(loop(seq_along(ls_curv_GR), function(x) {
 
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
 {{/verbose_mode}}
+{{/show_sa_drc_by_cl}}
 
+{{#show_sa_fitted_metrics}}
 ## Data Analysis of Fitted Metrics - Single-Agent Data
 
 The following plots summarize the key metrics calculated from the curve fits (e.g., IC50, GR_AOC). They provide a high-level, global overview of the drug response landscape.
+{{/show_sa_fitted_metrics}}
 
+{{#show_sa_heatmap}}
 ### Heatmaps {.tabset .tabset-fade .tabset-pills}
 
 The heatmaps display a selected metric for every drug (row) against every cell line (column). Rows and columns are clustered to group similar response profiles.
@@ -762,7 +769,7 @@ names(ls_plt_RV) <- metrics[normalization_type == "RV", ]$hm_title
 
 ```
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r fit_data_heat_GR, warning=FALSE, fig.show="hide"}
 ls_plt_GR <- pmap(metrics[normalization_type == "GR", ], 
@@ -776,7 +783,7 @@ names(ls_plt_GR) <- metrics[normalization_type == "GR", ]$hm_title
 
 ```
 
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 #### Relative Viability {.tabset}
 
@@ -835,7 +842,7 @@ invisible(loop(seq_along(ls_plt_RV), function(i) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 #### GR Value {.tabset}
 
@@ -893,8 +900,10 @@ invisible(loop(seq_along(ls_plt_GR), function(i) {
 ::: {.fullwidth}
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
+{{/show_sa_heatmap}}
 
+{{#show_sa_boxplot_cl}}
 {{#PRISM_excluded}}
 
 ### Boxplots by Cell Lines {.tabset .tabset-fade .tabset-pills}
@@ -918,7 +927,7 @@ names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_ti
 
 ```
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r fit_data_box_cl_GR, warning=FALSE, fig.show="hide"}
 ls_plt_GR <- pmap(metrics[normalization_type == "GR", ], 
@@ -929,7 +938,7 @@ names(ls_plt_GR) <- unlist(pmap(metrics[normalization_type == "GR", ], get_hm_ti
 
 ```
 
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 #### Relative Viability {.tabset}
 
@@ -958,7 +967,7 @@ invisible(loop(seq_along(ls_plt_RV), function(x) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 #### GR Value {.tabset}
 
@@ -985,9 +994,11 @@ invisible(loop(seq_along(ls_plt_GR), function(x) {
 ::: {.fullwidth}
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
 {{/PRISM_excluded}}
+{{/show_sa_boxplot_cl}}
 
+{{#show_sa_boxplot_drug}}
 ### Boxplots by Drugs {.tabset .tabset-fade .tabset-pills}
 
 These boxplots show the distribution of a given metric, grouped by drug.
@@ -1008,7 +1019,7 @@ names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_ti
 
 ```
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r fit_data_box_d_GR, warning=FALSE, fig.show="hide"}
 ls_plt_GR <- pmap(metrics[normalization_type == "GR", ], 
@@ -1019,7 +1030,7 @@ names(ls_plt_GR) <- unlist(pmap(metrics[normalization_type == "GR", ], get_hm_ti
 
 ```
 
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 #### Relative Viability {.tabset}
 
@@ -1047,7 +1058,7 @@ invisible(loop(seq_along(ls_plt_RV), function(x) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 #### GR Value {.tabset}
 
@@ -1074,8 +1085,10 @@ invisible(loop(seq_along(ls_plt_GR), function(x) {
 ::: {.fullwidth}
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
+{{/show_sa_boxplot_drug}}
 
+{{#show_sa_boxplot_tissue}}
 ### Boxplots by Tissue {.tabset .tabset-fade .tabset-pills}
 
 The boxplots show the distribution of a given metric, grouped by tissue.
@@ -1093,8 +1106,9 @@ ls_names <-
 metrics <- data.table(
   expand.grid(normalization_type = c("GR", "RV"),
               metric = c({{{sa_metrics}}}),
-              stringsAsFactors = FALSE),
-  named_n_mode = rep(c("bottom", "bottom", "bottom", "top", "top"), each = 2))
+              stringsAsFactors = FALSE))
+# the areas name the most sensitive groups from the top, the other metrics from the bottom
+metrics$named_n_mode <- ifelse(metrics$metric %in% c("x_AOC", "x_AOC_range"), "top", "bottom")
 ```
 {{#PRISM}}
 ```{r fit_data_box_t_RV_viz_PRISM, warning=FALSE, fig.show="hide"}
@@ -1146,7 +1160,7 @@ names(ls_plt_RV) <-
 ```
 {{/PRISM_excluded}}
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 {{#PRISM}}
 ```{r fit_data_box_t_GR_viz_PRISM, warning=FALSE, fig.show="hide"}
 metrics_GR <- metrics[normalization_type == "GR", ]
@@ -1192,7 +1206,7 @@ names(ls_plt_GR) <-
   unlist(pmap(metrics_GR[, .(metric, normalization_type)], get_hm_title))
 ```
 {{/PRISM_excluded}}
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 #### Relative Viability {.tabset}
 
@@ -1220,7 +1234,7 @@ invisible(loop(seq_along(plot_plan$plt), function(i) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 #### GR Value {.tabset}
 
 ```{r fit_data_tab_box_t_GR, warning=FALSE, echo=FALSE}
@@ -1246,10 +1260,12 @@ invisible(loop(seq_along(plot_plan$plt), function(i) {
 ::: {.fullwidth}
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
+{{/show_sa_boxplot_tissue}}
 
 
 {{#has_combo}}
+{{#show_combo_drc}}
 ## Data Analysis - Dose-response Curves by Cell Lines - Combination Data {.tabset .tabset-fade .tabset-pills}
 
 These plots show the dose-response surface for each drug combination within a given cell line. Each small panel shows the dose-response curve for the first drug at a fixed concentration of the second drug.
@@ -1301,7 +1317,7 @@ if ({{verbose_mode}}) {
 
 ```
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r fit_data_combo_curv_cl_viz_RV, warning=FALSE, fig.show="hide"}
 if ({{verbose_mode}}) {
@@ -1336,7 +1352,7 @@ if ({{verbose_mode}}) {
 
 ```
 
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 ::: {.fullwidth}
 
@@ -1374,7 +1390,7 @@ invisible(loop(seq_along(ls_plts), function(x) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 ::: {.fullwidth}
 
 ### GR Value {.tabset .tabset-dropdown}
@@ -1410,11 +1426,13 @@ invisible(loop(seq_along(ls_plts), function(x) {
 
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
+{{/show_combo_drc}}
 
 {{#PRISM_excluded}}
 {{#plot_iso}}
 
+{{#show_combo_metrics_panel}}
 ## Data Analysis - Metrics Heatmap for Combination Data {.tabset .tabset-fade .tabset-pills}
 
 This section visualizes the synergy results for each drug combination in each cell line. The 2x2 panel of plots provides a comprehensive view of the interaction, combining the measured response, calculated synergy scores, isobolograms, and the Combination Index.
@@ -1451,7 +1469,7 @@ names(ls_plt_RV) <- ls_names
 
 ```
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r fit_data_combo_heat_viz_GR, warning=FALSE, fig.show="hide"}
 ls_plt_GR <- pmap(tab_grid,
@@ -1464,7 +1482,7 @@ names(ls_plt_GR) <- ls_names
 
 ```
 
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 ::: {.fullwidth}
 
@@ -1493,7 +1511,7 @@ invisible(loop(seq_along(ls_plt_RV), function(x) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 ::: {.fullwidth}
 
 ### GR Value {.tabset .tabset-dropdown}
@@ -1520,9 +1538,11 @@ invisible(loop(seq_along(ls_plt_GR), function(x) {
 
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
 {{/verbose_mode}}
+{{/show_combo_metrics_panel}}
 
+{{#show_combo_isoref}}
 ## Data Analysis - Reference Isobolograms for Combination Data {.tabset}
 
 This section provides a detailed comparison of synergy for each drug combination across all tested cell lines. The plots are organized by synergy metric (e.g., Smooth response, HSA Excess, Bliss Excess). Each plot panel shows the synergy heatmaps for one drug combination across multiple cell lines, making it easy to spot differences in response.
@@ -1572,7 +1592,7 @@ names(ls_plt_RV) <- names(get_combo_excess_field_names())
 
 ```
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r fit_data_combo_iso_viz_GR, warning=FALSE, fig.show="hide"}
 ls_plt_GR <- lapply(names(get_combo_excess_field_names()), function(metric) {
@@ -1591,7 +1611,7 @@ names(ls_plt_GR) <- names(get_combo_excess_field_names())
 
 ```
 
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 ### Smooth {.tabset .tabset-fade .tabset-pills}
 
@@ -1622,7 +1642,7 @@ invisible(loop(seq_along(ls_plt_RV$smooth), function(x) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 ::: {.fullwidth}
 
 #### GR Value {.tabset .tabset-dropdown}
@@ -1649,7 +1669,7 @@ invisible(loop(seq_along(ls_plt_GR$smooth), function(x) {
 
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 ### HSA Excess {.tabset .tabset-fade .tabset-pills}
 
@@ -1680,7 +1700,7 @@ invisible(loop(seq_along(ls_plt_RV$hsa_excess), function(x) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 ::: {.fullwidth}
 
 #### GR Value {.tabset .tabset-dropdown}
@@ -1707,7 +1727,7 @@ invisible(loop(seq_along(ls_plt_GR$hsa_excess), function(x) {
 
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 ### Bliss Excess {.tabset .tabset-fade .tabset-pills}
 
@@ -1738,7 +1758,7 @@ invisible(loop(seq_along(ls_plt_RV$bliss_excess), function(x) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 ::: {.fullwidth}
 
 #### GR Value {.tabset .tabset-dropdown}
@@ -1765,14 +1785,18 @@ invisible(loop(seq_along(ls_plt_GR$bliss_excess), function(x) {
 
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
+{{/show_combo_isoref}}
 {{/plot_iso}}
 {{/PRISM_excluded}}
 
+{{#show_combo_fitted_metrics}}
 ## Data Analysis of Fitted Metrics - Combination Data
 
 These plots provide a high-level summary of the final synergy scores (e.g., Bliss Score, HSA Score) to help identify the most interesting combinations and cell lines from the screen.
+{{/show_combo_fitted_metrics}}
 
+{{#show_combo_heatmap}}
 ### Heatmaps {.tabset .tabset-fade .tabset-pills}
 
 These heatmaps show the final synergy score for each drug combination (rows) across all cell lines (columns).
@@ -1809,7 +1833,7 @@ names(ls_plt_RV) <- combo_metrics[normalization_type == "RV", ]$hm_title
 
 ```
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r fit_data_combo_viz_GR, warning=FALSE, fig.show="hide"}
 ls_plt_GR <- pmap(combo_metrics[normalization_type == "GR", ], 
@@ -1822,7 +1846,7 @@ names(ls_plt_GR) <- combo_metrics[normalization_type == "GR", ]$hm_title
 
 ```
 
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 #### Relative Viability {.tabset}
 
@@ -1873,7 +1897,7 @@ invisible(loop(seq_along(ls_plt_RV), function(i) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 ::: {.fullwidth}
 
 #### GR Value {.tabset}
@@ -1923,8 +1947,10 @@ invisible(loop(seq_along(ls_plt_GR), function(i) {
 
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
+{{/show_combo_heatmap}}
 
+{{#show_combo_boxplot_cl}}
 {{#PRISM_excluded}}
 
 ### Boxplots by Cell Lines {.tabset .tabset-fade .tabset-pills}
@@ -1954,7 +1980,7 @@ names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_ti
 
 ```
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r fit_data_combo_box_cl_GR, warning=FALSE, fig.show="hide"}
 ls_plt_GR <- pmap(metrics[normalization_type == "GR", ], 
@@ -1965,7 +1991,7 @@ names(ls_plt_GR) <- unlist(pmap(metrics[normalization_type == "GR", ], get_hm_ti
 
 ```
 
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 #### Relative Viability {.tabset}
 
@@ -1993,7 +2019,7 @@ invisible(loop(seq_along(ls_plt_RV), function(x) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 #### GR Value {.tabset}
 
@@ -2020,9 +2046,11 @@ invisible(loop(seq_along(ls_plt_GR), function(x) {
 ::: {.fullwidth}
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
 {{/PRISM_excluded}}
+{{/show_combo_boxplot_cl}}
 
+{{#show_combo_boxplot_drug}}
 ### Boxplots by Drugs {.tabset .tabset-fade .tabset-pills}
 
 These boxplots show the distribution of a given metric (i.e., HSA or Bliss score) across all cell lines, grouped by each drug or drug combination.
@@ -2050,7 +2078,7 @@ names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_ti
 
 ```
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r fit_data_combo_box_d_GR, warning=FALSE, fig.show="hide"}
 ls_plt_GR <- pmap(metrics[normalization_type == "GR", ], 
@@ -2061,7 +2089,7 @@ names(ls_plt_GR) <- unlist(pmap(metrics[normalization_type == "GR", ], get_hm_ti
 
 ```
 
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 #### Relative Viability {.tabset}
 
@@ -2089,7 +2117,7 @@ invisible(loop(seq_along(ls_plt_RV), function(x) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 #### GR Value {.tabset}
 
@@ -2116,8 +2144,10 @@ invisible(loop(seq_along(ls_plt_GR), function(x) {
 ::: {.fullwidth}
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
+{{/show_combo_boxplot_drug}}
 
+{{#show_combo_boxplot_tissue}}
 ### Boxplots by Tissue {.tabset .tabset-fade .tabset-pills}
 
 These boxplots show the distribution of a given metric (i.e., HSA or Bliss score) across all treatments, grouped by each tissue.
@@ -2131,7 +2161,13 @@ These boxplots show the distribution of a given metric (i.e., HSA or Bliss score
 * **Identify Outliers:** Individual points outside the whiskers can highlight a specific drug that has an exceptionally strong (or weak) effect on that tissue compared to the others.
 
 ```{r fit_data_combo_box_t_RV, warning=FALSE}
-tab_grid <- 
+# metrics
+metrics <- data.table(
+  expand.grid(normalization_type = c("GR", "RV"),
+              metric = c({{{combo_score_metrics}}}),
+              stringsAsFactors = FALSE))
+
+tab_grid <-
   unique(response_metrics_scores[, .SD, .SDcols = c("DrugName", "DrugName_2")])
 setorder(tab_grid)
 
@@ -2189,7 +2225,7 @@ names(ls_plt_RV) <- unlist(pmap(metrics[normalization_type == "RV", ], get_hm_ti
 {{/PRISM_excluded}}
 
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 {{#PRISM}}
 ```{r fit_data_combo_box_t_GR_vis_PRISM, warning=FALSE, fig.show="hide"}
 # shorten CellLineName
@@ -2237,7 +2273,7 @@ ls_plt_GR <- lapply(c({{{combo_score_metrics}}}), function(metric) {
 names(ls_plt_GR) <- unlist(pmap(metrics[normalization_type == "GR", ], get_hm_title))
 ```
 {{/PRISM_excluded}}
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 #### Relative Viability {.tabset}
 
@@ -2265,7 +2301,7 @@ invisible(loop(seq_along(plot_plan$plt), function(i) {
 `r knitr::knit(text = unlist(plts_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 #### GR Value {.tabset}
 
 ```{r fit_data_comb_tab_box_t_GR, warning=FALSE, echo=FALSE}
@@ -2291,7 +2327,8 @@ invisible(loop(seq_along(plot_plan$plt), function(i) {
 ::: {.fullwidth}
 `r knitr::knit(text = unlist(plts_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
+{{/show_combo_boxplot_tissue}}
 {{/has_combo}}
 
 # Conclusion

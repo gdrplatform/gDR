@@ -152,7 +152,13 @@ step draws; each one left out keeps everything:
 \code{"xc50"}, \code{"x_max"}, \code{"x_mean"}, \code{"x_AOC"}, \code{"x_AOC_range"};
 \item \code{combo_score_metrics}: combination scores of the heatmaps and boxplots, from
 \code{"hsa_score"}, \code{"bliss_score"};
-\item \code{iso_levels}: effect levels of the isobolograms, default \code{"0.5"}.
+\item \code{iso_levels}: effect levels of the isobolograms, default \code{"0.5"};
+\item \code{norm_types}: normalization types, \code{"RV"} alone leaves out the GR sections;
+\item \code{plots_to_generate}: sections of the report, from \code{"sa_drc_by_drug"},
+\code{"sa_drc_by_cl"}, \code{"sa_heatmap"}, \code{"sa_boxplot_cl"},
+\code{"sa_boxplot_drug"}, \code{"sa_boxplot_tissue"}, \code{"combo_drc"},
+\code{"combo_metrics_panel"}, \code{"combo_isoref"}, \code{"combo_heatmap"},
+\code{"combo_boxplot_cl"}, \code{"combo_boxplot_drug"}, \code{"combo_boxplot_tissue"}.
 }
 Default is an empty list.}
 

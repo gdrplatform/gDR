@@ -130,7 +130,13 @@
 #'       \code{"xc50"}, \code{"x_max"}, \code{"x_mean"}, \code{"x_AOC"}, \code{"x_AOC_range"};
 #'     \item \code{combo_score_metrics}: combination scores of the heatmaps and boxplots, from
 #'       \code{"hsa_score"}, \code{"bliss_score"};
-#'     \item \code{iso_levels}: effect levels of the isobolograms, default \code{"0.5"}.
+#'     \item \code{iso_levels}: effect levels of the isobolograms, default \code{"0.5"};
+#'     \item \code{norm_types}: normalization types, \code{"RV"} alone leaves out the GR sections;
+#'     \item \code{plots_to_generate}: sections of the report, from \code{"sa_drc_by_drug"},
+#'       \code{"sa_drc_by_cl"}, \code{"sa_heatmap"}, \code{"sa_boxplot_cl"},
+#'       \code{"sa_boxplot_drug"}, \code{"sa_boxplot_tissue"}, \code{"combo_drc"},
+#'       \code{"combo_metrics_panel"}, \code{"combo_isoref"}, \code{"combo_heatmap"},
+#'       \code{"combo_boxplot_cl"}, \code{"combo_boxplot_drug"}, \code{"combo_boxplot_tissue"}.
 #'   }
 #'   Default is an empty list.
 #' @param on_resolve_inputs Function or NULL. Hook called before the data type is determined,
@@ -802,6 +808,7 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
   render_params$metadata_columns <- paste0("'", processed_args$metadata_columns, "'", collapse = ", ")
 
   # Add other dynamic and boolean parameters
+  dynamic_params <- prepare_dynamic_render_params(data_type, plan$mae, output_dir, plan$steps)
   render_params <- c(
     render_params,
     list(
@@ -815,7 +822,8 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
       MAE = (data_type == "mae")
     ),
     lapply(plan$analysis_params, format_vector_for_rmd),
-    prepare_dynamic_render_params(data_type, plan$mae, output_dir, plan$steps)
+    dynamic_params,
+    analysis_section_flags(plan$analysis_params, dynamic_params$plot_GR_values)
   )
 
   # Deployment-specific parameters never override the ones computed above. Dropping them
