@@ -118,9 +118,13 @@ test_that("validate_and_prepare_inputs filters steps for MAE input", {
       stderr_con = file(tempfile(), open = "wt")
     )
   })
-  mockery::stub(test_fn, "determine_data_type", function(...) "bench")
-  mockery::stub(test_fn, "stage_and_update_paths", function(args, ...) args)
-  mockery::stub(test_fn, "validate_and_prepare_inputs", function(args, ...) list())
+  # These run in prepare_report_steps(), out of reach of a stub on test_fn.
+  local_mocked_bindings(
+    determine_data_type = function(...) "bench",
+    stage_and_update_paths = function(args, ...) args,
+    validate_and_prepare_inputs = function(args, ...) list(),
+    .env = parent.frame()
+  )
   mockery::stub(test_fn, "rmarkdown::render", render_mock)
   mockery::stub(test_fn, "create_symlink_to_current", NULL)
 
@@ -201,7 +205,7 @@ test_that("run_report runs on_failure before the output directory is removed", {
   })
 
   test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
-  mockery::stub(test_fn, "determine_data_type", function(...) stop("boom"))
+  local_mocked_bindings(determine_data_type = function(...) stop("boom"))
 
   seen <- new.env(parent = emptyenv())
 
@@ -328,7 +332,7 @@ test_that("run_report injects extra_render_params into the template data", {
 
   mock_whisker <- mockery::mock("rendered", cycle = TRUE)
   test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
-  mockery::stub(test_fn, "whisker::whisker.render", mock_whisker)
+  local_mocked_bindings(whisker.render = mock_whisker, .package = "whisker")
 
   # 'output_dir' is shadowed by a computed parameter, which is reported to the caller.
   expect_warning(
@@ -369,7 +373,7 @@ test_that("run_report lets on_resolve_inputs rewrite inputs and render params", 
 
   mock_stage <- mockery::mock(list(), cycle = TRUE)
   test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
-  mockery::stub(test_fn, "stage_and_update_paths", mock_stage)
+  local_mocked_bindings(stage_and_update_paths = mock_stage)
 
   test_fn(
     manifest = "manifest.xlsx",
@@ -591,7 +595,7 @@ test_that("run_report refuses a qcs run without an injected import section", {
   })
 
   test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
-  mockery::stub(test_fn, "determine_data_type", function(...) "qcs")
+  local_mocked_bindings(determine_data_type = function(...) "qcs")
 
   # The driver cannot import screening-system sessions on its own.
   expect_error(
@@ -743,7 +747,7 @@ test_that("run_report refuses a configuration file that could not be staged", {
   test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
   # Staging drops a path argument it cannot resolve; the report must not carry on with the
   # configuration the templates generate for themselves.
-  mockery::stub(test_fn, "stage_and_update_paths", function(args, ...) {
+  local_mocked_bindings(stage_and_update_paths = function(args, ...) {
     args$configuration_file_path <- NULL
     args
   })
@@ -768,7 +772,7 @@ test_that("run_report passes a staged configuration file through to the template
 
   test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
   staged <- file.path(dummy_out, "raw_data", "my_windows.yml")
-  mockery::stub(test_fn, "stage_and_update_paths", function(args, ...) {
+  local_mocked_bindings(stage_and_update_paths = function(args, ...) {
     args$configuration_file_path <- staged
     args
   })
