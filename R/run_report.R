@@ -138,6 +138,11 @@
 #'       \code{"combo_metrics_panel"}, \code{"combo_isoref"}, \code{"combo_heatmap"},
 #'       \code{"combo_boxplot_cl"}, \code{"combo_boxplot_drug"}, \code{"combo_boxplot_tissue"}.
 #'   }
+#'   Others restrict the data the analysis step draws, by name: \code{drugs_of_interest},
+#'   \code{cell_lines_of_interest}, \code{codrugs_of_interest}, \code{tissues_of_interest},
+#'   \code{moa_of_interest}, and \code{drug_pairs_of_interest}, a list of pairs
+#'   \code{c(drug, co-drug)}. The subset is written to \code{gDR_data/gDR_mae_selection.qs2}, and
+#'   the sections that need data it no longer has are left out.
 #'   Default is an empty list.
 #' @param on_resolve_inputs Function or NULL. Hook called before the data type is determined,
 #'   used to resolve input paths from an external source. It receives \code{args} (the list of
@@ -611,7 +616,8 @@ assert_report_args <- function(args) {
 #'
 #' @return A list with the validated arguments (\code{args}), the resolved
 #'   \code{extra_render_params} without the analysis selections, the resolved
-#'   \code{analysis_params}, \code{data_type}, \code{steps}, \code{mae}, \code{mae_path},
+#'   \code{analysis_params} and \code{data_selection}, \code{data_type}, \code{steps}, \code{mae},
+#'   \code{mae_path},
 #'   \code{is_prism_data}, and the step files in render order (\code{rmd_files}) with their
 #'   \code{template_paths} and \code{output_paths}.
 #' @keywords internal
@@ -646,6 +652,7 @@ prepare_report_steps <- function(args,
   # Validated before anything is staged; they reach the templates as computed parameters, so
   # they are taken out of the deployment-specific ones
   analysis_params <- resolve_analysis_params(extra_render_params)
+  data_selection <- resolve_data_selection(extra_render_params)
 
   data_type <- determine_data_type(args, output_dir)
 
@@ -762,8 +769,11 @@ prepare_report_steps <- function(args,
 
   list(
     args = processed_args,
-    extra_render_params = extra_render_params[setdiff(names(extra_render_params), names(analysis_params))],
+    extra_render_params = extra_render_params[
+      setdiff(names(extra_render_params), c(names(analysis_params), .DATA_SELECTIONS))
+    ],
     analysis_params = analysis_params,
+    data_selection = data_selection,
     data_type = data_type,
     steps = steps,
     mae = mae,
@@ -809,6 +819,14 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
 
   # Add other dynamic and boolean parameters
   dynamic_params <- prepare_dynamic_render_params(data_type, plan$mae, output_dir, plan$steps)
+  analysis_mae_file <- "gDR_mae.qs2"
+  if (identical(plan$rmd_files[[i]], "3-analysis.Rmd") && length(plan$data_selection) > 0) {
+    selected <- select_report_data(read_report_mae(plan, output_dir), plan$data_selection)
+    analysis_mae_file <- .SELECTED_MAE_FILE
+    qs2::qs_save(selected, file.path(output_dir, "gDR_data", analysis_mae_file))
+    # the sections drawn follow the selected data, not the whole dataset
+    dynamic_params <- prepare_dynamic_render_params("mae", selected, output_dir, 3)
+  }
   render_params <- c(
     render_params,
     list(
@@ -822,6 +840,7 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
       MAE = (data_type == "mae")
     ),
     lapply(plan$analysis_params, format_vector_for_rmd),
+    list(analysis_mae_file = analysis_mae_file),
     dynamic_params,
     analysis_section_flags(plan$analysis_params, dynamic_params$plot_GR_values)
   )

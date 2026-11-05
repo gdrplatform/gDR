@@ -313,7 +313,7 @@ This section loads the final `MultiAssayExperiment` (MAE) object, which contains
 
 ```{r load_mae}
 wd <- "{{output_dir}}"
-mae <- qs_read(file.path(wd, "gDR_data", "gDR_mae.qs2"))
+mae <- qs_read(file.path(wd, "gDR_data", "{{analysis_mae_file}}"))
 
 ```
 

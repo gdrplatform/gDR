@@ -148,6 +148,11 @@ step draws; each one left out keeps everything:
 \code{"combo_metrics_panel"}, \code{"combo_isoref"}, \code{"combo_heatmap"},
 \code{"combo_boxplot_cl"}, \code{"combo_boxplot_drug"}, \code{"combo_boxplot_tissue"}.
 }
+Others restrict the data the analysis step draws, by name: \code{drugs_of_interest},
+\code{cell_lines_of_interest}, \code{codrugs_of_interest}, \code{tissues_of_interest},
+\code{moa_of_interest}, and \code{drug_pairs_of_interest}, a list of pairs
+\code{c(drug, co-drug)}. The subset is written to \code{gDR_data/gDR_mae_selection.qs2}, and
+the sections that need data it no longer has are left out.
 Default is an empty list.}
 
 \item{on_resolve_inputs}{Function or NULL. Hook called before the data type is determined,
