@@ -23,7 +23,7 @@ build_report_rmd(
   metadata_columns = c("OncotreeLineage", "PatientRace"),
   output_dir,
   viz_format = "svg",
-  rmd_template_path,
+  rmd_template_path = system.file("report_templates", package = "gDR"),
   steps = seq_len(3),
   mae = NULL,
   special_sections = NULL,
@@ -97,7 +97,7 @@ Required if using \code{special_sections} equal \code{"PRISM"}}
 templates. Directories are searched in order and the first match wins, so a deployment can
 both override individual templates and supply steps that the other directories do not carry
 (for instance a publication step living outside the open-source template set).
-This is a required parameter.}
+Default is the templates shipped with gDR.}
 
 \item{steps}{Integer vector. Steps to write, within \code{1:3}:
 1: data import, 2: processing and QC, 3: analysis. Default is \code{1:3}.
@@ -171,8 +171,7 @@ rendering each before writing the next, or use \code{run_report()}.
 \dontrun{
 rmd <- build_report_rmd(
   mae = "path/to/mae.qs2",
-  output_dir = "~/test_report_mae",
-  rmd_template_path = "path/to/report_templates"
+  output_dir = "~/test_report_mae"
 )
 rmarkdown::render(rmd[["3-analysis"]])
 }
