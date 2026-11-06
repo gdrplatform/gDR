@@ -136,7 +136,9 @@
 #'       \code{"sa_drc_by_cl"}, \code{"sa_heatmap"}, \code{"sa_boxplot_cl"},
 #'       \code{"sa_boxplot_drug"}, \code{"sa_boxplot_tissue"}, \code{"combo_drc"},
 #'       \code{"combo_metrics_panel"}, \code{"combo_isoref"}, \code{"combo_heatmap"},
-#'       \code{"combo_boxplot_cl"}, \code{"combo_boxplot_drug"}, \code{"combo_boxplot_tissue"}.
+#'       \code{"combo_boxplot_cl"}, \code{"combo_boxplot_drug"}, \code{"combo_boxplot_tissue"};
+#'     \item \code{table_format}: formats of the assay tables, \code{"xlsx"} (a workbook per
+#'       experiment type, the default) and \code{"csv"} (a file per experiment type and assay).
 #'   }
 #'   Others restrict the data the analysis step draws, by name: \code{drugs_of_interest},
 #'   \code{cell_lines_of_interest}, \code{codrugs_of_interest}, \code{tissues_of_interest},

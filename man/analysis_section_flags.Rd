@@ -14,7 +14,8 @@ analysis_section_flags(analysis_params, plot_GR_values)
 \value{
 Named list of logical flags: \code{show_<section>} for every section of
 \code{plots_to_generate}, \code{show_sa_fitted_metrics} and \code{show_combo_fitted_metrics}
-for the headings over them, and \code{plot_GR}.
+for the headings over them, \code{plot_GR}, and \code{table_<format>} for every format of
+\code{table_format}.
 }
 \description{
 Section flags of the analysis step

@@ -3,12 +3,15 @@ test_that("resolve_analysis_params keeps everything for the selections left out"
   expect_equal(res$sa_metrics, c("xc50", "x_max", "x_mean", "x_AOC", "x_AOC_range"))
   expect_equal(res$combo_score_metrics, c("hsa_score", "bliss_score"))
   expect_equal(res$iso_levels, "0.5")
+  expect_equal(res$table_format, "xlsx")
 })
 
 test_that("resolve_analysis_params puts a selection in the order the report draws it", {
-  res <- resolve_analysis_params(list(sa_metrics = c("x_AOC", "xc50", "xc50"), iso_levels = c(0.75, 0.5)))
+  res <- resolve_analysis_params(list(sa_metrics = c("x_AOC", "xc50", "xc50"), iso_levels = c(0.75, 0.5),
+                                      table_format = c("csv", "xlsx")))
   expect_equal(res$sa_metrics, c("xc50", "x_AOC"))
   expect_equal(res$iso_levels, c("0.75", "0.5"))
+  expect_equal(res$table_format, c("xlsx", "csv"))
 })
 
 test_that("resolve_analysis_params rejects unknown or empty selections", {
@@ -16,6 +19,8 @@ test_that("resolve_analysis_params rejects unknown or empty selections", {
   expect_error(resolve_analysis_params(list(combo_score_metrics = character(0))), "combo_score_metrics")
   expect_error(resolve_analysis_params(list(iso_levels = "half")), "iso_levels")
   expect_error(resolve_analysis_params(list(iso_levels = 1.5)), "iso_levels")
+  expect_error(resolve_analysis_params(list(table_format = "tsv")), "table_format")
+  expect_error(resolve_analysis_params(list(table_format = character(0))), "table_format")
 })
 
 test_that("the analysis selections reach the templates without a shadowing warning", {
@@ -48,8 +53,12 @@ test_that("resolve_analysis_params lets the report leave out GR but not RV", {
 })
 
 test_that("analysis_section_flags shows the selected sections and GR only with GR data", {
-  all_on <- analysis_section_flags(resolve_analysis_params(list()), plot_GR_values = TRUE)
+  all_on <- analysis_section_flags(resolve_analysis_params(list(table_format = c("xlsx", "csv"))),
+                                   plot_GR_values = TRUE)
   expect_true(all(unlist(all_on)))
+  defaults <- analysis_section_flags(resolve_analysis_params(list()), plot_GR_values = TRUE)
+  expect_true(defaults$table_xlsx)
+  expect_false(defaults$table_csv)
   expect_false(analysis_section_flags(resolve_analysis_params(list()), plot_GR_values = NULL)$plot_GR)
 
   flags <- analysis_section_flags(
@@ -81,8 +90,16 @@ test_that("each section flag of the analysis template removes its own section", 
     off[[flag]] <- FALSE
     expect_false(grepl(headings[[flag]], whisker::whisker.render(template, off), fixed = TRUE), info = flag)
   }
-  # every section flag the code computes is used by the template, and the other way round
-  shows <- grep("^show_", tags, value = TRUE)
-  expect_setequal(shows, grep("^show_", names(analysis_section_flags(resolve_analysis_params(list()), TRUE)),
+  # every section and table flag the code computes is used by the template, and the other way round
+  shows <- grep("^(show|table)_", tags, value = TRUE)
+  expect_setequal(shows, grep("^(show|table)_", names(analysis_section_flags(resolve_analysis_params(list()), TRUE)),
                               value = TRUE))
+
+  csv_only <- all_on
+  csv_only$table_xlsx <- FALSE
+  rmd <- whisker::whisker.render(template, csv_only)
+  expect_false(grepl("```{r save_xlsx}", rmd, fixed = TRUE))
+  expect_true(grepl("```{r save_csv}", rmd, fixed = TRUE))
+  all_on$table_csv <- FALSE
+  expect_false(grepl("save_csv", whisker::whisker.render(template, all_on), fixed = TRUE))
 })

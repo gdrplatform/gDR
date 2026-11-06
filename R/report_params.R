@@ -15,6 +15,10 @@
 # Effect level of the isobolograms when none is selected.
 .DEFAULT_ISO_LEVELS <- "0.5"
 
+# Formats the assay tables can be written in; the workbook alone when none is selected.
+.TABLE_FORMATS <- c("xlsx", "csv")
+.DEFAULT_TABLE_FORMAT <- "xlsx"
+
 #' Resolve the selections of the analysis step
 #'
 #' Validates the analysis selections in \code{extra_render_params} and fills in the ones left out.
@@ -46,6 +50,14 @@ resolve_analysis_params <- function(extra_render_params) {
                             any.missing = FALSE, .var.name = "iso_levels")
   params$iso_levels <- as.character(iso_levels)
 
+  table_format <- extra_render_params$table_format
+  if (is.null(table_format)) {
+    table_format <- .DEFAULT_TABLE_FORMAT
+  }
+  checkmate::assert_character(table_format, min.len = 1, any.missing = FALSE, .var.name = "table_format")
+  checkmate::assert_subset(table_format, .TABLE_FORMATS, .var.name = "table_format")
+  params$table_format <- intersect(.TABLE_FORMATS, table_format)
+
   # the GR sections of the template reuse objects that its RV sections create
   if (!"RV" %in% params$norm_types) {
     stop("'norm_types' must include \"RV\"; the report can leave out GR, not RV.", call. = FALSE)
@@ -61,7 +73,8 @@ resolve_analysis_params <- function(extra_render_params) {
 #'
 #' @return Named list of logical flags: \code{show_<section>} for every section of
 #'   \code{plots_to_generate}, \code{show_sa_fitted_metrics} and \code{show_combo_fitted_metrics}
-#'   for the headings over them, and \code{plot_GR}.
+#'   for the headings over them, \code{plot_GR}, and \code{table_<format>} for every format of
+#'   \code{table_format}.
 #' @keywords internal
 analysis_section_flags <- function(analysis_params, plot_GR_values) {
   sections <- .ANALYSIS_CHOICES$plots_to_generate
@@ -70,5 +83,6 @@ analysis_section_flags <- function(analysis_params, plot_GR_values) {
   flags$show_sa_fitted_metrics <- any(shown[grepl("^sa_(heatmap|boxplot)", sections)])
   flags$show_combo_fitted_metrics <- any(shown[grepl("^combo_(heatmap|boxplot)", sections)])
   flags$plot_GR <- isTRUE(plot_GR_values) && "GR" %in% analysis_params$norm_types
+  flags[paste0("table_", .TABLE_FORMATS)] <- as.list(.TABLE_FORMATS %in% analysis_params$table_format)
   flags
 }

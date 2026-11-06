@@ -299,6 +299,10 @@ These files contain the full processed data in a "long" (tidy) format, with one 
 
 
 
+{{#table_csv}}
+The same tables are written as CSV files, one per experiment type and sheet (e.g., `single-agent-assay-data__Metrics.csv`).
+
+{{/table_csv}}
 ## Heatmap Data (in `tables/` folder)
 
 These files contain the specific data used to generate the summary heatmaps, pre-formatted for convenience. Each Excel file (e.g., `data__sa_fit_heat_RV__log10(IC50).xlsx` or `data__combo_fit_...xlsx`) contains three sheets:
@@ -333,6 +337,7 @@ assay_list <- MAEpply(mae, function(x) {
 
 ```
 
+{{#table_xlsx}}
 ```{r save_xlsx}
 assay_list_to_save <- lapply(assay_list, split_big_table_for_xlsx)
 for (experiment in names(assay_list_to_save)) {
@@ -342,6 +347,18 @@ for (experiment in names(assay_list_to_save)) {
 }
 
 ```
+{{/table_xlsx}}
+{{#table_csv}}
+```{r save_csv}
+for (experiment in names(assay_list)) {
+  for (assay in names(assay_list[[experiment]])) {
+    fwrite(assay_list[[experiment]][[assay]],
+           file.path(wd, "tables", paste0(experiment, "-assay-data__", assay, ".csv")))
+  }
+}
+
+```
+{{/table_csv}}
 
 # Downstream data analysis
 
