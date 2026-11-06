@@ -924,3 +924,52 @@ test_that("build_report_rmd removes the output directory it created when it fail
   )
   expect_false(dir.exists(file.path(out, "v1")))
 })
+
+test_that("build_report_rmd uses the templates shipped with gDR by default", {
+  out_default <- withr::local_tempdir()
+  out_explicit <- withr::local_tempdir()
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  rmd_default <- build_report_rmd(long_table = long_table, output_dir = out_default, steps = 1)
+  rmd_explicit <- build_report_rmd(
+    long_table = long_table,
+    output_dir = out_explicit,
+    rmd_template_path = system.file("report_templates", package = "gDR"),
+    steps = 1
+  )
+  expect_equal(
+    gsub(out_default, "", readLines(rmd_default), fixed = TRUE),
+    gsub(out_explicit, "", readLines(rmd_explicit), fixed = TRUE)
+  )
+})
+
+test_that("warn_misspelled_render_params reports names close to a template parameter only", {
+  template <- withr::local_tempfile(fileext = ".Rmd")
+  writeLines(c("{{#MAE}}x <- '{{viz_format}}'{{/MAE}}", "{{{report_inputs_file}}}"), template)
+
+  expect_warning(
+    warn_misspelled_render_params(list(viz_fromat = "png", report_input_file = "f"), template),
+    "'viz_fromat' \\(did you mean 'viz_format'\\?\\), 'report_input_file' \\(did you mean 'report_inputs_file'\\?\\)"
+  )
+  # read by a template, or far from every template parameter (read by the hooks of a deployment)
+  expect_no_warning(
+    warn_misspelled_render_params(list(viz_format = "png", push_to_DSDB = TRUE, username = "u"), template)
+  )
+})
+
+test_that("build_report_rmd warns about a misspelled entry of extra_render_params", {
+  out <- withr::local_tempdir()
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  expect_warning(
+    build_report_rmd(
+      long_table = long_table,
+      output_dir = out,
+      steps = 1,
+      extra_render_params = list(extra_section_import = "", username = "u")
+    ),
+    "did you mean 'extra_sections_import'"
+  )
+})
