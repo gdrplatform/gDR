@@ -66,6 +66,20 @@ test_that("the analysis template shows normalized periods in the configured grow
 })
 
 
+test_that("the analysis template names the growth-rate axis from the plotted rows", {
+  lines <- .incucyte_template_lines("3-analysis.Rmd")
+
+  # The axis is named from the same flag the block already uses to place the
+  # reference line, rather than from growth_metric alone.
+  expect_length(grep("ylab(rate_axis_label(sel_rates$is_normalized, growth_metric))",
+                     lines, fixed = TRUE), 1L)
+  expect_length(grep("is_normalized := norm_target != \"None\"", lines, fixed = TRUE), 1L)
+
+  # The old label hedged on every run, including those where nothing is raw.
+  expect_length(grep("or Raw Rate", lines, fixed = TRUE), 0L)
+})
+
+
 test_that("the analysis template labels periods in the plots but keys the tables by period", {
   lines <- .incucyte_template_lines("3-analysis.Rmd")
 
