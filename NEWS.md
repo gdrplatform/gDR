@@ -1,3 +1,6 @@
+## gDR 1.11.24 - 2026-11-10
+* fix the Incucyte growth-rate axis label, which named a raw rate even on runs where every plotted row was normalized
+
 ## gDR 1.11.23 - 2026-11-03
 * fix the processing step of PRISM level 6 reports, which failed on input without durations
 
