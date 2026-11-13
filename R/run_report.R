@@ -24,6 +24,14 @@
 # the clean-up in run_report()), so that publishing alone can be retried in resume mode.
 .PUBLICATION_STEP <- "4-publish_results.Rmd"
 
+# Data a step reads from its `gDR_data` directory that only rendering the previous step writes.
+# Without it the step loses its combination, GR and isobologram sections and still renders (see
+# prepare_dynamic_render_params()), so build_report_rmd() does not write such a step.
+.STEP_INPUTS <- c(
+  "2-processing_and_QC.Rmd" = "gDR_input.qs2",
+  "3-analysis.Rmd" = "gDR_mae.qs2"
+)
+
 #' Run a gDR report pipeline
 #'
 #' Infrastructure-agnostic driver for the gDR reporting pipeline. It stages all input files into
@@ -430,16 +438,19 @@ run_report <- function(
 #' checks that guard it belong to the caller that runs it, so it is left to \code{run_report()}.
 #'
 #' The parameters of a step are partly read from the data that rendering the previous step
-#' writes. With several steps requested, the documents after the first are written before that
-#' data exists and can differ from what \code{run_report()} renders; write one step at a time,
-#' rendering each before writing the next, or use \code{run_report()}.
+#' writes, so a step is written only once that data is in the run directory. Write and render
+#' one step at a time, passing the run directory with \code{resume = TRUE} for the next one, or
+#' use \code{run_report()}. An \code{mae} input needs only step 3 and is written in one call.
 #'
 #' @inheritParams run_report
+#' @param output_dir Character. Directory in which a new versioned run directory is created, or
+#'   with \code{resume = TRUE} the run directory to write into.
 #' @param steps Integer vector. Steps to write, within \code{1:3}:
 #'  1: data import, 2: processing and QC, 3: analysis. Default is \code{1:3}.
 #'  If \code{mae} is provided, steps 1 and 2 are skipped.
-#' @param resume Logical. Whether to write into the existing 'current' output directory instead of
-#'   creating a new version, e.g. to write step 3 after step 2 was rendered. Default is \code{FALSE}.
+#' @param resume Logical. Whether \code{output_dir} is an existing run directory to write into,
+#'   e.g. \code{dirname(rmd[[1]])} or the \code{current} link of a \code{run_report()} run.
+#'   Default is \code{FALSE}.
 #'
 #' @return Named character vector of the paths of the written \code{.Rmd} files, in render order,
 #'   named after the steps (e.g. \code{"3-analysis"}).
@@ -454,6 +465,13 @@ run_report <- function(
 #'   rmd_template_path = "path/to/report_templates"
 #' )
 #' rmarkdown::render(rmd[["3-analysis"]])
+#'
+#' # one step at a time
+#' rmd <- build_report_rmd(long_table = "path/to/long_table.csv", output_dir = "~/test_report",
+#'                         rmd_template_path = "path/to/report_templates", steps = 1)
+#' rmarkdown::render(rmd[["1-data_import"]])
+#' rmd <- build_report_rmd(output_dir = dirname(rmd[[1]]), rmd_template_path = "path/to/report_templates",
+#'                         steps = 2, resume = TRUE)
 #' }
 build_report_rmd <- function(
     qcs_id = NULL,
@@ -507,30 +525,41 @@ build_report_rmd <- function(
     )
   }
 
-  env <- setup_run_environment(output_dir, verbose_mode, resume)
-  # nothing is rendered, so nothing is logged
-  close(env$stdout_con)
-  close(env$stderr_con)
+  # 'current' points to the last rendered run, so the run to resume is named directly
+  run_dir <- if (resume) {
+    checkmate::assert_directory_exists(output_dir)
+    normalizePath(output_dir)
+  } else {
+    env <- setup_run_environment(output_dir, verbose_mode)
+    # nothing is rendered, so nothing is logged
+    close(env$stdout_con)
+    close(env$stderr_con)
+    env$output_dir
+  }
 
   done <- FALSE
   on.exit({
     if (!done && !resume) {
-      unlink(env$output_dir, recursive = TRUE, force = TRUE)
+      unlink(run_dir, recursive = TRUE, force = TRUE)
     }
   })
 
-  plan <- prepare_report_steps(args, extra_render_params, env$output_dir, on_resolve_inputs = on_resolve_inputs)
-  if (length(plan$steps) > 1) {
-    warning(
-      "Steps after the first are written before the earlier steps have been rendered, so their ",
-      "parameters can differ from what run_report() renders. Write one step at a time, or use ",
-      "run_report()."
-    )
+  plan <- prepare_report_steps(args, extra_render_params, run_dir, on_resolve_inputs = on_resolve_inputs)
+  inputs <- .STEP_INPUTS[intersect(plan$rmd_files, names(.STEP_INPUTS))]
+  missing_inputs <- inputs[!file.exists(file.path(run_dir, "gDR_data", inputs))]
+  if (length(missing_inputs) > 0) {
+    stop(sprintf(
+      paste("%s read(s) %s, which rendering the previous step writes and which is not in '%s' yet.",
+            "Render that step first and write the next one with resume = TRUE, or use run_report()."),
+      toString(tools::file_path_sans_ext(names(missing_inputs))),
+      toString(sprintf("'gDR_data/%s'", missing_inputs)),
+      run_dir
+    ))
   }
 
   warned_shadowed <- character(0)
   for (i in seq_along(plan$template_paths)) {
-    warned_shadowed <- write_report_step(plan, i, env$output_dir, warned_shadowed)
+    warned_shadowed <- write_report_step(plan, i, run_dir, warned_shadowed)
   }
 
   done <- TRUE

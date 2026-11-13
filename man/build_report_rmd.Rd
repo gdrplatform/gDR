@@ -89,7 +89,8 @@ Required if using \code{special_sections} equal \code{"PRISM"}}
 \item{metadata_columns}{Character. Metadata names from file pointed by \code{meta_data_path}
 Required if using \code{special_sections} equal \code{"PRISM"}}
 
-\item{output_dir}{Character. Directory to store reports and output data. This is a required parameter.}
+\item{output_dir}{Character. Directory in which a new versioned run directory is created, or
+with \code{resume = TRUE} the run directory to write into.}
 
 \item{viz_format}{Character. Format for visualizations. Default is \code{"svg"}.}
 
@@ -123,8 +124,9 @@ and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme}
 \item{configuration_file_path}{Character. Path to the configuration file.
 Currently, required only for Incucyte data}
 
-\item{resume}{Logical. Whether to write into the existing 'current' output directory instead of
-creating a new version, e.g. to write step 3 after step 2 was rendered. Default is \code{FALSE}.}
+\item{resume}{Logical. Whether \code{output_dir} is an existing run directory to write into,
+e.g. \code{dirname(rmd[[1]])} or the \code{current} link of a \code{run_report()} run.
+Default is \code{FALSE}.}
 
 \item{extra_render_params}{Named list. Additional parameters injected into every RMarkdown
 template alongside the ones derived from the arguments above. Use it to pass values that are
@@ -162,9 +164,9 @@ Only steps 1 to 3 are written. The publication step publishes when it is rendere
 checks that guard it belong to the caller that runs it, so it is left to \code{run_report()}.
 
 The parameters of a step are partly read from the data that rendering the previous step
-writes. With several steps requested, the documents after the first are written before that
-data exists and can differ from what \code{run_report()} renders; write one step at a time,
-rendering each before writing the next, or use \code{run_report()}.
+writes, so a step is written only once that data is in the run directory. Write and render
+one step at a time, passing the run directory with \code{resume = TRUE} for the next one, or
+use \code{run_report()}. An \code{mae} input needs only step 3 and is written in one call.
 }
 \examples{
 
@@ -175,6 +177,13 @@ rmd <- build_report_rmd(
   rmd_template_path = "path/to/report_templates"
 )
 rmarkdown::render(rmd[["3-analysis"]])
+
+# one step at a time
+rmd <- build_report_rmd(long_table = "path/to/long_table.csv", output_dir = "~/test_report",
+                        rmd_template_path = "path/to/report_templates", steps = 1)
+rmarkdown::render(rmd[["1-data_import"]])
+rmd <- build_report_rmd(output_dir = dirname(rmd[[1]]), rmd_template_path = "path/to/report_templates",
+                        steps = 2, resume = TRUE)
 }
 }
 \keyword{report}
