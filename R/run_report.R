@@ -99,7 +99,7 @@
 #'  templates. Directories are searched in order and the first match wins, so a deployment can
 #'  both override individual templates and supply steps that the other directories do not carry
 #'  (for instance a publication step living outside the open-source template set).
-#'  This is a required parameter.
+#'  Default is the templates shipped with gDR.
 #' @param steps Integer vector. Steps to run in the pipeline:
 #'  1: data import, 2: processing and QC, 3: analysis, 4: publish results.
 #'  Default is \code{1:3}. Note: If \code{mae} is provided, steps 1 and 2 are automatically skipped.
@@ -225,7 +225,7 @@ run_report <- function(
     ),
     output_dir,
     viz_format = "svg",
-    rmd_template_path,
+    rmd_template_path = system.file("report_templates", package = "gDR"),
     steps = seq_len(3),
     mae = NULL,
     special_sections = NULL,
@@ -461,8 +461,7 @@ run_report <- function(
 #' \dontrun{
 #' rmd <- build_report_rmd(
 #'   mae = "path/to/mae.qs2",
-#'   output_dir = "~/test_report_mae",
-#'   rmd_template_path = "path/to/report_templates"
+#'   output_dir = "~/test_report_mae"
 #' )
 #' rmarkdown::render(rmd[["3-analysis"]])
 #'
@@ -499,7 +498,7 @@ build_report_rmd <- function(
     ),
     output_dir,
     viz_format = "svg",
-    rmd_template_path,
+    rmd_template_path = system.file("report_templates", package = "gDR"),
     steps = seq_len(3),
     mae = NULL,
     special_sections = NULL,
@@ -752,6 +751,8 @@ prepare_report_steps <- function(args,
       toString(missing_templates)
     ))
   }
+
+  warn_misspelled_render_params(extra_render_params, template_paths)
 
   logo_src <- find_template("gdr_logo-01.png", run_args$rmd_template_path)
   if (!is.na(logo_src)) {
@@ -1469,4 +1470,38 @@ find_template <- function(file_names, template_dirs) {
     character(1),
     USE.NAMES = FALSE
   )
+}
+
+#' Warn about likely misspelled render parameters
+#'
+#' Whisker drops a parameter that no template reads without a word. Most such entries of
+#' \code{extra_render_params} are read by the hooks of a deployment, so only a name at most two
+#' edits away from a template parameter is reported, as the typo it most likely is.
+#'
+#' @param extra_render_params Named list of deployment-specific render parameters.
+#' @param template_paths Character vector of the templates of the run.
+#'
+#' @return \code{NULL}, invisibly.
+#' @keywords internal
+warn_misspelled_render_params <- function(extra_render_params, template_paths) {
+  tags <- unique(unlist(lapply(template_paths, function(path) {
+    lines <- readLines(path, warn = FALSE)
+    tags <- unlist(regmatches(lines, gregexpr("\\{\\{\\{?[#^/&]?\\s*[A-Za-z0-9_.]+\\s*\\}?\\}\\}", lines)))
+    trimws(gsub("[{}#^/&]", "", tags))
+  })))
+  unread <- setdiff(names(extra_render_params), tags)
+  if (length(unread) == 0 || length(tags) == 0) {
+    return(invisible(NULL))
+  }
+
+  distance <- utils::adist(unread, tags)
+  close <- apply(distance, 1, min) <= 2
+  if (any(close)) {
+    nearest <- tags[apply(distance[close, , drop = FALSE], 1, which.min)]
+    warning(sprintf(
+      "'extra_render_params' entries not read by any template of this run: %s.",
+      toString(sprintf("'%s' (did you mean '%s'?)", unread[close], nearest))
+    ), call. = FALSE)
+  }
+  invisible(NULL)
 }
