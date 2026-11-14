@@ -131,7 +131,29 @@
 #'   with parameters computed by this function are dropped with a warning. One entry is read by
 #'   the templates themselves: \code{report_inputs_file}, the path to a qs2 file with a named list
 #'   of plain data describing the inputs of the run, which the processing step records as the
-#'   \code{"report"} step in the provenance of every experiment. Default is an empty list.
+#'   \code{"report"} step in the provenance of every experiment. Others select what the analysis
+#'   step draws; each one left out keeps everything:
+#'   \itemize{
+#'     \item \code{sa_metrics}: single-agent metrics of the heatmaps and boxplots, from
+#'       \code{"xc50"}, \code{"x_max"}, \code{"x_mean"}, \code{"x_AOC"}, \code{"x_AOC_range"};
+#'     \item \code{combo_score_metrics}: combination scores of the heatmaps and boxplots, from
+#'       \code{"hsa_score"}, \code{"bliss_score"};
+#'     \item \code{iso_levels}: effect levels of the isobolograms, default \code{"0.5"};
+#'     \item \code{norm_types}: normalization types, \code{"RV"} alone leaves out the GR sections;
+#'     \item \code{plots_to_generate}: sections of the report, from \code{"sa_drc_by_drug"},
+#'       \code{"sa_drc_by_cl"}, \code{"sa_heatmap"}, \code{"sa_boxplot_cl"},
+#'       \code{"sa_boxplot_drug"}, \code{"sa_boxplot_tissue"}, \code{"combo_drc"},
+#'       \code{"combo_metrics_panel"}, \code{"combo_isoref"}, \code{"combo_heatmap"},
+#'       \code{"combo_boxplot_cl"}, \code{"combo_boxplot_drug"}, \code{"combo_boxplot_tissue"};
+#'     \item \code{table_format}: formats of the assay tables, \code{"xlsx"} (a workbook per
+#'       experiment type, the default) and \code{"csv"} (a file per experiment type and assay).
+#'   }
+#'   Others restrict the data the analysis step draws, by name: \code{drugs_of_interest},
+#'   \code{cell_lines_of_interest}, \code{codrugs_of_interest}, \code{tissues_of_interest},
+#'   \code{moa_of_interest}, and \code{drug_pairs_of_interest}, a list of pairs
+#'   \code{c(drug, co-drug)}. The subset is written to \code{gDR_data/gDR_mae_selection.qs2}, and
+#'   the sections that need data it no longer has are left out.
+#'   Default is an empty list.
 #' @param on_resolve_inputs Function or NULL. Hook called before the data type is determined,
 #'   used to resolve input paths from an external source. It receives \code{args} (the list of
 #'   input arguments) and \code{extra_render_params}, and must return a list with exactly these
@@ -624,7 +646,9 @@ assert_report_args <- function(args) {
 #' @param on_resolve_inputs,on_before_render Function or NULL, as in \code{run_report()}.
 #'
 #' @return A list with the validated arguments (\code{args}), the resolved
-#'   \code{extra_render_params}, \code{data_type}, \code{steps}, \code{mae}, \code{mae_path},
+#'   \code{extra_render_params} without the analysis selections, the resolved
+#'   \code{analysis_params} and \code{data_selection}, \code{data_type}, \code{steps}, \code{mae},
+#'   \code{mae_path},
 #'   \code{is_prism_data}, and the step files in render order (\code{rmd_files}) with their
 #'   \code{template_paths} and \code{output_paths}.
 #' @keywords internal
@@ -655,6 +679,11 @@ prepare_report_steps <- function(args,
     args <- resolved$args
     extra_render_params <- resolved$extra_render_params
   }
+
+  # Validated before anything is staged; they reach the templates as computed parameters, so
+  # they are taken out of the deployment-specific ones
+  analysis_params <- resolve_analysis_params(extra_render_params)
+  data_selection <- resolve_data_selection(extra_render_params)
 
   data_type <- determine_data_type(args, output_dir)
 
@@ -771,7 +800,11 @@ prepare_report_steps <- function(args,
 
   list(
     args = processed_args,
-    extra_render_params = extra_render_params,
+    extra_render_params = extra_render_params[
+      setdiff(names(extra_render_params), c(names(analysis_params), .DATA_SELECTIONS))
+    ],
+    analysis_params = analysis_params,
+    data_selection = data_selection,
     data_type = data_type,
     steps = steps,
     mae = mae,
@@ -816,6 +849,15 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
   render_params$metadata_columns <- paste0("'", processed_args$metadata_columns, "'", collapse = ", ")
 
   # Add other dynamic and boolean parameters
+  dynamic_params <- prepare_dynamic_render_params(data_type, plan$mae, output_dir, plan$steps)
+  analysis_mae_file <- "gDR_mae.qs2"
+  if (identical(plan$rmd_files[[i]], "3-analysis.Rmd") && length(plan$data_selection) > 0) {
+    selected <- select_report_data(read_report_mae(plan, output_dir), plan$data_selection)
+    analysis_mae_file <- .SELECTED_MAE_FILE
+    qs2::qs_save(selected, file.path(output_dir, "gDR_data", analysis_mae_file))
+    # the sections drawn follow the selected data, not the whole dataset
+    dynamic_params <- prepare_dynamic_render_params("mae", selected, output_dir, 3)
+  }
   render_params <- c(
     render_params,
     list(
@@ -828,7 +870,10 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
       PRISM_excluded = !plan$is_prism_data,
       MAE = (data_type == "mae")
     ),
-    prepare_dynamic_render_params(data_type, plan$mae, output_dir, plan$steps)
+    lapply(plan$analysis_params, format_vector_for_rmd),
+    list(analysis_mae_file = analysis_mae_file),
+    dynamic_params,
+    analysis_section_flags(plan$analysis_params, dynamic_params$plot_GR_values)
   )
 
   # Deployment-specific parameters never override the ones computed above. Dropping them

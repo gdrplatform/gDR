@@ -1,3 +1,7 @@
+## gDR 1.11.25 - 2026-11-05
+* add selections of metrics, synergy scores, isobologram levels, sections and normalization types to the report
+* add `table_format` to write the assay tables of the report as CSV files, next to or instead of the workbooks
+
 ## gDR 1.11.24 - 2026-11-05
 * add `build_report_rmd()`, which writes the `.Rmd` files of a report without rendering them
 
