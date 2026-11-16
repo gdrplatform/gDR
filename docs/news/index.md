@@ -1,5 +1,15 @@
 # Changelog
 
+## gDR 1.11.25 - 2026-11-16
+
+- add the templates shipped with gDR as the default `rmd_template_path`
+  of
+  [`run_report()`](https://gdrplatform.github.io/gDR/reference/run_report.md)
+  and
+  [`build_report_rmd()`](https://gdrplatform.github.io/gDR/reference/build_report_rmd.md)
+- add a warning for an `extra_render_params` entry no template reads but
+  close to a template parameter
+
 ## gDR 1.11.24 - 2026-11-05
 
 - add

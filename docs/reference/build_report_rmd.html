@@ -15,7 +15,7 @@ or edit a report before a long render, or to render it elsewhere."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">gDR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.11.24</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.11.25</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,7 +71,7 @@ or edit a report before a long render, or to render it elsewhere.</p>
 <span>  metadata_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OncotreeLineage"</span>, <span class="st">"PatientRace"</span><span class="op">)</span>,</span>
 <span>  <span class="va">output_dir</span>,</span>
 <span>  viz_format <span class="op">=</span> <span class="st">"svg"</span>,</span>
-<span>  <span class="va">rmd_template_path</span>,</span>
+<span>  rmd_template_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"report_templates"</span>, package <span class="op">=</span> <span class="st">"gDR"</span><span class="op">)</span>,</span>
 <span>  steps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,</span>
 <span>  mae <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  special_sections <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -183,7 +183,7 @@ with <code>resume = TRUE</code> the run directory to write into.</p></dd>
 templates. Directories are searched in order and the first match wins, so a deployment can
 both override individual templates and supply steps that the other directories do not carry
 (for instance a publication step living outside the open-source template set).
-This is a required parameter.</p></dd>
+Default is the templates shipped with gDR.</p></dd>
 
 
 <dt id="arg-steps">steps<a class="anchor" aria-label="anchor" href="#arg-steps"></a></dt>
@@ -277,8 +277,7 @@ use <code><a href="run_report.html">run_report()</a></code>. An <code>mae</code>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="va">rmd</span> <span class="op">&lt;-</span> <span class="fu">build_report_rmd</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  mae <span class="op">=</span> <span class="st">"path/to/mae.qs2"</span>,</span></span>
-<span class="r-in"><span>  output_dir <span class="op">=</span> <span class="st">"~/test_report_mae"</span>,</span></span>
-<span class="r-in"><span>  rmd_template_path <span class="op">=</span> <span class="st">"path/to/report_templates"</span></span></span>
+<span class="r-in"><span>  output_dir <span class="op">=</span> <span class="st">"~/test_report_mae"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">rmarkdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">render</a></span><span class="op">(</span><span class="va">rmd</span><span class="op">[[</span><span class="st">"3-analysis"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>

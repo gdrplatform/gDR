@@ -29,7 +29,7 @@ run_report(
   metadata_columns = c("OncotreeLineage", "PatientRace"),
   output_dir,
   viz_format = "svg",
-  rmd_template_path,
+  rmd_template_path = system.file("report_templates", package = "gDR"),
   steps = seq_len(3),
   mae = NULL,
   special_sections = NULL,
@@ -153,8 +153,8 @@ run_report(
   templates. Directories are searched in order and the first match wins,
   so a deployment can both override individual templates and supply
   steps that the other directories do not carry (for instance a
-  publication step living outside the open-source template set). This is
-  a required parameter.
+  publication step living outside the open-source template set). Default
+  is the templates shipped with gDR.
 
 - steps:
 
