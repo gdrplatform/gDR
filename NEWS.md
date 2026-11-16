@@ -1,3 +1,7 @@
+## gDR 1.11.25 - 2026-11-16
+* add the templates shipped with gDR as the default `rmd_template_path` of `run_report()` and `build_report_rmd()`
+* add a warning for an `extra_render_params` entry no template reads but close to a template parameter
+
 ## gDR 1.11.24 - 2026-11-05
 * add `build_report_rmd()`, which writes the `.Rmd` files of a report without rendering them
 
@@ -204,4 +208,5 @@
 
 ## gDR 0.0.0.1 - 2021-02-03
 * initial version
+
 
