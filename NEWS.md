@@ -1,3 +1,6 @@
+## gDR 1.11.24 - 2026-11-05
+* add `build_report_rmd()`, which writes the `.Rmd` files of a report without rendering them
+
 ## gDR 1.11.23 - 2026-11-03
 * fix the processing step of PRISM level 6 reports, which failed on input without durations
 
