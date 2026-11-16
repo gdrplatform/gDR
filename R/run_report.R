@@ -1521,8 +1521,9 @@ find_template <- function(file_names, template_dirs) {
 #'
 #' Whisker drops a parameter that no template reads without a word. Most such entries of
 #' \code{extra_render_params} are read by the hooks of a deployment, so only a name close to a
-#' template parameter is reported, as the typo it most likely is: one edit away for a name of four
-#' to six characters, two for a longer one, and never for a name of three or fewer.
+#' template parameter or to a selection of the report is reported, as the typo it most likely is:
+#' one edit away for a name of four to six characters, two for a longer one, and never for a name
+#' of three or fewer.
 #'
 #' @param extra_render_params Named list of deployment-specific render parameters.
 #' @param template_paths Character vector of the templates of the run.
@@ -1530,13 +1531,14 @@ find_template <- function(file_names, template_dirs) {
 #' @return \code{NULL}, invisibly.
 #' @keywords internal
 warn_misspelled_render_params <- function(extra_render_params, template_paths) {
-  tags <- unique(unlist(lapply(template_paths, function(path) {
+  template_tags <- unlist(lapply(template_paths, function(path) {
     lines <- readLines(path, warn = FALSE)
     tags <- unlist(regmatches(lines, gregexpr("\\{\\{\\{?[#^/&]?\\s*[A-Za-z0-9_.]+\\s*\\}?\\}\\}", lines)))
     trimws(gsub("[{}#^/&]", "", tags))
-  })))
+  }))
+  tags <- unique(c(template_tags, names(.ANALYSIS_CHOICES), .DATA_SELECTIONS))
   unread <- setdiff(names(extra_render_params), tags)
-  if (length(unread) == 0 || length(tags) == 0) {
+  if (length(unread) == 0) {
     return(invisible(NULL))
   }
 

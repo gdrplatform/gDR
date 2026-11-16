@@ -1008,6 +1008,17 @@ test_that("warn_misspelled_render_params allows fewer edits for a shorter name",
   expect_warning(warn_misspelled_render_params(list(viz_fromat = 1), template), "viz_fromat")
 })
 
+test_that("warn_misspelled_render_params reports names close to a selection of the report", {
+  template <- withr::local_tempfile(fileext = ".Rmd")
+  writeLines("{{viz_format}}", template)
+
+  expect_warning(
+    warn_misspelled_render_params(list(drug_of_interest = "x", norm_type = "GR"), template),
+    "'drug_of_interest' \\(did you mean 'drugs_of_interest'\\?\\), 'norm_type' \\(did you mean 'norm_types'\\?\\)"
+  )
+  expect_no_warning(warn_misspelled_render_params(list(drugs_of_interest = "x", norm_types = "GR"), template))
+})
+
 test_that("build_report_rmd warns about a misspelled entry of extra_render_params", {
   out <- withr::local_tempdir()
   long_table <- withr::local_tempfile(fileext = ".csv")
