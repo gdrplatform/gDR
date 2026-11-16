@@ -330,7 +330,7 @@ invisible(loop(seq_along(ls_table_RV), function(x) {
 `r knitr::knit(text = unlist(table_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r cgs_gr}
 # Run GSEA
@@ -377,7 +377,7 @@ invisible(loop(seq_along(ls_table_GR), function(x) {
 
 `r knitr::knit(text = unlist(table_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 # Visualizing Co-treatment GSEA Results
 
@@ -440,7 +440,7 @@ invisible(loop(seq_along(nested_list_RV), function(x) {
 `r knitr::knit(text = unlist(ls_plt_RV))`
 :::
 
-{{#plot_GR_values}}
+{{#plot_GR}}
 
 ```{r cgs_plot_gr}
 nested_list_GR <- lapply(names(cgs_analysis_GR), function(cl) {
@@ -491,7 +491,7 @@ invisible(loop(seq_along(nested_list_GR), function(x) {
 
 `r knitr::knit(text = unlist(ls_plt_GR))`
 :::
-{{/plot_GR_values}}
+{{/plot_GR}}
 
 # GSEA: Comparing Response Between Two Cell Lines
 

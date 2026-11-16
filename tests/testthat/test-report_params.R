@@ -148,3 +148,12 @@ test_that("build_report_rmd warns about requested isobologram levels only when a
   expect_warning(build(iso_levels = 0.1), "no isoline is drawn for them: 0.1 for RV\\.$")
   expect_no_warning(build(iso_levels = 0.1, plots_to_generate = "sa_heatmap"))
 })
+
+test_that("the add-on steps leave out GR with the analysis step", {
+  for (f in c("3-1-PRISM_analysis.Rmd", "3-1-chemical_genomics_analysis.Rmd")) {
+    template <- readLines(system.file("report_templates", f, package = "gDR"))
+    # plot_GR follows norm_types, plot_GR_values only the data
+    expect_false(any(grepl("plot_GR_values", template, fixed = TRUE)), info = f)
+    expect_true(any(grepl("plot_GR}}", template, fixed = TRUE)), info = f)
+  }
+})
