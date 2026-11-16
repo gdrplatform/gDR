@@ -96,7 +96,7 @@ Required if using \code{special_sections} equal \code{"PRISM"}}
 
 \item{output_dir}{Character. Directory to store reports and output data. This is a required parameter.}
 
-\item{viz_format}{Character. Format for visualizations. Default is \code{"svg"}.}
+\item{viz_format}{Character. Format for visualizations, \code{"svg"} (the default) or \code{"png"}.}
 
 \item{rmd_template_path}{Character vector. One or more directories holding the RMarkdown
 templates. Directories are searched in order and the first match wins, so a deployment can

@@ -133,10 +133,14 @@ select_report_data <- function(mae, selection) {
   if (length(non_empty) == length(selected)) {
     return(selected)
   }
-  # an experiment the selection empties is dropped on purpose
+  # an experiment the selection empties is dropped on purpose, along with its sample map rows
   withCallingHandlers(selected[, , non_empty], warning = function(w) {
     if (grepl("'experiments' dropped", conditionMessage(w), fixed = TRUE)) {
       invokeRestart("muffleWarning")
+    }
+  }, message = function(m) {
+    if (startsWith(conditionMessage(m), "harmonizing input")) {
+      invokeRestart("muffleMessage")
     }
   })
 }

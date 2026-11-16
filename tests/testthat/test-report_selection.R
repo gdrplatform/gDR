@@ -84,6 +84,9 @@ test_that("select_report_data matches a drug and a co-drug in either column of a
     mae, list(drugs_of_interest = "drug_026", codrugs_of_interest = "drug_005")
   ))
   expect_equal(NROW(both[["combination"]]), 1L)
+
+  # dropping the emptied combination experiment says nothing
+  expect_silent(select_report_data(mae, list(drugs_of_interest = "drug_004", codrugs_of_interest = "drug_005")))
 })
 
 test_that("select_report_data turns a reversed pair around, with a message", {

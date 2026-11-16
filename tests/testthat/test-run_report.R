@@ -681,6 +681,20 @@ test_that("run_report refuses a qcs run without an injected import section", {
   )
 })
 
+test_that("build_report_rmd takes svg or png as viz_format, not a name containing one", {
+  out <- withr::local_tempdir()
+  template_dir <- withr::local_tempdir()
+  writeLines("{{viz_format}}", file.path(template_dir, "3-analysis.Rmd"))
+  file.create(file.path(template_dir, "gdr_logo-01.png"))
+  build <- function(viz_format) {
+    build_report_rmd(mae = gDRutils::get_synthetic_data("finalMAE_combo_matrix_small.qs2"), output_dir = out,
+                     rmd_template_path = template_dir, steps = 3, viz_format = viz_format)
+  }
+
+  expect_equal(readLines(build("png")[["3-analysis"]]), "png")
+  expect_error(build("mysvgfile"), "viz_format")
+})
+
 test_that("run_report reports a missing step template up front", {
 
   dummy_out <- tempfile()

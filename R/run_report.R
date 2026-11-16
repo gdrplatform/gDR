@@ -94,7 +94,7 @@
 #' @param metadata_columns Character. Metadata names from file pointed by \code{meta_data_path}
 #'  Required if using \code{special_sections} equal \code{"PRISM"}
 #' @param output_dir Character. Directory to store reports and output data. This is a required parameter.
-#' @param viz_format Character. Format for visualizations. Default is \code{"svg"}.
+#' @param viz_format Character. Format for visualizations, \code{"svg"} (the default) or \code{"png"}.
 #' @param rmd_template_path Character vector. One or more directories holding the RMarkdown
 #'  templates. Directories are searched in order and the first match wins, so a deployment can
 #'  both override individual templates and supply steps that the other directories do not carry
@@ -617,7 +617,7 @@ assert_report_args <- function(args) {
     checkmate::assert_string(output_dir)
     checkmate::assert_character(rmd_template_path, min.len = 1, any.missing = FALSE)
     checkmate::assert_directory_exists(rmd_template_path)
-    checkmate::assert_string(viz_format, pattern = "svg|png")
+    checkmate::assert_choice(viz_format, c("svg", "png"))
     checkmate::assert_numeric(steps, lower = 1, upper = 4, any.missing = FALSE)
     checkmate::assert_flag(verbose_mode)
     checkmate::assert_flag(with_decoding)
@@ -887,7 +887,9 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
       # an add-on step draws the data its analysis step selected
       selected <- qs2::qs_read(selected_path)
     }
-    # the sections drawn follow the selected data, not the whole dataset
+    # the sections drawn follow the selected data, not the whole dataset; plot_GR_values comes from
+    # its Normalized assay here, and from the durations and division times of gDR_input.qs2 for a
+    # raw-file run without a selection, which agree for data that went through the processing step
     dynamic_params <- prepare_dynamic_render_params("mae", selected, output_dir, 3)
   }
   report_selection <- describe_report_selection(plan$analysis_params, plan$data_selection)
