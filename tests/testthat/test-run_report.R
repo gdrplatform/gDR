@@ -997,6 +997,17 @@ test_that("warn_misspelled_render_params reports names close to a template param
   )
 })
 
+test_that("warn_misspelled_render_params allows fewer edits for a shorter name", {
+  template <- withr::local_tempfile(fileext = ".Rmd")
+  writeLines("{{dpi}} {{embed}} {{viz_format}}", template)
+
+  expect_no_warning(warn_misspelled_render_params(list(api = 1), template))
+  expect_warning(warn_misspelled_render_params(list(embd = 1), template), "'embd' \\(did you mean 'embed'\\?\\)")
+  expect_no_warning(warn_misspelled_render_params(list(emb = 1), template))
+  expect_no_warning(warn_misspelled_render_params(list(ebd = 1, embdd_x = 1), template))
+  expect_warning(warn_misspelled_render_params(list(viz_fromat = 1), template), "viz_fromat")
+})
+
 test_that("build_report_rmd warns about a misspelled entry of extra_render_params", {
   out <- withr::local_tempdir()
   long_table <- withr::local_tempfile(fileext = ".csv")

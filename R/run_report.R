@@ -1475,8 +1475,9 @@ find_template <- function(file_names, template_dirs) {
 #' Warn about likely misspelled render parameters
 #'
 #' Whisker drops a parameter that no template reads without a word. Most such entries of
-#' \code{extra_render_params} are read by the hooks of a deployment, so only a name at most two
-#' edits away from a template parameter is reported, as the typo it most likely is.
+#' \code{extra_render_params} are read by the hooks of a deployment, so only a name close to a
+#' template parameter is reported, as the typo it most likely is: one edit away for a name of four
+#' to six characters, two for a longer one, and never for a name of three or fewer.
 #'
 #' @param extra_render_params Named list of deployment-specific render parameters.
 #' @param template_paths Character vector of the templates of the run.
@@ -1495,7 +1496,7 @@ warn_misspelled_render_params <- function(extra_render_params, template_paths) {
   }
 
   distance <- utils::adist(unread, tags)
-  close <- apply(distance, 1, min) <= 2
+  close <- apply(distance, 1, min) <= pmin(2, (nchar(unread) - 1) %/% 3)
   if (any(close)) {
     nearest <- tags[apply(distance[close, , drop = FALSE], 1, which.min)]
     warning(sprintf(
