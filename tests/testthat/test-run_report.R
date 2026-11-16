@@ -872,30 +872,69 @@ test_that("build_report_rmd writes the same .Rmd files as run_report", {
     # resume writes into the directory run_report() used, so the paths in the documents match
     rmd <- do.call(
       build_report_rmd,
-      c(list(output_dir = out, rmd_template_path = templates, resume = TRUE), cases[[case]])
+      c(list(output_dir = file.path(out, "current"), rmd_template_path = templates, resume = TRUE), cases[[case]])
     )
     expect_length(rmd, length(expected))
     expect_equal(stats::setNames(lapply(rmd, readLines), basename(rmd)), expected, info = case)
   }
 })
 
-test_that("build_report_rmd returns the written steps in render order and renders nothing", {
+test_that("build_report_rmd writes into a new run directory and renders nothing", {
   out <- withr::local_tempdir()
   template_dir <- .setup_dummy_templates()
   withr::defer(unlink(template_dir, recursive = TRUE))
   long_table <- withr::local_tempfile(fileext = ".csv")
   writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
 
-  expect_warning(
-    rmd <- build_report_rmd(long_table = long_table, output_dir = out, rmd_template_path = template_dir),
-    "Write one step at a time"
-  )
-  expect_named(rmd, c("1-data_import", "2-processing_and_QC", "3-analysis"))
-  expect_equal(dirname(rmd), rep(file.path(out, "v1"), 3), ignore_attr = TRUE)
-  expect_true(all(file.exists(rmd)))
+  rmd <- build_report_rmd(long_table = long_table, output_dir = out, rmd_template_path = template_dir, steps = 1)
+  expect_named(rmd, "1-data_import")
+  expect_equal(dirname(rmd), file.path(out, "v1"), ignore_attr = TRUE)
+  expect_true(file.exists(rmd))
   expect_length(list.files(out, pattern = "\\.html$", recursive = TRUE), 0)
   # 'current' is left to the run that renders the report
   expect_false(file.exists(file.path(out, "current")))
+})
+
+test_that("build_report_rmd refuses a step whose input the previous step has not written yet", {
+  out <- withr::local_tempdir()
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  expect_error(
+    build_report_rmd(long_table = long_table, output_dir = out, rmd_template_path = template_dir),
+    "2-processing_and_QC, 3-analysis read\\(s\\) 'gDR_data/gDR_input.qs2', 'gDR_data/gDR_mae.qs2'"
+  )
+  expect_false(dir.exists(file.path(out, "v1")))
+})
+
+test_that("build_report_rmd with resume writes the next step into the given run directory", {
+  out <- withr::local_tempdir()
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+  local_mocked_bindings(prepare_dynamic_render_params = function(...) list())
+
+  rmd <- build_report_rmd(long_table = long_table, output_dir = out, rmd_template_path = template_dir, steps = 1)
+  run_dir <- dirname(rmd[[1]])
+  expect_error(
+    build_report_rmd(output_dir = run_dir, rmd_template_path = template_dir, steps = 2, resume = TRUE),
+    "No valid input source"
+  )
+  expect_true(dir.exists(run_dir))
+
+  # what rendering step 1 writes
+  qs2::qs_save(data.table::data.table(), file.path(run_dir, "gDR_data", "gDR_input.qs2"))
+  rmd2 <- build_report_rmd(output_dir = run_dir, rmd_template_path = template_dir, steps = 2, resume = TRUE)
+  expect_equal(rmd2, c("2-processing_and_QC" = file.path(normalizePath(run_dir), "2-processing_and_QC.Rmd")))
+  expect_length(list.dirs(out, recursive = FALSE), 1)
+
+  expect_error(
+    build_report_rmd(output_dir = file.path(out, "v2"), rmd_template_path = template_dir, steps = 2, resume = TRUE),
+    "does not exist"
+  )
 })
 
 test_that("build_report_rmd refuses the publication step", {
@@ -923,4 +962,64 @@ test_that("build_report_rmd removes the output directory it created when it fail
     "not available in this installation"
   )
   expect_false(dir.exists(file.path(out, "v1")))
+})
+
+test_that("build_report_rmd uses the templates shipped with gDR by default", {
+  out_default <- withr::local_tempdir()
+  out_explicit <- withr::local_tempdir()
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  rmd_default <- build_report_rmd(long_table = long_table, output_dir = out_default, steps = 1)
+  rmd_explicit <- build_report_rmd(
+    long_table = long_table,
+    output_dir = out_explicit,
+    rmd_template_path = system.file("report_templates", package = "gDR"),
+    steps = 1
+  )
+  expect_equal(
+    gsub(out_default, "", readLines(rmd_default), fixed = TRUE),
+    gsub(out_explicit, "", readLines(rmd_explicit), fixed = TRUE)
+  )
+})
+
+test_that("warn_misspelled_render_params reports names close to a template parameter only", {
+  template <- withr::local_tempfile(fileext = ".Rmd")
+  writeLines(c("{{#MAE}}x <- '{{viz_format}}'{{/MAE}}", "{{{report_inputs_file}}}"), template)
+
+  expect_warning(
+    warn_misspelled_render_params(list(viz_fromat = "png", report_input_file = "f"), template),
+    "'viz_fromat' \\(did you mean 'viz_format'\\?\\), 'report_input_file' \\(did you mean 'report_inputs_file'\\?\\)"
+  )
+  # read by a template, or far from every template parameter (read by the hooks of a deployment)
+  expect_no_warning(
+    warn_misspelled_render_params(list(viz_format = "png", push_to_DSDB = TRUE, username = "u"), template)
+  )
+})
+
+test_that("warn_misspelled_render_params allows fewer edits for a shorter name", {
+  template <- withr::local_tempfile(fileext = ".Rmd")
+  writeLines("{{dpi}} {{embed}} {{viz_format}}", template)
+
+  expect_no_warning(warn_misspelled_render_params(list(api = 1), template))
+  expect_warning(warn_misspelled_render_params(list(embd = 1), template), "'embd' \\(did you mean 'embed'\\?\\)")
+  expect_no_warning(warn_misspelled_render_params(list(emb = 1), template))
+  expect_no_warning(warn_misspelled_render_params(list(ebd = 1, embdd_x = 1), template))
+  expect_warning(warn_misspelled_render_params(list(viz_fromat = 1), template), "viz_fromat")
+})
+
+test_that("build_report_rmd warns about a misspelled entry of extra_render_params", {
+  out <- withr::local_tempdir()
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  expect_warning(
+    build_report_rmd(
+      long_table = long_table,
+      output_dir = out,
+      steps = 1,
+      extra_render_params = list(extra_section_import = "", username = "u")
+    ),
+    "did you mean 'extra_sections_import'"
+  )
 })

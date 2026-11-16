@@ -24,6 +24,14 @@
 # the clean-up in run_report()), so that publishing alone can be retried in resume mode.
 .PUBLICATION_STEP <- "4-publish_results.Rmd"
 
+# Data a step reads from its `gDR_data` directory that only rendering the previous step writes.
+# Without it the step loses its combination, GR and isobologram sections and still renders (see
+# prepare_dynamic_render_params()), so build_report_rmd() does not write such a step.
+.STEP_INPUTS <- c(
+  "2-processing_and_QC.Rmd" = "gDR_input.qs2",
+  "3-analysis.Rmd" = "gDR_mae.qs2"
+)
+
 #' Run a gDR report pipeline
 #'
 #' Infrastructure-agnostic driver for the gDR reporting pipeline. It stages all input files into
@@ -91,7 +99,7 @@
 #'  templates. Directories are searched in order and the first match wins, so a deployment can
 #'  both override individual templates and supply steps that the other directories do not carry
 #'  (for instance a publication step living outside the open-source template set).
-#'  This is a required parameter.
+#'  Default is the templates shipped with gDR.
 #' @param steps Integer vector. Steps to run in the pipeline:
 #'  1: data import, 2: processing and QC, 3: analysis, 4: publish results.
 #'  Default is \code{1:3}. Note: If \code{mae} is provided, steps 1 and 2 are automatically skipped.
@@ -239,7 +247,7 @@ run_report <- function(
     ),
     output_dir,
     viz_format = "svg",
-    rmd_template_path,
+    rmd_template_path = system.file("report_templates", package = "gDR"),
     steps = seq_len(3),
     mae = NULL,
     special_sections = NULL,
@@ -452,16 +460,19 @@ run_report <- function(
 #' checks that guard it belong to the caller that runs it, so it is left to \code{run_report()}.
 #'
 #' The parameters of a step are partly read from the data that rendering the previous step
-#' writes. With several steps requested, the documents after the first are written before that
-#' data exists and can differ from what \code{run_report()} renders; write one step at a time,
-#' rendering each before writing the next, or use \code{run_report()}.
+#' writes, so a step is written only once that data is in the run directory. Write and render
+#' one step at a time, passing the run directory with \code{resume = TRUE} for the next one, or
+#' use \code{run_report()}. An \code{mae} input needs only step 3 and is written in one call.
 #'
 #' @inheritParams run_report
+#' @param output_dir Character. Directory in which a new versioned run directory is created, or
+#'   with \code{resume = TRUE} the run directory to write into.
 #' @param steps Integer vector. Steps to write, within \code{1:3}:
 #'  1: data import, 2: processing and QC, 3: analysis. Default is \code{1:3}.
 #'  If \code{mae} is provided, steps 1 and 2 are skipped.
-#' @param resume Logical. Whether to write into the existing 'current' output directory instead of
-#'   creating a new version, e.g. to write step 3 after step 2 was rendered. Default is \code{FALSE}.
+#' @param resume Logical. Whether \code{output_dir} is an existing run directory to write into,
+#'   e.g. \code{dirname(rmd[[1]])} or the \code{current} link of a \code{run_report()} run.
+#'   Default is \code{FALSE}.
 #'
 #' @return Named character vector of the paths of the written \code{.Rmd} files, in render order,
 #'   named after the steps (e.g. \code{"3-analysis"}).
@@ -472,10 +483,16 @@ run_report <- function(
 #' \dontrun{
 #' rmd <- build_report_rmd(
 #'   mae = "path/to/mae.qs2",
-#'   output_dir = "~/test_report_mae",
-#'   rmd_template_path = "path/to/report_templates"
+#'   output_dir = "~/test_report_mae"
 #' )
 #' rmarkdown::render(rmd[["3-analysis"]])
+#'
+#' # one step at a time
+#' rmd <- build_report_rmd(long_table = "path/to/long_table.csv", output_dir = "~/test_report",
+#'                         rmd_template_path = "path/to/report_templates", steps = 1)
+#' rmarkdown::render(rmd[["1-data_import"]])
+#' rmd <- build_report_rmd(output_dir = dirname(rmd[[1]]), rmd_template_path = "path/to/report_templates",
+#'                         steps = 2, resume = TRUE)
 #' }
 build_report_rmd <- function(
     qcs_id = NULL,
@@ -503,7 +520,7 @@ build_report_rmd <- function(
     ),
     output_dir,
     viz_format = "svg",
-    rmd_template_path,
+    rmd_template_path = system.file("report_templates", package = "gDR"),
     steps = seq_len(3),
     mae = NULL,
     special_sections = NULL,
@@ -529,30 +546,41 @@ build_report_rmd <- function(
     )
   }
 
-  env <- setup_run_environment(output_dir, verbose_mode, resume)
-  # nothing is rendered, so nothing is logged
-  close(env$stdout_con)
-  close(env$stderr_con)
+  # 'current' points to the last rendered run, so the run to resume is named directly
+  run_dir <- if (resume) {
+    checkmate::assert_directory_exists(output_dir)
+    normalizePath(output_dir)
+  } else {
+    env <- setup_run_environment(output_dir, verbose_mode)
+    # nothing is rendered, so nothing is logged
+    close(env$stdout_con)
+    close(env$stderr_con)
+    env$output_dir
+  }
 
   done <- FALSE
   on.exit({
     if (!done && !resume) {
-      unlink(env$output_dir, recursive = TRUE, force = TRUE)
+      unlink(run_dir, recursive = TRUE, force = TRUE)
     }
   })
 
-  plan <- prepare_report_steps(args, extra_render_params, env$output_dir, on_resolve_inputs = on_resolve_inputs)
-  if (length(plan$steps) > 1) {
-    warning(
-      "Steps after the first are written before the earlier steps have been rendered, so their ",
-      "parameters can differ from what run_report() renders. Write one step at a time, or use ",
-      "run_report()."
-    )
+  plan <- prepare_report_steps(args, extra_render_params, run_dir, on_resolve_inputs = on_resolve_inputs)
+  inputs <- .STEP_INPUTS[intersect(plan$rmd_files, names(.STEP_INPUTS))]
+  missing_inputs <- inputs[!file.exists(file.path(run_dir, "gDR_data", inputs))]
+  if (length(missing_inputs) > 0) {
+    stop(sprintf(
+      paste("%s read(s) %s, which rendering the previous step writes and which is not in '%s' yet.",
+            "Render that step first and write the next one with resume = TRUE, or use run_report()."),
+      toString(tools::file_path_sans_ext(names(missing_inputs))),
+      toString(sprintf("'gDR_data/%s'", missing_inputs)),
+      run_dir
+    ))
   }
 
   warned_shadowed <- character(0)
   for (i in seq_along(plan$template_paths)) {
-    warned_shadowed <- write_report_step(plan, i, env$output_dir, warned_shadowed)
+    warned_shadowed <- write_report_step(plan, i, run_dir, warned_shadowed)
   }
 
   done <- TRUE
@@ -752,6 +780,8 @@ prepare_report_steps <- function(args,
       toString(missing_templates)
     ))
   }
+
+  warn_misspelled_render_params(extra_render_params, template_paths)
 
   logo_src <- find_template("gdr_logo-01.png", run_args$rmd_template_path)
   if (!is.na(logo_src)) {
@@ -1485,4 +1515,39 @@ find_template <- function(file_names, template_dirs) {
     character(1),
     USE.NAMES = FALSE
   )
+}
+
+#' Warn about likely misspelled render parameters
+#'
+#' Whisker drops a parameter that no template reads without a word. Most such entries of
+#' \code{extra_render_params} are read by the hooks of a deployment, so only a name close to a
+#' template parameter is reported, as the typo it most likely is: one edit away for a name of four
+#' to six characters, two for a longer one, and never for a name of three or fewer.
+#'
+#' @param extra_render_params Named list of deployment-specific render parameters.
+#' @param template_paths Character vector of the templates of the run.
+#'
+#' @return \code{NULL}, invisibly.
+#' @keywords internal
+warn_misspelled_render_params <- function(extra_render_params, template_paths) {
+  tags <- unique(unlist(lapply(template_paths, function(path) {
+    lines <- readLines(path, warn = FALSE)
+    tags <- unlist(regmatches(lines, gregexpr("\\{\\{\\{?[#^/&]?\\s*[A-Za-z0-9_.]+\\s*\\}?\\}\\}", lines)))
+    trimws(gsub("[{}#^/&]", "", tags))
+  })))
+  unread <- setdiff(names(extra_render_params), tags)
+  if (length(unread) == 0 || length(tags) == 0) {
+    return(invisible(NULL))
+  }
+
+  distance <- utils::adist(unread, tags)
+  close <- apply(distance, 1, min) <= pmin(2, (nchar(unread) - 1) %/% 3)
+  if (any(close)) {
+    nearest <- tags[apply(distance[close, , drop = FALSE], 1, which.min)]
+    warning(sprintf(
+      "'extra_render_params' entries not read by any template of this run: %s.",
+      toString(sprintf("'%s' (did you mean '%s'?)", unread[close], nearest))
+    ), call. = FALSE)
+  }
+  invisible(NULL)
 }
