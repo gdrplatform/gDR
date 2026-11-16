@@ -289,24 +289,24 @@ head(convert_se_assay_to_dt(se, "Metrics"))
 #> 2:                 RV 0.9157913 0.08420865  0.05733832  0.4225500 0.8794050
 #> 3:                 GR 0.5092443 0.49075566  0.48159819 -0.4177500 0.5983619
 #> 4:                 RV 0.6675856 0.33241443  0.32656451  0.0260500 0.7335509
-#> 5:                 GR 0.2600750 0.73992500  0.73992500  0.2600750 0.3936048
-#> 6:                 RV 0.3225188 0.67748125  0.67748125  0.3225188 0.2540203
+#> 5:                 GR 0.2600750 0.73992500          NA  0.2600750 0.3936048
+#> 6:                 RV 0.3225188 0.67748125          NA  0.3225188 0.2540203
 #>    N_conc maxlog10Concentration        ec50      xc50         h        r2
 #>     <int>                 <num>       <num>     <num>     <num>     <num>
 #> 1:      9              1.000000 100.0000000 4.1712724 0.2918356 0.7732475
 #> 2:      9              1.000000   5.7741811 7.4683485 1.3311221 0.9199573
 #> 3:      9              1.000000   0.5757493 0.3199532 1.1597048 0.9858751
 #> 4:      9              1.000000   0.4793539 0.4942034 2.9149107 0.9751992
-#> 5:      1             -0.823909   0.0000000      -Inf 0.0001000 0.0000000
-#> 6:      1             -0.823909   0.0000000      -Inf 0.0001000 0.0000000
+#> 5:      1             -0.823909          NA      -Inf        NA        NA
+#> 6:      1             -0.823909          NA      -Inf        NA        NA
 #>           rss         p_value   x_0       x_inf               fit_type
 #>         <num>           <num> <num>       <num>                 <char>
-#> 1: 0.06111735 0.0055517820959     1 -0.76364407 DRC3pHillFitModelFixS0
+#> 1: 0.06111735 0.0055517820958     1 -0.76364406 DRC3pHillFitModelFixS0
 #> 2: 0.03159935 0.0001450862960     1  0.14499197 DRC3pHillFitModelFixS0
 #> 3: 0.03576754 0.0000003349268     1 -0.48824612 DRC3pHillFitModelFixS0
 #> 4: 0.04890734 0.0000024023028     1  0.04254419 DRC3pHillFitModelFixS0
-#> 5:         NA              NA     1  0.26007500   DRCConstantFitResult
-#> 6:         NA              NA     1  0.32251875   DRCConstantFitResult
+#> 5:         NA              NA    NA          NA   DRCTooFewPointsToFit
+#> 6:         NA              NA    NA          NA   DRCTooFewPointsToFit
 #>    fit_source Gnumber DrugName drug_moa Duration    clid CellLineName Tissue
 #>        <char>  <char>   <char>   <char>    <num>  <char>       <char> <char>
 #> 1:        gDR  G00002 drug_002    moa_A      168 CL00011  cellline_BA breast
@@ -338,13 +338,13 @@ heatmaps, etc.
 
 ``` r
 sessionInfo()
-#> R version 4.6.1 (2026-06-24)
+#> R version 4.6.2 (2026-10-29)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.5 LTS
+#> Running under: Ubuntu 26.04.1 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0
 #> 
 #> locale:
 #>  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
@@ -359,38 +359,38 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] kableExtra_1.4.1  gDR_1.11.18       gDRutils_1.11.21  gDRimport_1.11.12
-#> [5] gDRcore_1.11.24   BiocStyle_2.41.0 
+#> [1] kableExtra_1.4.1  gDR_1.11.24       gDRutils_1.11.26  gDRimport_1.11.15
+#> [5] gDRcore_1.11.32   BiocStyle_2.41.0 
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] viridisLite_0.4.3           farver_2.1.2               
 #>  [3] fastmap_1.2.0               BumpyMatrix_1.21.0         
 #>  [5] TH.data_1.1-5               digest_0.6.39              
-#>  [7] lifecycle_1.0.5             survival_3.8-6             
-#>  [9] magrittr_2.0.5              compiler_4.6.1             
+#>  [7] lifecycle_1.0.5             survival_3.8-12            
+#>  [9] magrittr_2.0.5              compiler_4.6.2             
 #> [11] rlang_1.3.0                 sass_0.4.10                
-#> [13] drc_4.0-0                   tools_4.6.1                
+#> [13] drc_4.0-0                   tools_4.6.2                
 #> [15] plotrix_3.8-14              yaml_2.3.12                
 #> [17] data.table_1.18.6.1         knitr_1.52                 
 #> [19] lambda.r_1.2.6              S4Arrays_1.13.2            
 #> [21] DelayedArray_0.39.8         xml2_1.6.0                 
 #> [23] RColorBrewer_1.1-3          abind_1.4-8                
 #> [25] multcomp_1.4-32             BiocParallel_1.47.0        
-#> [27] purrr_1.2.2                 BiocGenerics_0.59.12       
-#> [29] desc_1.4.3                  grid_4.6.1                 
-#> [31] stats4_4.6.1                scales_1.4.0               
-#> [33] gtools_3.9.5                MASS_7.3-65                
+#> [27] purrr_1.2.2                 BiocGenerics_0.59.13       
+#> [29] desc_1.4.3                  grid_4.6.2                 
+#> [31] stats4_4.6.2                scales_1.4.0               
+#> [33] gtools_3.9.5                MASS_7.3-66                
 #> [35] MultiAssayExperiment_1.39.1 SummarizedExperiment_1.43.0
 #> [37] cli_3.6.6                   mvtnorm_1.4-2              
 #> [39] rmarkdown_2.32              ragg_1.5.2                 
-#> [41] generics_0.1.4              otel_0.2.0                 
+#> [41] generics_0.1.4              otel_0.3.0                 
 #> [43] rstudioapi_0.19.0           readxl_1.6.0               
 #> [45] cachem_1.1.0                stringr_1.6.0              
-#> [47] splines_4.6.1               assertthat_0.2.1           
-#> [49] parallel_4.6.1              BiocManager_1.30.27        
+#> [47] splines_4.6.2               assertthat_0.2.1           
+#> [49] parallel_4.6.2              BiocManager_1.30.27        
 #> [51] formatR_1.14                cellranger_1.1.0           
 #> [53] XVector_0.53.0              matrixStats_1.5.0          
-#> [55] vctrs_0.7.3                 Matrix_1.7-5               
+#> [55] vctrs_0.7.3                 Matrix_1.7-6               
 #> [57] sandwich_3.1-3              jsonlite_2.0.0             
 #> [59] carData_3.0-6               bookdown_0.48              
 #> [61] car_3.1-5                   IRanges_2.47.5             
@@ -404,10 +404,10 @@ sessionInfo()
 #> [77] htmltools_0.5.9             Seqinfo_1.3.2              
 #> [79] brio_1.1.5                  R6_2.6.1                   
 #> [81] textshaping_1.0.5           evaluate_1.0.5             
-#> [83] lattice_0.22-9              Biobase_2.73.2             
+#> [83] lattice_0.23-1              Biobase_2.73.2             
 #> [85] futile.options_1.0.1        backports_1.5.1            
 #> [87] bslib_0.12.0                svglite_2.2.2              
-#> [89] SparseArray_1.13.4          checkmate_2.3.4            
+#> [89] SparseArray_1.13.5          checkmate_2.3.4            
 #> [91] xfun_0.62                   fs_2.1.0                   
 #> [93] MatrixGenerics_1.25.0       zoo_1.9-1                  
 #> [95] pkgconfig_2.0.3

@@ -222,7 +222,10 @@ run_report(
   registry metadata) without adding them to the signature of this
   function. Values are also persisted in `args.qs2`. Names colliding
   with parameters computed by this function are dropped with a warning.
-  Default is an empty list.
+  One entry is read by the templates themselves: `report_inputs_file`,
+  the path to a qs2 file with a named list of plain data describing the
+  inputs of the run, which the processing step records as the `"report"`
+  step in the provenance of every experiment. Default is an empty list.
 
 - on_resolve_inputs:
 

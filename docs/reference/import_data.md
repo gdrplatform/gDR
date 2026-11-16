@@ -54,13 +54,13 @@ a `data.table`
 ``` r
 td <- get_test_data()
 i_df <- import_data(manifest_path(td), template_path(td), result_path(td))
-#> INFO [2026-10-27 06:06:02] Manifest loaded successfully
-#> INFO [2026-10-27 06:06:02] Reading Template_7daytreated.xlsx with load_templates_xlsx
-#> INFO [2026-10-27 06:06:02] Reading Template_Untreated.xlsx with load_templates_xlsx
-#> INFO [2026-10-27 06:06:02] Loading Template_7daytreated.xlsx
-#> INFO [2026-10-27 06:06:02] Loading Template_Untreated.xlsx
-#> INFO [2026-10-27 06:06:02] Templates loaded successfully!
-#> INFO [2026-10-27 06:06:02] Reading file /home/runner/work/_temp/Library/gDRimport/extdata/data1/RawData_day0.xlsx, sheet Readout_0077vs0068_day7
+#> INFO [2026-11-16 07:18:53] Manifest loaded successfully
+#> INFO [2026-11-16 07:18:53] Reading Template_7daytreated.xlsx with load_templates_xlsx
+#> INFO [2026-11-16 07:18:53] Reading Template_Untreated.xlsx with load_templates_xlsx
+#> INFO [2026-11-16 07:18:53] Loading Template_7daytreated.xlsx
+#> INFO [2026-11-16 07:18:53] Loading Template_Untreated.xlsx
+#> INFO [2026-11-16 07:18:53] Templates loaded successfully!
+#> INFO [2026-11-16 07:18:53] Reading file /home/runner/work/_temp/Library/gDRimport/extdata/data1/RawData_day0.xlsx, sheet Readout_0077vs0068_day7
 #> New names:
 #> • `` -> `...1`
 #> • `` -> `...2`
@@ -87,14 +87,14 @@ i_df <- import_data(manifest_path(td), template_path(td), result_path(td))
 #> • `` -> `...23`
 #> • `` -> `...24`
 #> • `` -> `...25`
-#> INFO [2026-10-27 06:06:02] Plate 201904190a read; 384 wells
-#> INFO [2026-10-27 06:06:02] Plate 201904190b read; 384 wells
-#> INFO [2026-10-27 06:06:02] Plate 201904190c read; 384 wells
-#> INFO [2026-10-27 06:06:02] Plate 201904190d read; 384 wells
-#> INFO [2026-10-27 06:06:02] Plate 201904190e read; 384 wells
-#> INFO [2026-10-27 06:06:02] Plate 201904190f read; 384 wells
-#> INFO [2026-10-27 06:06:02] File done
-#> INFO [2026-10-27 06:06:02] Reading file /home/runner/work/_temp/Library/gDRimport/extdata/data1/RawData_day7.xlsx, sheet Readout_0077vs0068_day7
+#> INFO [2026-11-16 07:18:53] Plate 201904190a read; 384 wells
+#> INFO [2026-11-16 07:18:53] Plate 201904190b read; 384 wells
+#> INFO [2026-11-16 07:18:53] Plate 201904190c read; 384 wells
+#> INFO [2026-11-16 07:18:53] Plate 201904190d read; 384 wells
+#> INFO [2026-11-16 07:18:53] Plate 201904190e read; 384 wells
+#> INFO [2026-11-16 07:18:53] Plate 201904190f read; 384 wells
+#> INFO [2026-11-16 07:18:53] File done
+#> INFO [2026-11-16 07:18:53] Reading file /home/runner/work/_temp/Library/gDRimport/extdata/data1/RawData_day7.xlsx, sheet Readout_0077vs0068_day7
 #> New names:
 #> • `` -> `...1`
 #> • `` -> `...2`
@@ -121,15 +121,15 @@ i_df <- import_data(manifest_path(td), template_path(td), result_path(td))
 #> • `` -> `...23`
 #> • `` -> `...24`
 #> • `` -> `...25`
-#> INFO [2026-10-27 06:06:03] Plate 201904197a read; 384 wells
-#> INFO [2026-10-27 06:06:03] Plate 201904197b read; 384 wells
-#> INFO [2026-10-27 06:06:03] Plate 201904197c read; 384 wells
-#> INFO [2026-10-27 06:06:03] Plate 201904197d read; 384 wells
-#> INFO [2026-10-27 06:06:03] Plate 201904197e read; 384 wells
-#> INFO [2026-10-27 06:06:03] Plate 201904197f read; 384 wells
-#> INFO [2026-10-27 06:06:03] File done
-#> INFO [2026-10-27 06:06:03] Merging data
-#> INFO [2026-10-27 06:06:03] Merging the metadata (manifest and treatment files)
-#> WARN [2026-10-27 06:06:03] 4608 well loaded, 768 wells discarded for lack of annotation,
+#> INFO [2026-11-16 07:18:53] Plate 201904197a read; 384 wells
+#> INFO [2026-11-16 07:18:53] Plate 201904197b read; 384 wells
+#> INFO [2026-11-16 07:18:53] Plate 201904197c read; 384 wells
+#> INFO [2026-11-16 07:18:53] Plate 201904197d read; 384 wells
+#> INFO [2026-11-16 07:18:53] Plate 201904197e read; 384 wells
+#> INFO [2026-11-16 07:18:53] Plate 201904197f read; 384 wells
+#> INFO [2026-11-16 07:18:53] File done
+#> INFO [2026-11-16 07:18:53] Merging data
+#> INFO [2026-11-16 07:18:53] Merging the metadata (manifest and treatment files)
+#> WARN [2026-11-16 07:18:53] 4608 well loaded, 768 wells discarded for lack of annotation,
 #>     3840 data point selected
 ```

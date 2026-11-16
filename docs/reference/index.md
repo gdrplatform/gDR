@@ -14,6 +14,8 @@
 
 ## Report
 
+- [`build_report_rmd()`](https://gdrplatform.github.io/gDR/reference/build_report_rmd.md)
+  : Write the RMarkdown documents of a gDR report without rendering them
 - [`create_symlink_to_current()`](https://gdrplatform.github.io/gDR/reference/create_symlink_to_current.md)
   : Create symbolic link to current version
 - [`format_vector_for_rmd()`](https://gdrplatform.github.io/gDR/reference/format_vector_for_rmd.md)

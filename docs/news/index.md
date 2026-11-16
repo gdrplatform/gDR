@@ -1,5 +1,42 @@
 # Changelog
 
+## gDR 1.11.24 - 2026-11-05
+
+- add
+  [`build_report_rmd()`](https://gdrplatform.github.io/gDR/reference/build_report_rmd.md),
+  which writes the `.Rmd` files of a report without rendering them
+
+## gDR 1.11.23 - 2026-11-03
+
+- fix the processing step of PRISM level 6 reports, which failed on
+  input without durations
+
+## gDR 1.11.22 - 2026-11-03
+
+- add a `report` step to the provenance from
+  `extra_render_params$report_inputs_file`, a list of the run’s inputs
+
+## gDR 1.11.21 - 2026-11-02
+
+- add a note to the processing report when it leaves out data types it
+  does not process, such as co-dilution
+
+## gDR 1.11.20 - 2026-11-02
+
+- add the optional `treatment_time` config key to the Incucyte report,
+  the hour the treatment marker is drawn at
+
+## gDR 1.11.19 - 2026-10-30
+
+- use
+  [`runDrugResponseProcessingPipeline()`](https://gdrplatform.github.io/gDRcore/reference/runDrugResponseProcessingPipelineFxns.html)
+  in the processing report and read its saved steps for the quality
+  control
+- fix the missing import step in the provenance of the processing
+  report’s MAE
+- bump the gDRcore requirement to 1.11.29, which exports
+  [`read_intermediate_data()`](https://gdrplatform.github.io/gDRcore/reference/read_intermediate_data.html)
+
 ## gDR 1.11.18 - 2026-10-26
 
 - correct the Incucyte report wording on `rate_0`, the control rate

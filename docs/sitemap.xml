@@ -8,6 +8,8 @@
 <url><loc>https://gdrplatform.github.io/gDR/news/index.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDR/reference/add_treatment_column.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDR/reference/apply_custom_metadata_tags.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/reference/assert_report_args.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/reference/build_report_rmd.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDR/reference/cast_to_wide.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDR/reference/convert_growth_metric.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDR/reference/create_symlink_to_current.html</loc></url>
@@ -23,6 +25,7 @@
 <url><loc>https://gdrplatform.github.io/gDR/reference/is_null_or_empty.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDR/reference/label_periods.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDR/reference/prepare_dynamic_render_params.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/reference/prepare_report_steps.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDR/reference/resolve_incucyte_config_path.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDR/reference/resolve_path_spec.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDR/reference/run_report.html</loc></url>
@@ -32,5 +35,6 @@
 <url><loc>https://gdrplatform.github.io/gDR/reference/split_comma_separated_string.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDR/reference/stage_and_update_paths.html</loc></url>
 <url><loc>https://gdrplatform.github.io/gDR/reference/validate_and_prepare_inputs.html</loc></url>
+<url><loc>https://gdrplatform.github.io/gDR/reference/write_report_step.html</loc></url>
 </urlset>
 
