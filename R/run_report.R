@@ -138,7 +138,8 @@
 #'       \code{"xc50"}, \code{"x_max"}, \code{"x_mean"}, \code{"x_AOC"}, \code{"x_AOC_range"};
 #'     \item \code{combo_score_metrics}: combination scores of the heatmaps and boxplots, from
 #'       \code{"hsa_score"}, \code{"bliss_score"};
-#'     \item \code{iso_levels}: effect levels of the isobolograms, default \code{"0.5"};
+#'     \item \code{iso_levels}: effect levels of the isobolograms, from -1 to 0.8, default
+#'       \code{"0.5"}; a level the data does not have draws no isoline and is warned about;
 #'     \item \code{norm_types}: normalization types, \code{"RV"} alone leaves out the GR sections;
 #'     \item \code{plots_to_generate}: sections of the report, from \code{"sa_drc_by_drug"},
 #'       \code{"sa_drc_by_cl"}, \code{"sa_heatmap"}, \code{"sa_boxplot_cl"},
@@ -888,6 +889,15 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
     dynamic_params <- prepare_dynamic_render_params("mae", selected, output_dir, 3)
   }
   report_selection <- describe_report_selection(plan$analysis_params, plan$data_selection)
+  iso_sections <- c("combo_metrics_panel", "combo_isoref")
+  if (identical(plan$rmd_files[[i]], "3-analysis.Rmd") &&
+        !identical(plan$analysis_params$iso_levels, .DEFAULT_ISO_LEVELS) &&
+        any(iso_sections %in% plan$analysis_params$plots_to_generate)) {
+    warn_missing_iso_levels(
+      if (length(plan$data_selection) > 0) selected else read_report_mae(plan, output_dir),
+      plan$analysis_params
+    )
+  }
   render_params <- c(
     render_params,
     list(

@@ -152,7 +152,8 @@ step draws. Leave one out to keep all its choices; there is no \code{"all"} valu
 \code{"xc50"}, \code{"x_max"}, \code{"x_mean"}, \code{"x_AOC"}, \code{"x_AOC_range"};
 \item \code{combo_score_metrics}: combination scores of the heatmaps and boxplots, from
 \code{"hsa_score"}, \code{"bliss_score"};
-\item \code{iso_levels}: effect levels of the isobolograms, default \code{"0.5"};
+\item \code{iso_levels}: effect levels of the isobolograms, from -1 to 0.8, default
+\code{"0.5"}; a level the data does not have draws no isoline and is warned about;
 \item \code{norm_types}: normalization types, \code{"RV"} alone leaves out the GR sections;
 \item \code{plots_to_generate}: sections of the report, from \code{"sa_drc_by_drug"},
 \code{"sa_drc_by_cl"}, \code{"sa_heatmap"}, \code{"sa_boxplot_cl"},

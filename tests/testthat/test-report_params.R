@@ -19,6 +19,8 @@ test_that("resolve_analysis_params rejects unknown or empty selections", {
   expect_error(resolve_analysis_params(list(combo_score_metrics = character(0))), "combo_score_metrics")
   expect_error(resolve_analysis_params(list(iso_levels = "half")), "iso_levels")
   expect_error(resolve_analysis_params(list(iso_levels = 1.5)), "iso_levels")
+  expect_error(resolve_analysis_params(list(iso_levels = 0.95)), "iso_levels")
+  expect_error(resolve_analysis_params(list(iso_levels = -1.5)), "iso_levels")
   expect_error(resolve_analysis_params(list(table_format = "tsv")), "table_format")
   expect_error(resolve_analysis_params(list(table_format = character(0))), "table_format")
 })
@@ -102,4 +104,35 @@ test_that("each section flag of the analysis template removes its own section", 
   expect_true(grepl("```{r save_csv}", rmd, fixed = TRUE))
   all_on$table_csv <- FALSE
   expect_false(grepl("save_csv", whisker::whisker.render(template, all_on), fixed = TRUE))
+})
+
+test_that("resolve_analysis_params writes iso_levels as the isobolograms store them", {
+  expect_equal(resolve_analysis_params(list(iso_levels = c("0.50", -0.25, 0.5)))$iso_levels, c("0.5", "-0.25"))
+})
+
+test_that("warn_missing_iso_levels names the levels the isobolograms of the data do not have", {
+  mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small.qs2")
+  # the GR levels of this data go down to -0.25, the RV ones start at 0.2
+  expect_warning(
+    warn_missing_iso_levels(mae, resolve_analysis_params(list(iso_levels = c("0.5", "-0.25")))),
+    "no isoline is drawn for them: -0.25 for RV\\.$"
+  )
+  expect_no_warning(warn_missing_iso_levels(mae, resolve_analysis_params(list(iso_levels = c(0.2, 0.8)))))
+  sa_only <- suppressWarnings(mae[, , "single-agent"])
+  expect_no_warning(warn_missing_iso_levels(sa_only, resolve_analysis_params(list(iso_levels = 0.1))))
+})
+
+test_that("build_report_rmd warns about requested isobologram levels only when an isoline section is drawn", {
+  out <- withr::local_tempdir()
+  template_dir <- withr::local_tempdir()
+  writeLines("{{{iso_levels}}}", file.path(template_dir, "3-analysis.Rmd"))
+  file.create(file.path(template_dir, "gdr_logo-01.png"))
+  mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small.qs2")
+  build <- function(...) {
+    build_report_rmd(mae = mae, output_dir = out, rmd_template_path = template_dir, steps = 3,
+                     extra_render_params = list(...))
+  }
+
+  expect_warning(build(iso_levels = 0.1), "no isoline is drawn for them: 0.1 for RV\\.$")
+  expect_no_warning(build(iso_levels = 0.1, plots_to_generate = "sa_heatmap"))
 })

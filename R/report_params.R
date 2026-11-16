@@ -46,9 +46,11 @@ resolve_analysis_params <- function(extra_render_params) {
     iso_levels <- .DEFAULT_ISO_LEVELS
   }
   checkmate::assert_atomic_vector(iso_levels, min.len = 1, any.missing = FALSE, .var.name = "iso_levels")
-  checkmate::assert_numeric(suppressWarnings(as.numeric(iso_levels)), lower = 0, upper = 1,
-                            any.missing = FALSE, .var.name = "iso_levels")
-  params$iso_levels <- as.character(iso_levels)
+  levels <- suppressWarnings(as.numeric(iso_levels))
+  # gDRcore computes the levels on a 0.05 grid up to 0.8, below 0 for GR
+  checkmate::assert_numeric(levels, lower = -1, upper = 0.8, any.missing = FALSE, .var.name = "iso_levels")
+  # stored as text in the isobolograms, "0.5" rather than "0.50"
+  params$iso_levels <- unique(as.character(levels))
 
   table_format <- extra_render_params$table_format
   if (is.null(table_format)) {
@@ -85,4 +87,34 @@ analysis_section_flags <- function(analysis_params, plot_GR_values) {
   flags$plot_GR <- isTRUE(plot_GR_values) && "GR" %in% analysis_params$norm_types
   flags[paste0("table_", .TABLE_FORMATS)] <- as.list(.TABLE_FORMATS %in% analysis_params$table_format)
   flags
+}
+
+#' Warn about requested isobologram levels the data does not have
+#'
+#' gDRplots draws the isolines whose level is one of \code{iso_levels}; a level the data does not
+#' have draws nothing, without a word.
+#'
+#' @param mae MultiAssayExperiment the analysis step draws.
+#' @param analysis_params List returned by \code{resolve_analysis_params()}.
+#'
+#' @return \code{NULL}, invisibly.
+#' @keywords internal
+warn_missing_iso_levels <- function(mae, analysis_params) {
+  combo <- gDRutils::get_supported_experiments("combo")
+  if (!combo %in% names(mae) || !"isobolograms" %in% SummarizedExperiment::assayNames(mae[[combo]])) {
+    return(invisible(NULL))
+  }
+  iso <- gDRutils::convert_se_assay_to_dt(mae[[combo]], "isobolograms")
+  norm_col <- gDRutils::get_env_identifiers("normalization_type")
+  missing <- vapply(intersect(analysis_params$norm_types, unique(iso[[norm_col]])), function(norm) {
+    toString(setdiff(analysis_params$iso_levels, iso[iso[[norm_col]] == norm, ][["iso_level"]]))
+  }, character(1))
+  missing <- missing[nzchar(missing)]
+  if (length(missing) > 0) {
+    warning(sprintf(
+      "'iso_levels' not in the isobolograms of the data, so no isoline is drawn for them: %s.",
+      toString(sprintf("%s for %s", missing, names(missing)))
+    ), call. = FALSE)
+  }
+  invisible(NULL)
 }
