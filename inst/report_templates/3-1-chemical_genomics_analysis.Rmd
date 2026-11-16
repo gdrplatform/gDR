@@ -495,7 +495,7 @@ invisible(loop(seq_along(nested_list_GR), function(x) {
 
 # GSEA: Comparing Response Between Two Cell Lines
 
-This second analysis is an example of how to use GSEA to compare two different cell lines. It aims to identify drug classes (MOAs) to which one cell line is significantly more or less sensitive than the other. All drugs are ranked based on the difference in their response between the two selected cell lines, and GSEA is performed on this ranked list.
+This second analysis is an example of how to use GSEA to compare two different cell lines. It aims to identify drug classes (MOAs) to which one cell line is significantly more or less sensitive than the other. All drugs are ranked based on the difference in their response between the two cell lines, and GSEA is performed on this ranked list. The comparison uses the combination data, so both cell lines must have been screened at the same co-treatment concentration: for each co-treatment concentration, the first two cell lines screened at it are compared. When no two cell lines share a co-treatment concentration, this section is skipped.
 
 *(The interpretation guide for the results table is the same as in the section above, but the NES now represents differential sensitivity between the two cell lines.)*
 
@@ -504,19 +504,33 @@ This second analysis is an example of how to use GSEA to compare two different c
 analyzed_metrics <- "x_mean"
 cell_line_name <- get_env_identifiers("cellline_name")
 
-cellline1 <- unique(response_metrics_combo_capped[[cell_line_name]])[[1]]
-cellline2 <- unique(response_metrics_combo_capped[[cell_line_name]])[[2]]
-sprintf("Cell Line 1: %s; Cell Line 2: %s", cellline1, cellline2)
+# cell lines screened at different co-treatment concentrations share no combination to compare,
+# so the first two cell lines of each co-treatment concentration are paired
+cotrt_lines <- unique(response_metrics_combo_capped[cotrt_value != 0,
+                                                    c("cotrt_value", cell_line_name),
+                                                    with = FALSE])
+cl_pairs <- lapply(split(cotrt_lines[[cell_line_name]], cotrt_lines$cotrt_value),
+                   function(cls) unique(cls)[1:2])
+cl_pairs <- unique(Filter(function(pair) !anyNA(pair), cl_pairs))
+has_cl_pairs <- length(cl_pairs) > 0
+
+if (has_cl_pairs) {
+  vapply(cl_pairs, paste, character(1), collapse = " vs. ")
+} else {
+  "No two cell lines share a co-treatment concentration; the comparison is skipped."
+}
 
 
 ```
 
-```{r cgs_cl_diff_rv}
-cgs_analysis_RV <- analyze_cgs(response_metrics_combo_capped,
-                               cellline1 = cellline1,
-                               cellline2 = cellline2,
-                               metrics = analyzed_metrics,
-                               normalization_type = "RV")
+```{r cgs_cl_diff_rv, eval = has_cl_pairs}
+cgs_analysis_RV <- do.call(c, lapply(cl_pairs, function(pair) {
+  analyze_cgs(response_metrics_combo_capped,
+              cellline1 = pair[[1]],
+              cellline2 = pair[[2]],
+              metrics = analyzed_metrics,
+              normalization_type = "RV")
+}))
 
 
 ```
@@ -525,7 +539,7 @@ cgs_analysis_RV <- analyze_cgs(response_metrics_combo_capped,
 
 ## Relative Viability {.tabset}
 
-```{r cgs_table_cl_diff_rv, warning=FALSE, echo=FALSE}
+```{r cgs_table_cl_diff_rv, warning=FALSE, echo=FALSE, eval = has_cl_pairs}
 ls_table_RV <- lapply(cgs_analysis_RV, "[[", 1)
 
 ls_table_RV_1lvl <- lapply(seq_along(ls_table_RV), function(i) names(ls_table_RV)[[i]])
@@ -555,7 +569,7 @@ invisible(loop(seq_along(ls_table_RV), function(x) {
 
 ```
 
-`r knitr::knit(text = unlist(table_RV))`
+`r if (has_cl_pairs) knitr::knit(text = unlist(table_RV))`
 :::
 
 # Visualizing Differential Cell Line GSEA Results
@@ -566,7 +580,7 @@ invisible(loop(seq_along(ls_table_RV), function(x) {
 * **Colored Barcodes:** Below the main plot, each colored horizontal bar represents a statistically significant drug class (MOA). The vertical tick marks ('barcode') show the positions of the drugs from that class within the overall ranking.
 * **Text Labels (Right Side):** The text on the right provides the statistics for each enriched MOA, including the **NES** (direction and magnitude) and the **FDR** (statistical significance).
 
-```{r cgs_plot_cl_diff_rv}
+```{r cgs_plot_cl_diff_rv, eval = has_cl_pairs}
 nested_list_RV <- lapply(names(cgs_analysis_RV), function(cl) {
   metric_results <- lapply(analyzed_metrics, function(m) {
     plot_cgs_ranking(results = cgs_analysis_RV, cl, m)
@@ -583,7 +597,7 @@ names(nested_list_RV) <- names(cgs_analysis_RV)
 
 ## Relative Viability {.tabset}
 
-```{r cgs_plot_cl_diff_display_rv, warning=FALSE, echo=FALSE}
+```{r cgs_plot_cl_diff_display_rv, warning=FALSE, echo=FALSE, eval = has_cl_pairs}
 ls_link_RV <- list()
 ls_path_RV <- list()
 for (cl_nm in names(nested_list_RV)) {
@@ -613,7 +627,7 @@ invisible(loop(seq_along(nested_list_RV), function(x) {
 
 ```
 
-`r knitr::knit(text = unlist(ls_plt_RV))`
+`r if (has_cl_pairs) knitr::knit(text = unlist(ls_plt_RV))`
 :::
 
 # Conclusion
