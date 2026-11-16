@@ -43,9 +43,11 @@ resolve_data_selection <- function(extra_render_params) {
 #'
 #' Drugs are those of \code{drugs_of_interest}, of the mechanisms in \code{moa_of_interest} and
 #' the first drug of each pair in \code{drug_pairs_of_interest}; cell lines are those of
-#' \code{cell_lines_of_interest} and of the tissues in \code{tissues_of_interest}. Combinations are
-#' further restricted to the pairs of \code{drug_pairs_of_interest} or, without pairs, to the
-#' co-drugs of \code{codrugs_of_interest}. Experiments left without data are dropped.
+#' \code{cell_lines_of_interest} and of the tissues in \code{tissues_of_interest}. Which drug of a
+#' combination is the first one depends on how the screen was set up, so a combination is kept
+#' when either of its drugs is selected, and when either of them is one of
+#' \code{codrugs_of_interest}. With \code{drug_pairs_of_interest}, combinations are restricted to
+#' those pairs instead, matched in either order. Experiments left without data are dropped.
 #'
 #' @param mae MultiAssayExperiment.
 #' @param selection Named list returned by \code{resolve_data_selection()}.
@@ -57,36 +59,43 @@ select_report_data <- function(mae, selection) {
   checkmate::assert_list(selection, names = "unique")
 
   ids <- gDRutils::get_env_identifiers(
-    c("drug_name", "drug_name2", "drug_moa", "cellline_name", "cellline_tissue"),
+    c("drug_name", "drug_name2", "drug_moa", "drug_moa2", "cellline_name", "cellline_tissue"),
     simplify = FALSE
   )
   ses <- MultiAssayExperiment::experiments(mae)
   rows <- lapply(ses, function(se) data.table::as.data.table(SummarizedExperiment::rowData(se)))
   cols <- lapply(ses, function(se) data.table::as.data.table(SummarizedExperiment::colData(se)))
   available <- function(tables, col) unique(unlist(lapply(tables, `[[`, col)))
+  combo_rows <- Filter(function(r) ids$drug_name2 %in% names(r), rows)
+  drug_cols <- list(c(ids$drug_name, ids$drug_moa), c(ids$drug_name2, ids$drug_moa2))
 
   .check_found <- function(selected, values, nm) {
     missing <- setdiff(selected, values)
     if (length(missing) > 0) {
-      stop(sprintf("'%s' has value(s) not found in the data: %s.", nm, toString(missing)), call. = FALSE)
+      .stop_selection(sprintf("'%s' has value(s) not found in the data: %s.", nm, toString(missing)))
     }
   }
 
   drugs <- selection$drugs_of_interest
-  .check_found(drugs, available(rows, ids$drug_name), "drugs_of_interest")
+  .check_found(drugs, union(available(rows, ids$drug_name), available(rows, ids$drug_name2)), "drugs_of_interest")
   if (!is.null(selection$moa_of_interest)) {
-    .check_found(selection$moa_of_interest, available(rows, ids$drug_moa), "moa_of_interest")
+    moa <- selection$moa_of_interest
+    .check_found(moa, union(available(rows, ids$drug_moa), available(rows, ids$drug_moa2)), "moa_of_interest")
     drugs <- union(drugs, unique(unlist(lapply(rows, function(r) {
-      r[[ids$drug_name]][r[[ids$drug_moa]] %in% selection$moa_of_interest]
+      lapply(drug_cols, function(cc) if (all(cc %in% names(r))) r[[cc[1]]][r[[cc[2]]] %in% moa])
     }))))
   }
   pairs <- selection$drug_pairs_of_interest
   if (!is.null(pairs)) {
-    .check_found(vapply(pairs, `[[`, character(1), 1), available(rows, ids$drug_name), "drug_pairs_of_interest")
-    .check_found(vapply(pairs, `[[`, character(1), 2), available(rows, ids$drug_name2), "drug_pairs_of_interest")
+    pairs <- orient_drug_pairs(pairs, combo_rows, ids$drug_name, ids$drug_name2)
     drugs <- union(drugs, vapply(pairs, `[[`, character(1), 1))
   }
-  .check_found(selection$codrugs_of_interest, available(rows, ids$drug_name2), "codrugs_of_interest")
+  codrugs <- selection$codrugs_of_interest
+  .check_found(
+    codrugs,
+    union(available(combo_rows, ids$drug_name), available(combo_rows, ids$drug_name2)),
+    "codrugs_of_interest"
+  )
 
   cell_lines <- selection$cell_lines_of_interest
   .check_found(cell_lines, available(cols, ids$cellline_name), "cell_lines_of_interest")
@@ -98,19 +107,17 @@ select_report_data <- function(mae, selection) {
   }
 
   keep_rows <- lapply(rows, function(r) {
-    keep <- rep(TRUE, NROW(r))
-    if (!is.null(drugs)) {
-      keep <- keep & r[[ids$drug_name]] %in% drugs
+    if (!ids$drug_name2 %in% names(r)) {
+      return(if (is.null(drugs)) rep(TRUE, NROW(r)) else r[[ids$drug_name]] %in% drugs)
     }
-    if (ids$drug_name2 %in% names(r)) {
-      if (!is.null(pairs)) {
-        keep <- keep & paste(r[[ids$drug_name]], r[[ids$drug_name2]]) %in%
-          vapply(pairs, paste, character(1), collapse = " ")
-      } else if (!is.null(selection$codrugs_of_interest)) {
-        keep <- keep & r[[ids$drug_name2]] %in% selection$codrugs_of_interest
-      }
+    if (!is.null(pairs)) {
+      return(paste(r[[ids$drug_name]], r[[ids$drug_name2]], sep = "\r") %in%
+               vapply(pairs, paste, character(1), collapse = "\r"))
     }
-    keep
+    in_either <- function(values) {
+      is.null(values) | r[[ids$drug_name]] %in% values | r[[ids$drug_name2]] %in% values
+    }
+    in_either(drugs) & in_either(codrugs)
   })
   keep_cols <- lapply(cols, function(cl) {
     if (is.null(cell_lines)) rep(TRUE, NROW(cl)) else cl[[ids$cellline_name]] %in% cell_lines
@@ -121,7 +128,7 @@ select_report_data <- function(mae, selection) {
     all(dim(se) > 0)
   }, logical(1))]
   if (!gDRutils::get_supported_experiments("sa") %in% non_empty) {
-    stop("The data selection leaves no single-agent data, which the analysis report needs.", call. = FALSE)
+    .stop_selection("The data selection leaves no single-agent data, which the analysis report needs.")
   }
   if (length(non_empty) == length(selected)) {
     return(selected)
@@ -132,6 +139,45 @@ select_report_data <- function(mae, selection) {
       invokeRestart("muffleWarning")
     }
   })
+}
+
+#' Orient drug pairs as the combination data stores them
+#'
+#' A pair given in the other order than the data stores it is turned around, with a message. A pair
+#' that was not tested together stops the run with the pairs that were.
+#'
+#' @param pairs List of character pairs of \code{drug_pairs_of_interest}.
+#' @param combo_rows List of the row data tables of the combination experiments.
+#' @param col1,col2 Character strings of the columns of the first and the second drug.
+#'
+#' @return \code{pairs}, each in the order of the data.
+#' @keywords internal
+orient_drug_pairs <- function(pairs, combo_rows, col1, col2) {
+  tested <- unique(unlist(lapply(combo_rows, function(r) paste(r[[col1]], r[[col2]], sep = " + "))))
+  as_given <- vapply(pairs, paste, character(1), collapse = " + ")
+  reversed <- vapply(pairs, function(p) paste(rev(p), collapse = " + "), character(1))
+
+  swap <- !as_given %in% tested & reversed %in% tested
+  untested <- !as_given %in% tested & !swap
+  if (any(untested)) {
+    .stop_selection(sprintf(
+      "'drug_pairs_of_interest' has pair(s) not tested together in the data: %s. Tested pairs: %s.",
+      toString(as_given[untested]), if (length(tested) > 0) toString(sort(tested)) else "none"
+    ))
+  }
+  if (any(swap)) {
+    message(sprintf(
+      "'drug_pairs_of_interest' pair(s) turned around to the order of the data: %s.",
+      toString(sprintf("%s -> %s", as_given[swap], reversed[swap]))
+    ))
+    pairs[swap] <- lapply(pairs[swap], rev)
+  }
+  pairs
+}
+
+# A selection the data does not have; run_report() keeps the rendered steps for a resume.
+.stop_selection <- function(msg) {
+  stop(errorCondition(msg, class = "report_selection_error", call = NULL))
 }
 
 #' Read the data the analysis step of a run draws

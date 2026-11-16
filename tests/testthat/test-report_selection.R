@@ -31,8 +31,9 @@ test_that("select_report_data resolves mechanisms, tissues, co-drugs and pairs",
 
   by_moa <- suppressMessages(select_report_data(mae, list(moa_of_interest = "moa_D")))
   expect_equal(.drugs(by_moa, "single-agent"), "drug_021")
-  # drug_021 is only ever the second drug of a combination
-  expect_equal(names(by_moa), "single-agent")
+  # drug_021 is only ever the second drug of a combination, and its combinations stay
+  expect_equal(.drugs(by_moa, "combination", "DrugName_2"), "drug_021")
+  expect_equal(NROW(by_moa[["combination"]]), 3L)
 
   by_tissue <- suppressMessages(select_report_data(mae, list(tissues_of_interest = "tissue_y")))
   expect_equal(dim(by_tissue[["single-agent"]]), dim(mae[["single-agent"]]))
@@ -54,11 +55,65 @@ test_that("select_report_data names what it cannot find and refuses to drop the 
   mae <- .selection_mae()
   expect_error(select_report_data(mae, list(drugs_of_interest = c("drug_004", "nope"))),
                "'drugs_of_interest'.*nope")
+  # both drugs are in the data, but were never tested together
   expect_error(select_report_data(mae, list(drug_pairs_of_interest = list(c("drug_004", "drug_005")))),
-               "drug_pairs_of_interest.*drug_005")
+               "not tested together in the data: drug_004 \\+ drug_005\\. Tested pairs: drug_004 \\+ drug_021",
+               class = "report_selection_error")
+  expect_error(select_report_data(mae, list(codrugs_of_interest = "nope")), "'codrugs_of_interest'.*nope",
+               class = "report_selection_error")
   combo_only <- suppressWarnings(suppressMessages(mae[, , "combination"]))
   expect_error(suppressMessages(select_report_data(combo_only, list(drugs_of_interest = "drug_004"))),
                "no single-agent data")
+})
+
+test_that("select_report_data matches a drug and a co-drug in either column of a combination", {
+  mae <- .selection_mae()
+
+  # drug_021 is the second drug of every combination it is in
+  by_drug <- suppressMessages(select_report_data(mae, list(drugs_of_interest = "drug_021")))
+  expect_equal(.drugs(by_drug, "single-agent"), "drug_021")
+  expect_equal(.drugs(by_drug, "combination"), c("drug_004", "drug_005", "drug_006"))
+  expect_equal(.drugs(by_drug, "combination", "DrugName_2"), "drug_021")
+
+  # drug_004 is only ever the first drug
+  by_codrug <- suppressMessages(select_report_data(mae, list(codrugs_of_interest = "drug_004")))
+  expect_equal(.drugs(by_codrug, "combination"), "drug_004")
+  expect_equal(.drugs(by_codrug, "single-agent"), .drugs(mae, "single-agent"))
+
+  both <- suppressMessages(select_report_data(
+    mae, list(drugs_of_interest = "drug_026", codrugs_of_interest = "drug_005")
+  ))
+  expect_equal(NROW(both[["combination"]]), 1L)
+})
+
+test_that("select_report_data turns a reversed pair around, with a message", {
+  mae <- .selection_mae()
+  expect_message(
+    reversed <- select_report_data(mae, list(drug_pairs_of_interest = list(c("drug_021", "drug_005")))),
+    "turned around to the order of the data: drug_021 \\+ drug_005 -> drug_005 \\+ drug_021"
+  )
+  as_stored <- suppressMessages(
+    select_report_data(mae, list(drug_pairs_of_interest = list(c("drug_005", "drug_021"))))
+  )
+  expect_equal(reversed, as_stored)
+  expect_equal(.drugs(reversed, "single-agent"), "drug_005")
+})
+
+test_that("build_report_rmd writes no step when the selection does not match an MAE input", {
+  out <- withr::local_tempdir()
+  template_dir <- withr::local_tempdir()
+  writeLines("{{analysis_mae_file}}", file.path(template_dir, "3-analysis.Rmd"))
+  file.create(file.path(template_dir, "gdr_logo-01.png"))
+
+  expect_error(
+    build_report_rmd(
+      mae = .selection_mae(), output_dir = out, rmd_template_path = template_dir, steps = 3,
+      extra_render_params = list(drugs_of_interest = "nope")
+    ),
+    "'drugs_of_interest'.*nope",
+    class = "report_selection_error"
+  )
+  expect_length(list.files(out, pattern = "\\.Rmd$", recursive = TRUE), 0)
 })
 
 test_that("the analysis step reads the selected data and its flags follow it", {
@@ -72,11 +127,12 @@ test_that("the analysis step reads the selected data and its flags follow it", {
   full <- build_report_rmd(mae = mae, output_dir = out, rmd_template_path = template_dir, steps = 3)
   expect_equal(readLines(full[["3-analysis"]]), "file: gDR_mae.qs2; combo: yes")
 
+  # drug_004 and drug_005 were never combined, so the selection leaves no combination
   selected <- suppressMessages(build_report_rmd(
     mae = mae, output_dir = out, rmd_template_path = template_dir, steps = 3,
-    extra_render_params = list(moa_of_interest = "moa_D")
+    extra_render_params = list(drugs_of_interest = "drug_004", codrugs_of_interest = "drug_005")
   ))
   expect_equal(readLines(selected[["3-analysis"]]), "file: gDR_mae_selection.qs2; combo: no")
   saved <- qs2::qs_read(file.path(dirname(selected[["3-analysis"]]), "gDR_data", "gDR_mae_selection.qs2"))
-  expect_equal(.drugs(saved, "single-agent"), "drug_021")
+  expect_equal(.drugs(saved, "single-agent"), "drug_004")
 })

@@ -17,8 +17,10 @@ The subset MultiAssayExperiment.
 \description{
 Drugs are those of \code{drugs_of_interest}, of the mechanisms in \code{moa_of_interest} and
 the first drug of each pair in \code{drug_pairs_of_interest}; cell lines are those of
-\code{cell_lines_of_interest} and of the tissues in \code{tissues_of_interest}. Combinations are
-further restricted to the pairs of \code{drug_pairs_of_interest} or, without pairs, to the
-co-drugs of \code{codrugs_of_interest}. Experiments left without data are dropped.
+\code{cell_lines_of_interest} and of the tissues in \code{tissues_of_interest}. Which drug of a
+combination is the first one depends on how the screen was set up, so a combination is kept
+when either of its drugs is selected, and when either of them is one of
+\code{codrugs_of_interest}. With \code{drug_pairs_of_interest}, combinations are restricted to
+those pairs instead, matched in either order. Experiments left without data are dropped.
 }
 \keyword{internal}
