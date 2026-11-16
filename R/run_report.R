@@ -147,7 +147,9 @@
 #'       \code{"combo_metrics_panel"}, \code{"combo_isoref"}, \code{"combo_heatmap"},
 #'       \code{"combo_boxplot_cl"}, \code{"combo_boxplot_drug"}, \code{"combo_boxplot_tissue"};
 #'     \item \code{table_format}: formats of the assay tables, \code{"xlsx"} (a workbook per
-#'       experiment type, the default) and \code{"csv"} (a file per experiment type and assay).
+#'       experiment type, the default) and \code{"csv"} (a file per experiment type and assay);
+#'       \code{c("xlsx", "csv")} writes both, \code{"csv"} alone writes no assay workbook. The data of
+#'       the heatmaps is always a workbook, with a CSV of its \code{matrix} sheet for \code{"csv"}.
 #'   }
 #'   Others restrict the data the analysis step draws, by name: \code{drugs_of_interest},
 #'   \code{cell_lines_of_interest}, \code{codrugs_of_interest}, \code{tissues_of_interest},
@@ -913,6 +915,7 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
     lapply(plan$analysis_params, format_vector_for_rmd),
     list(
       analysis_mae_file = analysis_mae_file,
+      assay_file_types = paste(c(xlsx = "Excel", csv = "CSV")[plan$analysis_params$table_format], collapse = " and "),
       has_report_selection = !is.null(report_selection),
       report_selection = if (is.null(report_selection)) "" else report_selection
     ),

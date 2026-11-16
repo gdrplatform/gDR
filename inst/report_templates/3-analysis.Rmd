@@ -212,7 +212,7 @@ Author: <a href="https://github.com/gdrplatform">gDR team</a>
 
 # Introduction
 
-This report concludes the gDR analysis pipeline by presenting the final results in user-friendly formats. Starting with the processed `MultiAssayExperiment` object from Step 2, this report first exports all data into Excel files. It then generates a series of visualizations designed for biological interpretation, including dose-response curves and summary heatmaps of the calculated drug sensitivity metrics.
+This report concludes the gDR analysis pipeline by presenting the final results in user-friendly formats. Starting with the processed `MultiAssayExperiment` object from Step 2, this report first exports all data into {{assay_file_types}} files. It then generates a series of visualizations designed for biological interpretation, including dose-response curves and summary heatmaps of the calculated drug sensitivity metrics.
 
 {{#has_report_selection}}
 ## Selection
@@ -235,11 +235,16 @@ library(purrr)
 
 # Key Output Files
 
-This report generates the **`tables`** folder, which contains the final, user-friendly Excel files for all processed data and visualization data.
+This report generates the **`tables`** folder, which contains the processed data as {{assay_file_types}} files and the data behind the heatmaps.
 
 ## Main Assay Reports (in `tables/` folder)
 
+{{#table_xlsx}}
 These files contain the full processed data in a "long" (tidy) format, with one Excel file per experiment type (e.g., `single-agent-assay-data.xlsx`, `combo-assay-data.xlsx`). Each file contains multiple sheets:
+{{/table_xlsx}}
+{{^table_xlsx}}
+These files contain the full processed data in a "long" (tidy) format, with one CSV file per experiment type and assay (e.g., `single-agent-assay-data__Metrics.csv`). The assays are:
+{{/table_xlsx}}
 
 * **`Averaged`:** The normalized dose-response data, averaged across technical replicates.
 * **Key columns:** `Concentration`, `x`, and `x_std`. The `x` column represents the mean normalized response, and `x_std` is its standard deviation. The meaning of these values (Relative Viability or GR value) is defined by the `normalization_type` column in the same row.
@@ -307,10 +312,12 @@ These files contain the full processed data in a "long" (tidy) format, with one 
 
 
 
+{{#table_xlsx}}
 {{#table_csv}}
 The same tables are written as CSV files, one per experiment type and sheet (e.g., `single-agent-assay-data__Metrics.csv`).
 
 {{/table_csv}}
+{{/table_xlsx}}
 ## Heatmap Data (in `tables/` folder)
 
 These files contain the specific data used to generate the summary heatmaps, pre-formatted for convenience. Each Excel file (e.g., `data__sa_fit_heat_RV__log10(IC50).xlsx` or `data__combo_fit_...xlsx`) contains three sheets:
@@ -318,6 +325,10 @@ These files contain the specific data used to generate the summary heatmaps, pre
 * **`matrix`:** The wide-format data matrix. The first column lists the rows (e.g., Drugs or Drug Combinations), the first row lists the columns (e.g., Cell Lines), and the cells contain the metric values.
 * **`annotation_col`:** A table of metadata for the columns of the `matrix` sheet (e.g., cell line tissue type).
 * **`annotation_row`:** A table of metadata for the rows of the `matrix` sheet (e.g., drug MOA).
+{{#table_csv}}
+
+The `matrix` sheet is also written as a CSV file next to each workbook (e.g., `data__sa_fit_heat_RV__IC50__matrix.csv`).
+{{/table_csv}}
 
 # Read the gDR MAE data
 
@@ -329,9 +340,9 @@ mae <- qs_read(file.path(wd, "gDR_data", "{{analysis_mae_file}}"))
 
 ```
 
-# Split SE objects into list of assays and save as an XLSX file
+# Split SE objects into list of assays and save them as tables
 
-For convenience and for sharing with non-R users, all processed data assays (Averaged, Metrics, etc.) are extracted from the MAE object and saved as multi-sheet Excel files. One file is created for each experiment type (e.g., single-agent, combo).
+For convenience and for sharing with non-R users, all processed data assays (Averaged, Metrics, etc.) are extracted from the MAE object and saved as {{assay_file_types}} files in the `tables` folder.
 
 ```{r split_assay}
 assay_list <- MAEpply(mae, function(x) {
@@ -860,6 +871,13 @@ invisible(loop(seq_along(ls_plt_RV), function(i) {
     path = ls_path_data_RV[[name]]
   )
 }))
+{{#table_csv}}
+# The matrix sheet as a CSV file next to the workbook
+invisible(loop(seq_along(ls_plt_RV), function(i) {
+  name <- names(ls_plt_RV)[[i]]
+  fwrite(ls_plt_RV[[i]][["data"]][["matrix"]], sub("\\.xlsx$", "__matrix.csv", ls_path_data_RV[[name]]))
+}))
+{{/table_csv}}
 
 ```
 
@@ -919,6 +937,13 @@ invisible(loop(seq_along(ls_plt_GR), function(i) {
     path = ls_path_data_GR[[name]]
   )
 }))
+{{#table_csv}}
+# The matrix sheet as a CSV file next to the workbook
+invisible(loop(seq_along(ls_plt_GR), function(i) {
+  name <- names(ls_plt_GR)[[i]]
+  fwrite(ls_plt_GR[[i]][["data"]][["matrix"]], sub("\\.xlsx$", "__matrix.csv", ls_path_data_GR[[name]]))
+}))
+{{/table_csv}}
 
 ```
 
@@ -1915,6 +1940,13 @@ invisible(loop(seq_along(ls_plt_RV), function(i) {
     path = ls_path_data_RV[[name]]
   )
 }))
+{{#table_csv}}
+# The matrix sheet as a CSV file next to the workbook
+invisible(loop(seq_along(ls_plt_RV), function(i) {
+  name <- names(ls_plt_RV)[[i]]
+  fwrite(ls_plt_RV[[i]][["data"]][["matrix"]], sub("\\.xlsx$", "__matrix.csv", ls_path_data_RV[[name]]))
+}))
+{{/table_csv}}
 
 ```
 
@@ -1967,6 +1999,13 @@ invisible(loop(seq_along(ls_plt_GR), function(i) {
     path = ls_path_data_GR[[name]]
   )
 }))
+{{#table_csv}}
+# The matrix sheet as a CSV file next to the workbook
+invisible(loop(seq_along(ls_plt_GR), function(i) {
+  name <- names(ls_plt_GR)[[i]]
+  fwrite(ls_plt_GR[[i]][["data"]][["matrix"]], sub("\\.xlsx$", "__matrix.csv", ls_path_data_GR[[name]]))
+}))
+{{/table_csv}}
 
 ```
 
@@ -2358,7 +2397,7 @@ invisible(loop(seq_along(plot_plan$plt), function(i) {
 
 # Conclusion
 
-This report concludes the gDR data analysis workflow. The processed data has been exported to Excel files for external use, and the key results have been visualized through dose-response curves and summary plots of sensitivity metrics. These generated plots and tables form the basis for biological interpretation and further investigation.
+This report concludes the gDR data analysis workflow. The processed data has been exported to {{assay_file_types}} files for external use, and the key results have been visualized through dose-response curves and summary plots of sensitivity metrics. These generated plots and tables form the basis for biological interpretation and further investigation.
 
 <div class="feedback-panel">
 <h3>We Value Your Feedback!</h3>

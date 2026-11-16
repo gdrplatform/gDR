@@ -81,29 +81,41 @@ test_that("each section flag of the analysis template removes its own section", 
   all_on <- as.list(stats::setNames(rep(TRUE, length(tags)), tags))
   full <- whisker::whisker.render(template, all_on)
 
-  headings <- c(
-    show_sa_drc_by_cl = "## Data Analysis - Dose-response Curves by Cell Lines - Single-Agent Data",
-    show_combo_metrics_panel = "## Data Analysis - Metrics Heatmap for Combination Data",
-    show_combo_isoref = "## Data Analysis - Reference Isobolograms for Combination Data"
-  )
-  for (flag in names(headings)) {
-    expect_true(grepl(headings[[flag]], full, fixed = TRUE))
+  # each section is told apart by its first chunk; SA and combination sections share headings
+  section_flags <- paste0("show_", .ANALYSIS_CHOICES$plots_to_generate)
+  first_chunks <- vapply(section_flags, function(flag) {
+    start <- grep(sprintf("{{#%s}}", flag), template, fixed = TRUE)[1]
+    sub(",.*", "", grep("^```\\{r ", template[start:length(template)], value = TRUE)[1])
+  }, character(1))
+  expect_false(anyDuplicated(first_chunks) > 0)
+  has_section <- function(rmd) vapply(first_chunks, function(h) grepl(h, rmd, fixed = TRUE), logical(1))
+  expect_true(all(has_section(full)))
+  for (flag in section_flags) {
     off <- all_on
     off[[flag]] <- FALSE
-    expect_false(grepl(headings[[flag]], whisker::whisker.render(template, off), fixed = TRUE), info = flag)
+    # the flag removes its own section and no other
+    expect_equal(unname(has_section(whisker::whisker.render(template, off))), section_flags != flag, info = flag)
   }
   # every section and table flag the code computes is used by the template, and the other way round
   shows <- grep("^(show|table)_", tags, value = TRUE)
   expect_setequal(shows, grep("^(show|table)_", names(analysis_section_flags(resolve_analysis_params(list()), TRUE)),
                               value = TRUE))
 
+  # the text about the tables follows the formats written
+  expect_true(grepl("The same tables are written as CSV files", full, fixed = TRUE))
+  expect_true(grepl("__matrix.csv", full, fixed = TRUE))
   csv_only <- all_on
   csv_only$table_xlsx <- FALSE
   rmd <- whisker::whisker.render(template, csv_only)
   expect_false(grepl("```{r save_xlsx}", rmd, fixed = TRUE))
   expect_true(grepl("```{r save_csv}", rmd, fixed = TRUE))
+  expect_true(grepl("one CSV file per experiment type and assay", rmd, fixed = TRUE))
+  expect_false(grepl("one Excel file per experiment type", rmd, fixed = TRUE))
+  expect_false(grepl("The same tables are written as CSV files", rmd, fixed = TRUE))
   all_on$table_csv <- FALSE
-  expect_false(grepl("save_csv", whisker::whisker.render(template, all_on), fixed = TRUE))
+  xlsx_only <- whisker::whisker.render(template, all_on)
+  expect_false(grepl("save_csv", xlsx_only, fixed = TRUE))
+  expect_false(grepl("__matrix.csv", xlsx_only, fixed = TRUE))
 })
 
 test_that("resolve_analysis_params writes iso_levels as the isobolograms store them", {
