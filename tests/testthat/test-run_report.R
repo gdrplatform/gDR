@@ -320,6 +320,40 @@ test_that("run_report removes the output directory when a publication-only run f
   expect_false(dir.exists(dummy_out))
 })
 
+test_that("run_report keeps the rendered steps when the data selection does not match the data", {
+
+  dummy_out <- tempfile()
+  dir.create(dummy_out)
+  template_dir <- .setup_dummy_templates()
+  on.exit({
+    unlink(dummy_out, recursive = TRUE)
+    unlink(template_dir, recursive = TRUE)
+  })
+
+  # Steps 1 and 2 render; the names of the selection are checked once step 2 wrote the data.
+  mock_symlink <- mockery::mock(NULL)
+  test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, TRUE))
+  mockery::stub(test_fn, "create_symlink_to_current", mock_symlink)
+  local_mocked_bindings(
+    read_report_mae = function(...) NULL,
+    select_report_data = function(...) .stop_selection("'drugs_of_interest' has value(s) not found in the data: nope.")
+  )
+
+  expect_error(
+    test_fn(
+      manifest = "manifest.xlsx",
+      output_dir = dummy_out,
+      rmd_template_path = template_dir,
+      steps = 1:3,
+      extra_render_params = list(drugs_of_interest = "nope")
+    ),
+    "drugs_of_interest"
+  )
+
+  expect_true(dir.exists(dummy_out))
+  expect_length(mockery::mock_args(mock_symlink), 1)
+})
+
 test_that("run_report injects extra_render_params into the template data", {
 
   dummy_out <- tempfile()

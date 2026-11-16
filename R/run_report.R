@@ -297,6 +297,7 @@ run_report <- function(
   # The step being rendered when the run stopped, and the steps rendered before it.
   state$failed_step <- NULL
   state$rendered_steps <- character(0)
+  state$selection_failed <- FALSE
   on.exit({
     if (!state$success) {
       # The failure hook runs before any clean-up, so that it can still read the log files
@@ -316,20 +317,29 @@ run_report <- function(
       # a full re-run just to retry the upload.
       publication_failed <- identical(state$failed_step, .PUBLICATION_STEP) &&
         length(state$rendered_steps) > 0
+      # The names of a selection are checked against the data once the processing step rendered
+      # it; keeping that step lets the analysis be retried alone.
+      selection_failed <- state$selection_failed && length(state$rendered_steps) > 0
 
       # In RESUME mode, we generally do NOT want to delete the directory on failure
       # as it contains valuable data from previous steps.
       if (!resume && !is.null(env$output_dir) && dir.exists(env$output_dir)) {
 
-        if (publication_failed) {
+        if (publication_failed || selection_failed) {
           tryCatch({
             create_symlink_to_current(dirname(env$output_dir), env$output_dir, verbose_mode)
           }, error = function(e_link) {
             message(sprintf("Could not point 'current' at '%s': %s", env$output_dir, e_link$message))
           })
           message(sprintf(
-            paste("\nPublication failed, but the report was rendered. Keeping '%s' as 'current';",
-                  "retry the publication alone with steps = 4 and resume = TRUE."),
+            if (publication_failed) {
+              paste("\nPublication failed, but the report was rendered. Keeping '%s' as 'current';",
+                    "retry the publication alone with steps = 4 and resume = TRUE.")
+            } else {
+              paste("\nThe data selection does not match the data, but the steps before the analysis",
+                    "were rendered. Keeping '%s' as 'current'; fix the selection and write the analysis",
+                    "alone with steps = 3 and resume = TRUE.")
+            },
             env$output_dir
           ))
         } else if (remove_on_failure) {
@@ -436,6 +446,7 @@ run_report <- function(
     }
     # Store error message for the on.exit failure email
     state$error_for_mail <- full_error_msg
+    state$selection_failed <- inherits(e, "report_selection_error")
     stop(e)
 
   }, finally = {
