@@ -132,7 +132,7 @@
 #'   the templates themselves: \code{report_inputs_file}, the path to a qs2 file with a named list
 #'   of plain data describing the inputs of the run, which the processing step records as the
 #'   \code{"report"} step in the provenance of every experiment. Others select what the analysis
-#'   step draws; each one left out keeps everything:
+#'   step draws. Leave one out to keep all its choices; there is no \code{"all"} value:
 #'   \itemize{
 #'     \item \code{sa_metrics}: single-agent metrics of the heatmaps and boxplots, from
 #'       \code{"xc50"}, \code{"x_max"}, \code{"x_mean"}, \code{"x_AOC"}, \code{"x_AOC_range"};
@@ -151,8 +151,11 @@
 #'   Others restrict the data the analysis step draws, by name: \code{drugs_of_interest},
 #'   \code{cell_lines_of_interest}, \code{codrugs_of_interest}, \code{tissues_of_interest},
 #'   \code{moa_of_interest}, and \code{drug_pairs_of_interest}, a list of pairs
-#'   \code{c(drug, co-drug)}. The subset is written to \code{gDR_data/gDR_mae_selection.qs2}, and
-#'   the sections that need data it no longer has are left out.
+#'   \code{c(drug, co-drug)}. A combination is kept when either of its drugs is selected, and a
+#'   pair matches in either order. The subset is written to
+#'   \code{gDR_data/gDR_mae_selection.qs2}, the sections that need data it no longer has are left
+#'   out, and the analysis step lists the selections at its top. A run that publishes its results
+#'   (step 4) takes no selection.
 #'   Default is an empty list.
 #' @param on_resolve_inputs Function or NULL. Hook called before the data type is determined,
 #'   used to resolve input paths from an external source. It receives \code{args} (the list of
@@ -694,6 +697,14 @@ prepare_report_steps <- function(args,
   # they are taken out of the deployment-specific ones
   analysis_params <- resolve_analysis_params(extra_render_params)
   data_selection <- resolve_data_selection(extra_render_params)
+  # the publication step uploads the whole dataset, next to a report that would draw part of it
+  narrowed <- narrowing_selections(analysis_params, data_selection)
+  if (4 %in% args$steps && length(narrowed) > 0) {
+    stop(sprintf(
+      "A run that publishes its results (step 4) reports the whole dataset; leave out %s, or step 4.",
+      toString(sprintf("'%s'", narrowed))
+    ), call. = FALSE)
+  }
 
   data_type <- determine_data_type(args, output_dir)
 
@@ -863,13 +874,20 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
   # Add other dynamic and boolean parameters
   dynamic_params <- prepare_dynamic_render_params(data_type, plan$mae, output_dir, plan$steps)
   analysis_mae_file <- "gDR_mae.qs2"
-  if (identical(plan$rmd_files[[i]], "3-analysis.Rmd") && length(plan$data_selection) > 0) {
-    selected <- select_report_data(read_report_mae(plan, output_dir), plan$data_selection)
+  if (startsWith(plan$rmd_files[[i]], "3-") && length(plan$data_selection) > 0) {
     analysis_mae_file <- .SELECTED_MAE_FILE
-    qs2::qs_save(selected, file.path(output_dir, "gDR_data", analysis_mae_file))
+    selected_path <- file.path(output_dir, "gDR_data", analysis_mae_file)
+    if (identical(plan$rmd_files[[i]], "3-analysis.Rmd")) {
+      selected <- select_report_data(read_report_mae(plan, output_dir), plan$data_selection)
+      qs2::qs_save(selected, selected_path)
+    } else {
+      # an add-on step draws the data its analysis step selected
+      selected <- qs2::qs_read(selected_path)
+    }
     # the sections drawn follow the selected data, not the whole dataset
     dynamic_params <- prepare_dynamic_render_params("mae", selected, output_dir, 3)
   }
+  report_selection <- describe_report_selection(plan$analysis_params, plan$data_selection)
   render_params <- c(
     render_params,
     list(
@@ -883,7 +901,11 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
       MAE = (data_type == "mae")
     ),
     lapply(plan$analysis_params, format_vector_for_rmd),
-    list(analysis_mae_file = analysis_mae_file),
+    list(
+      analysis_mae_file = analysis_mae_file,
+      has_report_selection = !is.null(report_selection),
+      report_selection = if (is.null(report_selection)) "" else report_selection
+    ),
     dynamic_params,
     analysis_section_flags(plan$analysis_params, dynamic_params$plot_GR_values)
   )

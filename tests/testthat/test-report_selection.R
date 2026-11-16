@@ -136,3 +136,49 @@ test_that("the analysis step reads the selected data and its flags follow it", {
   saved <- qs2::qs_read(file.path(dirname(selected[["3-analysis"]]), "gDR_data", "gDR_mae_selection.qs2"))
   expect_equal(.drugs(saved, "single-agent"), "drug_004")
 })
+
+test_that("describe_report_selection lists the selections that narrow the report", {
+  full <- resolve_analysis_params(list())
+  expect_null(describe_report_selection(full, list()))
+  expect_length(narrowing_selections(full, list()), 0)
+
+  narrowed <- resolve_analysis_params(list(norm_types = "RV", plots_to_generate = c("sa_heatmap", "combo_drc")))
+  selection <- list(drug_pairs_of_interest = list(c("drug_005", "drug_021")), drugs_of_interest = "drug_004")
+  expect_equal(
+    narrowing_selections(narrowed, selection),
+    c("drug_pairs_of_interest", "drugs_of_interest", "norm_types", "plots_to_generate")
+  )
+  expect_equal(
+    describe_report_selection(narrowed, selection),
+    paste(
+      "* **Drugs:** drug_004",
+      "* **Drug pairs:** drug_005 + drug_021",
+      "* **Normalization types:** RV",
+      "* **Sections:** sa_heatmap, combo_drc",
+      sep = "\n"
+    )
+  )
+})
+
+test_that("the analysis step and its add-on step note the selection and draw the selected data", {
+  out <- withr::local_tempdir()
+  template_dir <- withr::local_tempdir()
+  writeLines("{{analysis_mae_file}}{{#has_report_selection}}|{{{report_selection}}}{{/has_report_selection}}",
+             file.path(template_dir, "3-analysis.Rmd"))
+  writeLines("{{analysis_mae_file}}", file.path(template_dir, "3-1-chemical_genomics_analysis.Rmd"))
+  file.create(file.path(template_dir, "gdr_logo-01.png"))
+  mae <- .selection_mae()
+
+  full <- build_report_rmd(mae = mae, output_dir = out, rmd_template_path = template_dir, steps = 3,
+                           special_sections = "chemical_genomics")
+  expect_equal(unname(vapply(full, readLines, character(1))), c("gDR_mae.qs2", "gDR_mae.qs2"))
+
+  selected <- suppressMessages(build_report_rmd(
+    mae = mae, output_dir = out, rmd_template_path = template_dir, steps = 3,
+    special_sections = "chemical_genomics", extra_render_params = list(drugs_of_interest = "drug_004")
+  ))
+  expect_equal(
+    unname(vapply(selected, readLines, character(1))),
+    c("gDR_mae_selection.qs2|* **Drugs:** drug_004", "gDR_mae_selection.qs2")
+  )
+})

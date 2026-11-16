@@ -136,7 +136,7 @@ with parameters computed by this function are dropped with a warning. One entry 
 the templates themselves: \code{report_inputs_file}, the path to a qs2 file with a named list
 of plain data describing the inputs of the run, which the processing step records as the
 \code{"report"} step in the provenance of every experiment. Others select what the analysis
-step draws; each one left out keeps everything:
+step draws. Leave one out to keep all its choices; there is no \code{"all"} value:
 \itemize{
 \item \code{sa_metrics}: single-agent metrics of the heatmaps and boxplots, from
 \code{"xc50"}, \code{"x_max"}, \code{"x_mean"}, \code{"x_AOC"}, \code{"x_AOC_range"};
@@ -155,8 +155,11 @@ experiment type, the default) and \code{"csv"} (a file per experiment type and a
 Others restrict the data the analysis step draws, by name: \code{drugs_of_interest},
 \code{cell_lines_of_interest}, \code{codrugs_of_interest}, \code{tissues_of_interest},
 \code{moa_of_interest}, and \code{drug_pairs_of_interest}, a list of pairs
-\code{c(drug, co-drug)}. The subset is written to \code{gDR_data/gDR_mae_selection.qs2}, and
-the sections that need data it no longer has are left out.
+\code{c(drug, co-drug)}. A combination is kept when either of its drugs is selected, and a
+pair matches in either order. The subset is written to
+\code{gDR_data/gDR_mae_selection.qs2}, the sections that need data it no longer has are left
+out, and the analysis step lists the selections at its top. A run that publishes its results
+(step 4) takes no selection.
 Default is an empty list.}
 
 \item{on_resolve_inputs}{Function or NULL. Hook called before the data type is determined,

@@ -214,6 +214,14 @@ Author: <a href="https://github.com/gdrplatform">gDR team</a>
 
 This report concludes the gDR analysis pipeline by presenting the final results in user-friendly formats. Starting with the processed `MultiAssayExperiment` object from Step 2, this report first exports all data into Excel files. It then generates a series of visualizations designed for biological interpretation, including dose-response curves and summary heatmaps of the calculated drug sensitivity metrics.
 
+{{#has_report_selection}}
+## Selection
+
+This report does not show everything the dataset holds. It is restricted to:
+
+{{{report_selection}}}
+
+{{/has_report_selection}}
 ```{r libraries}
 library(qs2)
 library(SummarizedExperiment)

@@ -201,3 +201,51 @@ read_report_mae <- function(plan, output_dir) {
   }
   qs2::qs_read(path)
 }
+
+# Labels of the selections in the note at the top of a selected analysis step.
+.SELECTION_LABELS <- c(
+  drugs_of_interest = "Drugs",
+  codrugs_of_interest = "Co-drugs",
+  drug_pairs_of_interest = "Drug pairs",
+  moa_of_interest = "Mechanisms of action",
+  cell_lines_of_interest = "Cell lines",
+  tissues_of_interest = "Tissues",
+  norm_types = "Normalization types",
+  sa_metrics = "Single-agent metrics",
+  combo_score_metrics = "Synergy scores",
+  plots_to_generate = "Sections"
+)
+
+#' Names of the selections that narrow the report
+#'
+#' @param analysis_params List returned by \code{resolve_analysis_params()}.
+#' @param data_selection List returned by \code{resolve_data_selection()}.
+#'
+#' @return Character vector of the data selections that are set and of the analysis selections
+#'   that leave out some of their choices.
+#' @keywords internal
+narrowing_selections <- function(analysis_params, data_selection) {
+  narrowed <- Filter(function(nm) !setequal(analysis_params[[nm]], .ANALYSIS_CHOICES[[nm]]),
+                     names(.ANALYSIS_CHOICES))
+  c(names(data_selection), unlist(narrowed))
+}
+
+#' Describe the selections a report is drawn on
+#'
+#' @inheritParams narrowing_selections
+#'
+#' @return Character string of one Markdown bullet per narrowing selection, or \code{NULL} when the
+#'   report covers the whole dataset.
+#' @keywords internal
+describe_report_selection <- function(analysis_params, data_selection) {
+  narrowed <- narrowing_selections(analysis_params, data_selection)
+  if (length(narrowed) == 0) {
+    return(NULL)
+  }
+  values <- c(data_selection, analysis_params)[narrowed]
+  if (!is.null(values$drug_pairs_of_interest)) {
+    values$drug_pairs_of_interest <- vapply(values$drug_pairs_of_interest, paste, character(1), collapse = " + ")
+  }
+  narrowed <- .SELECTION_LABELS[intersect(names(.SELECTION_LABELS), narrowed)]
+  paste(sprintf("* **%s:** %s", narrowed, vapply(values[names(narrowed)], toString, character(1))), collapse = "\n")
+}

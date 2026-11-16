@@ -354,6 +354,32 @@ test_that("run_report keeps the rendered steps when the data selection does not 
   expect_length(mockery::mock_args(mock_symlink), 1)
 })
 
+test_that("run_report refuses to narrow a report it publishes", {
+
+  dummy_out <- tempfile()
+  dir.create(dummy_out)
+  template_dir <- .setup_dummy_templates()
+  on.exit({
+    unlink(dummy_out, recursive = TRUE)
+    unlink(template_dir, recursive = TRUE)
+  })
+
+  mock_render <- mockery::mock(TRUE, cycle = TRUE)
+  test_fn <- .stub_run_report_io(run_report, dummy_out, mock_render)
+  run <- function(steps) {
+    test_fn(
+      manifest = "manifest.xlsx",
+      output_dir = dummy_out,
+      rmd_template_path = template_dir,
+      steps = steps,
+      extra_render_params = list(plots_to_generate = "sa_heatmap", cell_lines_of_interest = "x")
+    )
+  }
+
+  expect_error(run(1:4), "step 4.*'cell_lines_of_interest', 'plots_to_generate'")
+  expect_length(mockery::mock_args(mock_render), 0)
+})
+
 test_that("run_report injects extra_render_params into the template data", {
 
   dummy_out <- tempfile()
