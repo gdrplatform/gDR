@@ -359,7 +359,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] kableExtra_1.4.1  gDR_1.11.25       gDRutils_1.11.26  gDRimport_1.11.15
+#> [1] kableExtra_1.4.1  gDR_1.11.26       gDRutils_1.11.26  gDRimport_1.11.15
 #> [5] gDRcore_1.11.32   BiocStyle_2.41.0 
 #> 
 #> loaded via a namespace (and not attached):
@@ -395,7 +395,7 @@ sessionInfo()
 #> [59] carData_3.0-6               bookdown_0.48              
 #> [61] car_3.1-5                   IRanges_2.47.5             
 #> [63] S4Vectors_0.51.10           Formula_1.2-6              
-#> [65] systemfonts_1.3.2           testthat_3.3.2             
+#> [65] systemfonts_1.3.3           testthat_3.3.2             
 #> [67] jquerylib_0.1.4             rematch_2.0.0              
 #> [69] glue_1.8.1                  pkgdown_2.2.1              
 #> [71] codetools_0.2-20            stringi_1.8.9              

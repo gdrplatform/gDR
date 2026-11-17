@@ -1,5 +1,10 @@
 # Changelog
 
+## gDR 1.11.26 - 2026-11-16
+
+- fix the cell line comparison of the chemical genomics report for
+  screens with several co-treatment concentrations
+
 ## gDR 1.11.25 - 2026-11-16
 
 - add the templates shipped with gDR as the default `rmd_template_path`
