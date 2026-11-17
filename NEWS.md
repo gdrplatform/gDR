@@ -1,3 +1,6 @@
+## gDR 1.11.26 - 2026-11-16
+* fix the cell line comparison of the chemical genomics report for screens with several co-treatment concentrations
+
 ## gDR 1.11.25 - 2026-11-16
 * add the templates shipped with gDR as the default `rmd_template_path` of `run_report()` and `build_report_rmd()`
 * add a warning for an `extra_render_params` entry no template reads but close to a template parameter
