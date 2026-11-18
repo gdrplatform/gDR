@@ -493,43 +493,46 @@ invisible(loop(seq_along(nested_list_GR), function(x) {
 :::
 {{/plot_GR}}
 
-# GSEA: Comparing Response Between Two Cell Lines
+# GSEA: Comparing Resistant and Parental Cell Lines
 
-This second analysis is an example of how to use GSEA to compare two different cell lines. It aims to identify drug classes (MOAs) to which one cell line is significantly more or less sensitive than the other. All drugs are ranked based on the difference in their response between the two cell lines, and GSEA is performed on this ranked list. The comparison uses the combination data, so both cell lines must have been screened at the same co-treatment concentration: for each co-treatment concentration, the first two cell lines screened at it are compared. When no two cell lines share a co-treatment concentration, this section is skipped.
+This second analysis compares each resistant cell line with its parental line, the cell line named in its `parental_identifier`. The resistant cells are taken at the co-treatment concentration they were screened with (the anchor drug they are resistant to), and the parental cells with the library drug alone. All drugs are ranked by the difference in their response (resistant minus parental), and GSEA tests which drug classes (MOAs) the resistant cells depend on more (negative NES) or less (positive NES) than their parental line. Cell lines are compared only with their own parental line; when the screen has no resistant line together with its parental line, this section is skipped.
 
-*(The interpretation guide for the results table is the same as in the section above, but the NES now represents differential sensitivity between the two cell lines.)*
+*(The interpretation guide for the results table is the same as in the section above, but the NES now represents the difference between the resistant and the parental cells.)*
 
 ```{r cgs_cl_diff_rv_prep}
 # Run GSEA
 analyzed_metrics <- "x_mean"
 cell_line_name <- get_env_identifiers("cellline_name")
 
-# cell lines screened at different co-treatment concentrations share no combination to compare,
-# so the first two cell lines of each co-treatment concentration are paired
-cotrt_lines <- unique(response_metrics_combo_capped[cotrt_value != 0,
-                                                    c("cotrt_value", cell_line_name),
-                                                    with = FALSE])
-cl_pairs <- lapply(split(cotrt_lines[[cell_line_name]], cotrt_lines$cotrt_value),
-                   function(cls) unique(cls)[1:2])
-cl_pairs <- unique(Filter(function(pair) !anyNA(pair), cl_pairs))
-has_cl_pairs <- length(cl_pairs) > 0
+# a resistant line is one whose parental_identifier names another cell line of the screen
+resistant_pairs <- if ("parental_identifier" %in% names(response_metrics_combo_capped)) {
+  cell_lines <- unique(response_metrics_combo_capped[, c(cell_line_name, "parental_identifier"), with = FALSE])
+  cell_lines[get(cell_line_name) != parental_identifier & parental_identifier %in% get(cell_line_name)]
+} else {
+  NULL
+}
+has_cl_pairs <- NROW(resistant_pairs) > 0
 
 if (has_cl_pairs) {
-  vapply(cl_pairs, paste, character(1), collapse = " vs. ")
+  resistant_pairs
 } else {
-  "No two cell lines share a co-treatment concentration; the comparison is skipped."
+  "The screen has no resistant cell line together with its parental line; the comparison is skipped."
 }
 
 
 ```
 
 ```{r cgs_cl_diff_rv, eval = has_cl_pairs}
-cgs_analysis_RV <- do.call(c, lapply(cl_pairs, function(pair) {
-  analyze_cgs(response_metrics_combo_capped,
-              cellline1 = pair[[1]],
-              cellline2 = pair[[2]],
-              metrics = analyzed_metrics,
-              normalization_type = "RV")
+cgs_analysis_RV <- do.call(c, lapply(seq_len(NROW(resistant_pairs)), function(i) {
+  resistant <- resistant_pairs[[cell_line_name]][i]
+  parental <- resistant_pairs$parental_identifier[i]
+  # the resistant cells at the co-treatment concentration they were screened with (0 if none)
+  cotrt <- max(response_metrics_combo_capped[get(cell_line_name) == resistant, cotrt_value], na.rm = TRUE)
+  analyze_cgs_conditions(response_metrics_combo_capped,
+                         condition1 = list(cell_line = resistant, cotrt_value = cotrt),
+                         condition2 = list(cell_line = parental, cotrt_value = 0),
+                         metrics = analyzed_metrics,
+                         normalization_type = "RV")
 }))
 
 
@@ -546,11 +549,11 @@ ls_table_RV_1lvl <- lapply(seq_along(ls_table_RV), function(i) names(ls_table_RV
 names(ls_table_RV_1lvl) <- names(ls_table_RV)
 
 ls_link_RV <- prep_filename_path(plt_list = ls_table_RV_1lvl,
-                                 prefix = "cgs_tables_cl_diff_RV__",
+                                 prefix = "cgs_tables_resistant_vs_parental_RV__",
                                  path_file = file.path(".", "tables"),
                                  file_format = "xlsx")
 ls_path_data_RV <- prep_filename_path(plt_list = ls_table_RV_1lvl,
-                                      prefix = "cgs_tables_cl_diff_RV__",
+                                      prefix = "cgs_tables_resistant_vs_parental_RV__",
                                       path_file = file.path(wd, "tables"),
                                       file_format = "xlsx")
 table_RV <- prep_double_table_chunk(tbl_list = ls_table_RV,
@@ -572,7 +575,7 @@ invisible(loop(seq_along(ls_table_RV), function(x) {
 `r if (has_cl_pairs) knitr::knit(text = unlist(table_RV))`
 :::
 
-# Visualizing Differential Cell Line GSEA Results
+# Visualizing Resistant vs. Parental GSEA Results
 
 **What to look for:**
 
@@ -601,7 +604,7 @@ names(nested_list_RV) <- names(cgs_analysis_RV)
 ls_link_RV <- list()
 ls_path_RV <- list()
 for (cl_nm in names(nested_list_RV)) {
-  prefix_RV <- neutralize_spaces(escape_special_characters(sprintf("cgs_plot_cl_diff_RV__%s_", cl_nm)))
+  prefix_RV <- neutralize_spaces(escape_special_characters(sprintf("cgs_plot_resistant_vs_parental_RV__%s_", cl_nm)))
   ls_link_RV[[cl_nm]] <- prep_filename_path(plt_list = nested_list_RV[[cl_nm]],
                                             prefix = prefix_RV,
                                             path_file = file.path(".", "plots"),

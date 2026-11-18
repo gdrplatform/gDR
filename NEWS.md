@@ -1,3 +1,6 @@
+## gDR 1.11.29 - 2026-11-18
+* compare each resistant cell line with its parental line in the chemical genomics report
+
 ## gDR 1.11.28 - 2026-11-18
 * fix the Incucyte growth-rate axis label, which named a raw rate even on runs where every plotted row was normalized
 * fix data selections in the report failing with MultiAssayExperiment 1.38 by loading MultiAssayExperiment with gDR
