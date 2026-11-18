@@ -41,6 +41,7 @@ prepare_report_steps(
 ## Value
 
 A list with the validated arguments (`args`), the resolved
-`extra_render_params`, `data_type`, `steps`, `mae`, `mae_path`,
-`is_prism_data`, and the step files in render order (`rmd_files`) with
-their `template_paths` and `output_paths`.
+`extra_render_params` without the analysis selections, the resolved
+`analysis_params` and `data_selection`, `data_type`, `steps`, `mae`,
+`mae_path`, `is_prism_data`, and the step files in render order
+(`rmd_files`) with their `template_paths` and `output_paths`.

@@ -301,7 +301,7 @@ head(convert_se_assay_to_dt(se, "Metrics"))
 #> 6:      1             -0.823909          NA      -Inf        NA        NA
 #>           rss         p_value   x_0       x_inf               fit_type
 #>         <num>           <num> <num>       <num>                 <char>
-#> 1: 0.06111735 0.0055517820958     1 -0.76364406 DRC3pHillFitModelFixS0
+#> 1: 0.06111735 0.0055517820959     1 -0.76364407 DRC3pHillFitModelFixS0
 #> 2: 0.03159935 0.0001450862960     1  0.14499197 DRC3pHillFitModelFixS0
 #> 3: 0.03576754 0.0000003349268     1 -0.48824612 DRC3pHillFitModelFixS0
 #> 4: 0.04890734 0.0000024023028     1  0.04254419 DRC3pHillFitModelFixS0
@@ -359,7 +359,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] kableExtra_1.4.1  gDR_1.11.26       gDRutils_1.11.26  gDRimport_1.11.15
+#> [1] kableExtra_1.4.1  gDR_1.11.27       gDRutils_1.11.26  gDRimport_1.11.15
 #> [5] gDRcore_1.11.32   BiocStyle_2.41.0 
 #> 
 #> loaded via a namespace (and not attached):

@@ -15,7 +15,7 @@ or edit a report before a long render, or to render it elsewhere."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">gDR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.11.26</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.11.27</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -175,7 +175,7 @@ with <code>resume = TRUE</code> the run directory to write into.</p></dd>
 
 
 <dt id="arg-viz-format">viz_format<a class="anchor" aria-label="anchor" href="#arg-viz-format"></a></dt>
-<dd><p>Character. Format for visualizations. Default is <code>"svg"</code>.</p></dd>
+<dd><p>Character. Format for visualizations, <code>"svg"</code> (the default) or <code>"png"</code>.</p></dd>
 
 
 <dt id="arg-rmd-template-path">rmd_template_path<a class="anchor" aria-label="anchor" href="#arg-rmd-template-path"></a></dt>
@@ -240,7 +240,32 @@ signature of this function. Values are also persisted in <code>args.qs2</code>. 
 with parameters computed by this function are dropped with a warning. One entry is read by
 the templates themselves: <code>report_inputs_file</code>, the path to a qs2 file with a named list
 of plain data describing the inputs of the run, which the processing step records as the
-<code>"report"</code> step in the provenance of every experiment. Default is an empty list.</p></dd>
+<code>"report"</code> step in the provenance of every experiment. Others select what the analysis
+step draws. Leave one out to keep all its choices; there is no <code>"all"</code> value:</p><ul><li><p><code>sa_metrics</code>: single-agent metrics of the heatmaps and boxplots, from
+<code>"xc50"</code>, <code>"x_max"</code>, <code>"x_mean"</code>, <code>"x_AOC"</code>, <code>"x_AOC_range"</code>;</p></li>
+<li><p><code>combo_score_metrics</code>: combination scores of the heatmaps and boxplots, from
+<code>"hsa_score"</code>, <code>"bliss_score"</code>;</p></li>
+<li><p><code>iso_levels</code>: effect levels of the isobolograms, from -1 to 0.8, default
+<code>"0.5"</code>; a level the data does not have draws no isoline and is warned about;</p></li>
+<li><p><code>norm_types</code>: normalization types, <code>"RV"</code> alone leaves out the GR sections;</p></li>
+<li><p><code>plots_to_generate</code>: sections of the report, from <code>"sa_drc_by_drug"</code>,
+<code>"sa_drc_by_cl"</code>, <code>"sa_heatmap"</code>, <code>"sa_boxplot_cl"</code>,
+<code>"sa_boxplot_drug"</code>, <code>"sa_boxplot_tissue"</code>, <code>"combo_drc"</code>,
+<code>"combo_metrics_panel"</code>, <code>"combo_isoref"</code>, <code>"combo_heatmap"</code>,
+<code>"combo_boxplot_cl"</code>, <code>"combo_boxplot_drug"</code>, <code>"combo_boxplot_tissue"</code>;</p></li>
+<li><p><code>table_format</code>: formats of the assay tables, <code>"xlsx"</code> (a workbook per
+experiment type, the default) and <code>"csv"</code> (a file per experiment type and assay);
+<code>c("xlsx", "csv")</code> writes both, <code>"csv"</code> alone writes no assay workbook. The data of
+the heatmaps is always a workbook, with a CSV of its <code>matrix</code> sheet for <code>"csv"</code>.</p></li>
+</ul><p>Others restrict the data the analysis step draws, by name: <code>drugs_of_interest</code>,
+<code>cell_lines_of_interest</code>, <code>codrugs_of_interest</code>, <code>tissues_of_interest</code>,
+<code>moa_of_interest</code>, and <code>drug_pairs_of_interest</code>, a list of pairs
+<code>c(drug, co-drug)</code>. A combination is kept when either of its drugs is selected, and a
+pair matches in either order. The subset is written to
+<code>gDR_data/gDR_mae_selection.qs2</code>, the sections that need data it no longer has are left
+out, and the analysis step lists the selections at its top. A run that publishes its results
+(step 4) takes no selection.
+Default is an empty list.</p></dd>
 
 
 <dt id="arg-on-resolve-inputs">on_resolve_inputs<a class="anchor" aria-label="anchor" href="#arg-on-resolve-inputs"></a></dt>

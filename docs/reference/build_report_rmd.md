@@ -145,7 +145,8 @@ build_report_rmd(
 
 - viz_format:
 
-  Character. Format for visualizations. Default is `"svg"`.
+  Character. Format for visualizations, `"svg"` (the default) or
+  `"png"`.
 
 - rmd_template_path:
 
@@ -217,7 +218,46 @@ build_report_rmd(
   One entry is read by the templates themselves: `report_inputs_file`,
   the path to a qs2 file with a named list of plain data describing the
   inputs of the run, which the processing step records as the `"report"`
-  step in the provenance of every experiment. Default is an empty list.
+  step in the provenance of every experiment. Others select what the
+  analysis step draws. Leave one out to keep all its choices; there is
+  no `"all"` value:
+
+  - `sa_metrics`: single-agent metrics of the heatmaps and boxplots,
+    from `"xc50"`, `"x_max"`, `"x_mean"`, `"x_AOC"`, `"x_AOC_range"`;
+
+  - `combo_score_metrics`: combination scores of the heatmaps and
+    boxplots, from `"hsa_score"`, `"bliss_score"`;
+
+  - `iso_levels`: effect levels of the isobolograms, from -1 to 0.8,
+    default `"0.5"`; a level the data does not have draws no isoline and
+    is warned about;
+
+  - `norm_types`: normalization types, `"RV"` alone leaves out the GR
+    sections;
+
+  - `plots_to_generate`: sections of the report, from
+    `"sa_drc_by_drug"`, `"sa_drc_by_cl"`, `"sa_heatmap"`,
+    `"sa_boxplot_cl"`, `"sa_boxplot_drug"`, `"sa_boxplot_tissue"`,
+    `"combo_drc"`, `"combo_metrics_panel"`, `"combo_isoref"`,
+    `"combo_heatmap"`, `"combo_boxplot_cl"`, `"combo_boxplot_drug"`,
+    `"combo_boxplot_tissue"`;
+
+  - `table_format`: formats of the assay tables, `"xlsx"` (a workbook
+    per experiment type, the default) and `"csv"` (a file per experiment
+    type and assay); `c("xlsx", "csv")` writes both, `"csv"` alone
+    writes no assay workbook. The data of the heatmaps is always a
+    workbook, with a CSV of its `matrix` sheet for `"csv"`.
+
+  Others restrict the data the analysis step draws, by name:
+  `drugs_of_interest`, `cell_lines_of_interest`, `codrugs_of_interest`,
+  `tissues_of_interest`, `moa_of_interest`, and
+  `drug_pairs_of_interest`, a list of pairs `c(drug, co-drug)`. A
+  combination is kept when either of its drugs is selected, and a pair
+  matches in either order. The subset is written to
+  `gDR_data/gDR_mae_selection.qs2`, the sections that need data it no
+  longer has are left out, and the analysis step lists the selections at
+  its top. A run that publishes its results (step 4) takes no selection.
+  Default is an empty list.
 
 - on_resolve_inputs:
 
