@@ -1,5 +1,12 @@
 # Changelog
 
+## gDR 1.11.28 - 2026-11-18
+
+- fix the Incucyte growth-rate axis label, which named a raw rate even
+  on runs where every plotted row was normalized
+- fix data selections in the report failing with MultiAssayExperiment
+  1.38 by loading MultiAssayExperiment with gDR
+
 ## gDR 1.11.27 - 2026-11-17
 
 - add selections of metrics, synergy scores, isobologram levels,

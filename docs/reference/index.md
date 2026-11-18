@@ -41,5 +41,7 @@
   : Generate a Draft YAML Configuration for Incucyte Analysis
 - [`label_periods()`](https://gdrplatform.github.io/gDR/reference/label_periods.md)
   : Display labels for the growth-rate periods of the Incucyte analysis
+- [`rate_axis_label()`](https://gdrplatform.github.io/gDR/reference/rate_axis_label.md)
+  : Name the quantity on the growth-rate axis of the Incucyte analysis
 - [`resolve_incucyte_config_path()`](https://gdrplatform.github.io/gDR/reference/resolve_incucyte_config_path.md)
   : Resolve the configuration file an Incucyte report reads
