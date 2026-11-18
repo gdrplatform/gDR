@@ -94,7 +94,7 @@
 #' @param metadata_columns Character. Metadata names from file pointed by \code{meta_data_path}
 #'  Required if using \code{special_sections} equal \code{"PRISM"}
 #' @param output_dir Character. Directory to store reports and output data. This is a required parameter.
-#' @param viz_format Character. Format for visualizations. Default is \code{"svg"}.
+#' @param viz_format Character. Format for visualizations, \code{"svg"} (the default) or \code{"png"}.
 #' @param rmd_template_path Character vector. One or more directories holding the RMarkdown
 #'  templates. Directories are searched in order and the first match wins, so a deployment can
 #'  both override individual templates and supply steps that the other directories do not carry
@@ -131,7 +131,35 @@
 #'   with parameters computed by this function are dropped with a warning. One entry is read by
 #'   the templates themselves: \code{report_inputs_file}, the path to a qs2 file with a named list
 #'   of plain data describing the inputs of the run, which the processing step records as the
-#'   \code{"report"} step in the provenance of every experiment. Default is an empty list.
+#'   \code{"report"} step in the provenance of every experiment. Others select what the analysis
+#'   step draws. Leave one out to keep all its choices; there is no \code{"all"} value:
+#'   \itemize{
+#'     \item \code{sa_metrics}: single-agent metrics of the heatmaps and boxplots, from
+#'       \code{"xc50"}, \code{"x_max"}, \code{"x_mean"}, \code{"x_AOC"}, \code{"x_AOC_range"};
+#'     \item \code{combo_score_metrics}: combination scores of the heatmaps and boxplots, from
+#'       \code{"hsa_score"}, \code{"bliss_score"};
+#'     \item \code{iso_levels}: effect levels of the isobolograms, from -1 to 0.8, default
+#'       \code{"0.5"}; a level the data does not have draws no isoline and is warned about;
+#'     \item \code{norm_types}: normalization types, \code{"RV"} alone leaves out the GR sections;
+#'     \item \code{plots_to_generate}: sections of the report, from \code{"sa_drc_by_drug"},
+#'       \code{"sa_drc_by_cl"}, \code{"sa_heatmap"}, \code{"sa_boxplot_cl"},
+#'       \code{"sa_boxplot_drug"}, \code{"sa_boxplot_tissue"}, \code{"combo_drc"},
+#'       \code{"combo_metrics_panel"}, \code{"combo_isoref"}, \code{"combo_heatmap"},
+#'       \code{"combo_boxplot_cl"}, \code{"combo_boxplot_drug"}, \code{"combo_boxplot_tissue"};
+#'     \item \code{table_format}: formats of the assay tables, \code{"xlsx"} (a workbook per
+#'       experiment type, the default) and \code{"csv"} (a file per experiment type and assay);
+#'       \code{c("xlsx", "csv")} writes both, \code{"csv"} alone writes no assay workbook. The data of
+#'       the heatmaps is always a workbook, with a CSV of its \code{matrix} sheet for \code{"csv"}.
+#'   }
+#'   Others restrict the data the analysis step draws, by name: \code{drugs_of_interest},
+#'   \code{cell_lines_of_interest}, \code{codrugs_of_interest}, \code{tissues_of_interest},
+#'   \code{moa_of_interest}, and \code{drug_pairs_of_interest}, a list of pairs
+#'   \code{c(drug, co-drug)}. A combination is kept when either of its drugs is selected, and a
+#'   pair matches in either order. The subset is written to
+#'   \code{gDR_data/gDR_mae_selection.qs2}, the sections that need data it no longer has are left
+#'   out, and the analysis step lists the selections at its top. A run that publishes its results
+#'   (step 4) takes no selection.
+#'   Default is an empty list.
 #' @param on_resolve_inputs Function or NULL. Hook called before the data type is determined,
 #'   used to resolve input paths from an external source. It receives \code{args} (the list of
 #'   input arguments) and \code{extra_render_params}, and must return a list with exactly these
@@ -275,6 +303,7 @@ run_report <- function(
   # The step being rendered when the run stopped, and the steps rendered before it.
   state$failed_step <- NULL
   state$rendered_steps <- character(0)
+  state$selection_failed <- FALSE
   on.exit({
     if (!state$success) {
       # The failure hook runs before any clean-up, so that it can still read the log files
@@ -294,20 +323,29 @@ run_report <- function(
       # a full re-run just to retry the upload.
       publication_failed <- identical(state$failed_step, .PUBLICATION_STEP) &&
         length(state$rendered_steps) > 0
+      # The names of a selection are checked against the data once the processing step rendered
+      # it; keeping that step lets the analysis be retried alone.
+      selection_failed <- state$selection_failed && length(state$rendered_steps) > 0
 
       # In RESUME mode, we generally do NOT want to delete the directory on failure
       # as it contains valuable data from previous steps.
       if (!resume && !is.null(env$output_dir) && dir.exists(env$output_dir)) {
 
-        if (publication_failed) {
+        if (publication_failed || selection_failed) {
           tryCatch({
             create_symlink_to_current(dirname(env$output_dir), env$output_dir, verbose_mode)
           }, error = function(e_link) {
             message(sprintf("Could not point 'current' at '%s': %s", env$output_dir, e_link$message))
           })
           message(sprintf(
-            paste("\nPublication failed, but the report was rendered. Keeping '%s' as 'current';",
-                  "retry the publication alone with steps = 4 and resume = TRUE."),
+            if (publication_failed) {
+              paste("\nPublication failed, but the report was rendered. Keeping '%s' as 'current';",
+                    "retry the publication alone with steps = 4 and resume = TRUE.")
+            } else {
+              paste("\nThe data selection does not match the data, but the steps before the analysis",
+                    "were rendered. Keeping '%s' as 'current'; fix the selection and write the analysis",
+                    "alone with steps = 3 and resume = TRUE.")
+            },
             env$output_dir
           ))
         } else if (remove_on_failure) {
@@ -414,6 +452,7 @@ run_report <- function(
     }
     # Store error message for the on.exit failure email
     state$error_for_mail <- full_error_msg
+    state$selection_failed <- inherits(e, "report_selection_error")
     stop(e)
 
   }, finally = {
@@ -578,7 +617,7 @@ assert_report_args <- function(args) {
     checkmate::assert_string(output_dir)
     checkmate::assert_character(rmd_template_path, min.len = 1, any.missing = FALSE)
     checkmate::assert_directory_exists(rmd_template_path)
-    checkmate::assert_string(viz_format, pattern = "svg|png")
+    checkmate::assert_choice(viz_format, c("svg", "png"))
     checkmate::assert_numeric(steps, lower = 1, upper = 4, any.missing = FALSE)
     checkmate::assert_flag(verbose_mode)
     checkmate::assert_flag(with_decoding)
@@ -623,7 +662,9 @@ assert_report_args <- function(args) {
 #' @param on_resolve_inputs,on_before_render Function or NULL, as in \code{run_report()}.
 #'
 #' @return A list with the validated arguments (\code{args}), the resolved
-#'   \code{extra_render_params}, \code{data_type}, \code{steps}, \code{mae}, \code{mae_path},
+#'   \code{extra_render_params} without the analysis selections, the resolved
+#'   \code{analysis_params} and \code{data_selection}, \code{data_type}, \code{steps}, \code{mae},
+#'   \code{mae_path},
 #'   \code{is_prism_data}, and the step files in render order (\code{rmd_files}) with their
 #'   \code{template_paths} and \code{output_paths}.
 #' @keywords internal
@@ -653,6 +694,19 @@ prepare_report_steps <- function(args,
 
     args <- resolved$args
     extra_render_params <- resolved$extra_render_params
+  }
+
+  # Validated before anything is staged; they reach the templates as computed parameters, so
+  # they are taken out of the deployment-specific ones
+  analysis_params <- resolve_analysis_params(extra_render_params)
+  data_selection <- resolve_data_selection(extra_render_params)
+  # the publication step uploads the whole dataset, next to a report that would draw part of it
+  narrowed <- narrowing_selections(analysis_params, data_selection)
+  if (4 %in% args$steps && length(narrowed) > 0) {
+    stop(sprintf(
+      "A run that publishes its results (step 4) reports the whole dataset; leave out %s, or step 4.",
+      toString(sprintf("'%s'", narrowed))
+    ), call. = FALSE)
   }
 
   data_type <- determine_data_type(args, output_dir)
@@ -772,7 +826,11 @@ prepare_report_steps <- function(args,
 
   list(
     args = processed_args,
-    extra_render_params = extra_render_params,
+    extra_render_params = extra_render_params[
+      setdiff(names(extra_render_params), c(names(analysis_params), .DATA_SELECTIONS))
+    ],
+    analysis_params = analysis_params,
+    data_selection = data_selection,
     data_type = data_type,
     steps = steps,
     mae = mae,
@@ -817,6 +875,33 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
   render_params$metadata_columns <- paste0("'", processed_args$metadata_columns, "'", collapse = ", ")
 
   # Add other dynamic and boolean parameters
+  dynamic_params <- prepare_dynamic_render_params(data_type, plan$mae, output_dir, plan$steps)
+  analysis_mae_file <- "gDR_mae.qs2"
+  if (startsWith(plan$rmd_files[[i]], "3-") && length(plan$data_selection) > 0) {
+    analysis_mae_file <- .SELECTED_MAE_FILE
+    selected_path <- file.path(output_dir, "gDR_data", analysis_mae_file)
+    if (identical(plan$rmd_files[[i]], "3-analysis.Rmd")) {
+      selected <- select_report_data(read_report_mae(plan, output_dir), plan$data_selection)
+      qs2::qs_save(selected, selected_path)
+    } else {
+      # an add-on step draws the data its analysis step selected
+      selected <- qs2::qs_read(selected_path)
+    }
+    # the sections drawn follow the selected data, not the whole dataset; plot_GR_values comes from
+    # its Normalized assay here, and from the durations and division times of gDR_input.qs2 for a
+    # raw-file run without a selection, which agree for data that went through the processing step
+    dynamic_params <- prepare_dynamic_render_params("mae", selected, output_dir, 3)
+  }
+  report_selection <- describe_report_selection(plan$analysis_params, plan$data_selection)
+  iso_sections <- c("combo_metrics_panel", "combo_isoref")
+  if (identical(plan$rmd_files[[i]], "3-analysis.Rmd") &&
+        !identical(plan$analysis_params$iso_levels, .DEFAULT_ISO_LEVELS) &&
+        any(iso_sections %in% plan$analysis_params$plots_to_generate)) {
+    warn_missing_iso_levels(
+      if (length(plan$data_selection) > 0) selected else read_report_mae(plan, output_dir),
+      plan$analysis_params
+    )
+  }
   render_params <- c(
     render_params,
     list(
@@ -829,7 +914,15 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
       PRISM_excluded = !plan$is_prism_data,
       MAE = (data_type == "mae")
     ),
-    prepare_dynamic_render_params(data_type, plan$mae, output_dir, plan$steps)
+    lapply(plan$analysis_params, format_vector_for_rmd),
+    list(
+      analysis_mae_file = analysis_mae_file,
+      assay_file_types = paste(c(xlsx = "Excel", csv = "CSV")[plan$analysis_params$table_format], collapse = " and "),
+      has_report_selection = !is.null(report_selection),
+      report_selection = if (is.null(report_selection)) "" else report_selection
+    ),
+    dynamic_params,
+    analysis_section_flags(plan$analysis_params, dynamic_params$plot_GR_values)
   )
 
   # Deployment-specific parameters never override the ones computed above. Dropping them
@@ -1476,8 +1569,9 @@ find_template <- function(file_names, template_dirs) {
 #'
 #' Whisker drops a parameter that no template reads without a word. Most such entries of
 #' \code{extra_render_params} are read by the hooks of a deployment, so only a name close to a
-#' template parameter is reported, as the typo it most likely is: one edit away for a name of four
-#' to six characters, two for a longer one, and never for a name of three or fewer.
+#' template parameter or to a selection of the report is reported, as the typo it most likely is:
+#' one edit away for a name of four to six characters, two for a longer one, and never for a name
+#' of three or fewer.
 #'
 #' @param extra_render_params Named list of deployment-specific render parameters.
 #' @param template_paths Character vector of the templates of the run.
@@ -1485,13 +1579,14 @@ find_template <- function(file_names, template_dirs) {
 #' @return \code{NULL}, invisibly.
 #' @keywords internal
 warn_misspelled_render_params <- function(extra_render_params, template_paths) {
-  tags <- unique(unlist(lapply(template_paths, function(path) {
+  template_tags <- unlist(lapply(template_paths, function(path) {
     lines <- readLines(path, warn = FALSE)
     tags <- unlist(regmatches(lines, gregexpr("\\{\\{\\{?[#^/&]?\\s*[A-Za-z0-9_.]+\\s*\\}?\\}\\}", lines)))
     trimws(gsub("[{}#^/&]", "", tags))
-  })))
+  }))
+  tags <- unique(c(template_tags, names(.ANALYSIS_CHOICES), .DATA_SELECTIONS))
   unread <- setdiff(names(extra_render_params), tags)
-  if (length(unread) == 0 || length(tags) == 0) {
+  if (length(unread) == 0) {
     return(invisible(NULL))
   }
 

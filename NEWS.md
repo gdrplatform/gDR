@@ -1,3 +1,8 @@
+## gDR 1.11.27 - 2026-11-17
+* add selections of metrics, synergy scores, isobologram levels, sections, normalization types and data to the report
+* add `table_format` to write the assay tables of the report as CSV files, next to or instead of the workbooks
+* prevent `run_report()` from removing the rendered steps when a data selection does not match the data
+
 ## gDR 1.11.26 - 2026-11-16
 * fix the cell line comparison of the chemical genomics report for screens with several co-treatment concentrations
 

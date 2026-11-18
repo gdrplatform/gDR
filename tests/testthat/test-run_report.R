@@ -320,6 +320,66 @@ test_that("run_report removes the output directory when a publication-only run f
   expect_false(dir.exists(dummy_out))
 })
 
+test_that("run_report keeps the rendered steps when the data selection does not match the data", {
+
+  dummy_out <- tempfile()
+  dir.create(dummy_out)
+  template_dir <- .setup_dummy_templates()
+  on.exit({
+    unlink(dummy_out, recursive = TRUE)
+    unlink(template_dir, recursive = TRUE)
+  })
+
+  # Steps 1 and 2 render; the names of the selection are checked once step 2 wrote the data.
+  mock_symlink <- mockery::mock(NULL)
+  test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, TRUE))
+  mockery::stub(test_fn, "create_symlink_to_current", mock_symlink)
+  local_mocked_bindings(
+    read_report_mae = function(...) NULL,
+    select_report_data = function(...) .stop_selection("'drugs_of_interest' has value(s) not found in the data: nope.")
+  )
+
+  expect_error(
+    test_fn(
+      manifest = "manifest.xlsx",
+      output_dir = dummy_out,
+      rmd_template_path = template_dir,
+      steps = 1:3,
+      extra_render_params = list(drugs_of_interest = "nope")
+    ),
+    "drugs_of_interest"
+  )
+
+  expect_true(dir.exists(dummy_out))
+  expect_length(mockery::mock_args(mock_symlink), 1)
+})
+
+test_that("run_report refuses to narrow a report it publishes", {
+
+  dummy_out <- tempfile()
+  dir.create(dummy_out)
+  template_dir <- .setup_dummy_templates()
+  on.exit({
+    unlink(dummy_out, recursive = TRUE)
+    unlink(template_dir, recursive = TRUE)
+  })
+
+  mock_render <- mockery::mock(TRUE, cycle = TRUE)
+  test_fn <- .stub_run_report_io(run_report, dummy_out, mock_render)
+  run <- function(steps) {
+    test_fn(
+      manifest = "manifest.xlsx",
+      output_dir = dummy_out,
+      rmd_template_path = template_dir,
+      steps = steps,
+      extra_render_params = list(plots_to_generate = "sa_heatmap", cell_lines_of_interest = "x")
+    )
+  }
+
+  expect_error(run(1:4), "step 4.*'cell_lines_of_interest', 'plots_to_generate'")
+  expect_length(mockery::mock_args(mock_render), 0)
+})
+
 test_that("run_report injects extra_render_params into the template data", {
 
   dummy_out <- tempfile()
@@ -619,6 +679,20 @@ test_that("run_report refuses a qcs run without an injected import section", {
       extra_render_params = list(extra_sections_import = "```{r}\n1 + 1\n```")
     )
   )
+})
+
+test_that("build_report_rmd takes svg or png as viz_format, not a name containing one", {
+  out <- withr::local_tempdir()
+  template_dir <- withr::local_tempdir()
+  writeLines("{{viz_format}}", file.path(template_dir, "3-analysis.Rmd"))
+  file.create(file.path(template_dir, "gdr_logo-01.png"))
+  build <- function(viz_format) {
+    build_report_rmd(mae = gDRutils::get_synthetic_data("finalMAE_combo_matrix_small.qs2"), output_dir = out,
+                     rmd_template_path = template_dir, steps = 3, viz_format = viz_format)
+  }
+
+  expect_equal(readLines(build("png")[["3-analysis"]]), "png")
+  expect_error(build("mysvgfile"), "viz_format")
 })
 
 test_that("run_report reports a missing step template up front", {
@@ -1006,6 +1080,17 @@ test_that("warn_misspelled_render_params allows fewer edits for a shorter name",
   expect_no_warning(warn_misspelled_render_params(list(emb = 1), template))
   expect_no_warning(warn_misspelled_render_params(list(ebd = 1, embdd_x = 1), template))
   expect_warning(warn_misspelled_render_params(list(viz_fromat = 1), template), "viz_fromat")
+})
+
+test_that("warn_misspelled_render_params reports names close to a selection of the report", {
+  template <- withr::local_tempfile(fileext = ".Rmd")
+  writeLines("{{viz_format}}", template)
+
+  expect_warning(
+    warn_misspelled_render_params(list(drug_of_interest = "x", norm_type = "GR"), template),
+    "'drug_of_interest' \\(did you mean 'drugs_of_interest'\\?\\), 'norm_type' \\(did you mean 'norm_types'\\?\\)"
+  )
+  expect_no_warning(warn_misspelled_render_params(list(drugs_of_interest = "x", norm_types = "GR"), template))
 })
 
 test_that("build_report_rmd warns about a misspelled entry of extra_render_params", {

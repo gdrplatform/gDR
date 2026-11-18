@@ -23,7 +23,9 @@ prepare_report_steps(
 }
 \value{
 A list with the validated arguments (\code{args}), the resolved
-\code{extra_render_params}, \code{data_type}, \code{steps}, \code{mae}, \code{mae_path},
+\code{extra_render_params} without the analysis selections, the resolved
+\code{analysis_params} and \code{data_selection}, \code{data_type}, \code{steps}, \code{mae},
+\code{mae_path},
 \code{is_prism_data}, and the step files in render order (\code{rmd_files}) with their
 \code{template_paths} and \code{output_paths}.
 }

@@ -96,7 +96,7 @@ Required if using \code{special_sections} equal \code{"PRISM"}}
 
 \item{output_dir}{Character. Directory to store reports and output data. This is a required parameter.}
 
-\item{viz_format}{Character. Format for visualizations. Default is \code{"svg"}.}
+\item{viz_format}{Character. Format for visualizations, \code{"svg"} (the default) or \code{"png"}.}
 
 \item{rmd_template_path}{Character vector. One or more directories holding the RMarkdown
 templates. Directories are searched in order and the first match wins, so a deployment can
@@ -145,7 +145,35 @@ signature of this function. Values are also persisted in \code{args.qs2}. Names 
 with parameters computed by this function are dropped with a warning. One entry is read by
 the templates themselves: \code{report_inputs_file}, the path to a qs2 file with a named list
 of plain data describing the inputs of the run, which the processing step records as the
-\code{"report"} step in the provenance of every experiment. Default is an empty list.}
+\code{"report"} step in the provenance of every experiment. Others select what the analysis
+step draws. Leave one out to keep all its choices; there is no \code{"all"} value:
+\itemize{
+\item \code{sa_metrics}: single-agent metrics of the heatmaps and boxplots, from
+\code{"xc50"}, \code{"x_max"}, \code{"x_mean"}, \code{"x_AOC"}, \code{"x_AOC_range"};
+\item \code{combo_score_metrics}: combination scores of the heatmaps and boxplots, from
+\code{"hsa_score"}, \code{"bliss_score"};
+\item \code{iso_levels}: effect levels of the isobolograms, from -1 to 0.8, default
+\code{"0.5"}; a level the data does not have draws no isoline and is warned about;
+\item \code{norm_types}: normalization types, \code{"RV"} alone leaves out the GR sections;
+\item \code{plots_to_generate}: sections of the report, from \code{"sa_drc_by_drug"},
+\code{"sa_drc_by_cl"}, \code{"sa_heatmap"}, \code{"sa_boxplot_cl"},
+\code{"sa_boxplot_drug"}, \code{"sa_boxplot_tissue"}, \code{"combo_drc"},
+\code{"combo_metrics_panel"}, \code{"combo_isoref"}, \code{"combo_heatmap"},
+\code{"combo_boxplot_cl"}, \code{"combo_boxplot_drug"}, \code{"combo_boxplot_tissue"};
+\item \code{table_format}: formats of the assay tables, \code{"xlsx"} (a workbook per
+experiment type, the default) and \code{"csv"} (a file per experiment type and assay);
+\code{c("xlsx", "csv")} writes both, \code{"csv"} alone writes no assay workbook. The data of
+the heatmaps is always a workbook, with a CSV of its \code{matrix} sheet for \code{"csv"}.
+}
+Others restrict the data the analysis step draws, by name: \code{drugs_of_interest},
+\code{cell_lines_of_interest}, \code{codrugs_of_interest}, \code{tissues_of_interest},
+\code{moa_of_interest}, and \code{drug_pairs_of_interest}, a list of pairs
+\code{c(drug, co-drug)}. A combination is kept when either of its drugs is selected, and a
+pair matches in either order. The subset is written to
+\code{gDR_data/gDR_mae_selection.qs2}, the sections that need data it no longer has are left
+out, and the analysis step lists the selections at its top. A run that publishes its results
+(step 4) takes no selection.
+Default is an empty list.}
 
 \item{on_resolve_inputs}{Function or NULL. Hook called before the data type is determined,
 used to resolve input paths from an external source. It receives \code{args} (the list of
