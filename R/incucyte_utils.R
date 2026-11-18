@@ -458,6 +458,45 @@ convert_growth_metric <- function(ngr, ngr_sd, metric = c("NormalizedGrowthRate"
 }
 
 
+#' Name the quantity on the growth-rate axis of the Incucyte analysis
+#'
+#' The bar panel plots \code{plot_value}, which is a normalized rate where
+#' \code{is_normalized} is \code{TRUE} and a raw one where it is \code{FALSE}.
+#' Periods are faceted and \code{normalization_map} gives each period one
+#' target, so the flag is constant within a facet and the two kinds only meet
+#' when a config mixes \code{"None"} with a reference period. In every other
+#' case the axis names one quantity, and saying so beats naming both.
+#'
+#' @param is_normalized logical; one value per plotted row, as the analysis
+#'   derives it from \code{normalization_map}. Only the distinct values matter.
+#' @param metric string; the configured \code{growth_metric}, which decides how
+#'   a normalized rate is named.
+#'
+#' @return A string for \code{ggplot2::ylab()}.
+#'
+#' @examples
+#' rate_axis_label(c(TRUE, TRUE), "GR")
+#' rate_axis_label(c(FALSE, FALSE), "GR")
+#' rate_axis_label(c(TRUE, FALSE), "GR")
+#'
+#' @keywords incucyte
+#' @export
+rate_axis_label <- function(is_normalized, metric = c("NormalizedGrowthRate", "GR")) {
+  checkmate::assert_logical(is_normalized, any.missing = FALSE, min.len = 1L)
+  metric <- match.arg(metric)
+
+  raw <- "Raw log2 growth rate"
+  normalized <- if (metric == "GR") "GR value" else "Normalized growth rate"
+
+  kinds <- unique(is_normalized)
+  if (length(kinds) > 1L) {
+    # Both kinds are on one axis, so neither name alone is true.
+    return(paste0(normalized, " or raw log2 growth rate"))
+  }
+  if (kinds) normalized else raw
+}
+
+
 #' Display labels for the growth-rate periods of the Incucyte analysis
 #'
 #' @param periods character; period names defined in the config, a subset of

@@ -950,8 +950,9 @@ for (current_cell_line in config$cell_lines) {
         # The 'scales' argument is controlled by the config variable
         facet_wrap(vars(range), scales = y_axis_scales, labeller = as_labeller(period_labels)) +
         
-        # A generic y-axis label, as units may be mixed
-        ylab(if (growth_metric == "GR") "GR value (or Raw Rate)" else "Value (Normalized or Raw Rate)")
+        # Name what is actually on the axis. The rows carry is_normalized, so the
+        # two kinds only need naming together when a config mixes them.
+        ylab(rate_axis_label(sel_rates$is_normalized, growth_metric))
         
 
     # 2. Conditionally add the y=1 hline

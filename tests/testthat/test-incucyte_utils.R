@@ -270,6 +270,41 @@ test_that("convert_growth_metric returns normalized growth rates or GR values", 
 })
 
 
+test_that("rate_axis_label names the one quantity on the axis when there is only one", {
+  # The case the hedge used to cover unconditionally: every period normalized.
+  expect_identical(rate_axis_label(c(TRUE, TRUE), "GR"), "GR value")
+  expect_identical(rate_axis_label(TRUE, "NormalizedGrowthRate"), "Normalized growth rate")
+
+  # No period normalized, so the metric does not enter the name at all.
+  expect_identical(rate_axis_label(c(FALSE, FALSE), "GR"), "Raw log2 growth rate")
+  expect_identical(rate_axis_label(FALSE, "NormalizedGrowthRate"), "Raw log2 growth rate")
+
+  # The default metric is the same one the analysis defaults to.
+  expect_identical(rate_axis_label(TRUE), rate_axis_label(TRUE, "NormalizedGrowthRate"))
+})
+
+
+test_that("rate_axis_label names both kinds only when both are plotted", {
+  expect_identical(rate_axis_label(c(TRUE, FALSE), "GR"),
+                   "GR value or raw log2 growth rate")
+  expect_identical(rate_axis_label(c(FALSE, TRUE), "NormalizedGrowthRate"),
+                   "Normalized growth rate or raw log2 growth rate")
+
+  # Order and repetition are irrelevant -- only the distinct kinds matter.
+  expect_identical(rate_axis_label(c(TRUE, TRUE, FALSE, TRUE), "GR"),
+                   rate_axis_label(c(FALSE, TRUE), "GR"))
+})
+
+
+test_that("rate_axis_label refuses input it cannot name", {
+  # NA would otherwise count as a third kind and silently force the both-kinds label.
+  expect_error(rate_axis_label(c(TRUE, NA), "GR"), "missing")
+  expect_error(rate_axis_label(logical(0), "GR"), "length")
+  expect_error(rate_axis_label(c(1, 0), "GR"), "logical")
+  expect_error(rate_axis_label(TRUE, "RV"), "should be one of")
+})
+
+
 test_that("label_periods keeps the period names unless the config labels them", {
   expect_identical(label_periods(c("early", "late")), c(early = "early", late = "late"))
   expect_identical(
