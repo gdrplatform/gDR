@@ -368,7 +368,7 @@ if (all(nchar(metadata_columns) == 0)) {
 
 ```{r features_obj_sa, warning=FALSE, fig.show="hide"}
 drug_name_vec <- sort(unique(response_metrics_sa_capped[["DrugName"]]))
-normalization_type_vec <- ifelse({{plot_GR}}, c("RV", "GR"), "RV")
+normalization_type_vec <- if ({{plot_GR}}) c("RV", "GR") else "RV"
 
 obj_plot <- create_PRISM_plot_list_sa(drug_name_vec = drug_name_vec,
                                       dt_metrics = response_metrics_sa_capped,
@@ -622,7 +622,7 @@ The interpretation is the same as for the single-agent data. The plots will show
 ```{r features_obj_combo, warning=FALSE, fig.show="hide"}
 drug_name_vec <- sort(unique(response_metrics_combo[["DrugName"]]))
 codrug_name_vec <- sort(unique(response_metrics_combo[["DrugName_2"]]))
-normalization_type_vec <- ifelse({{plot_GR}}, c("RV", "GR"), "RV")
+normalization_type_vec <- if ({{plot_GR}}) c("RV", "GR") else "RV"
 
 obj_plot <- create_PRISM_plot_list_combo(drug1_name_vec = drug_name_vec,
                                          drug2_name_vec = codrug_name_vec,
