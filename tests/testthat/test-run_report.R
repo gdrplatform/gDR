@@ -118,9 +118,13 @@ test_that("validate_and_prepare_inputs filters steps for MAE input", {
       stderr_con = file(tempfile(), open = "wt")
     )
   })
-  mockery::stub(test_fn, "determine_data_type", function(...) "bench")
-  mockery::stub(test_fn, "stage_and_update_paths", function(args, ...) args)
-  mockery::stub(test_fn, "validate_and_prepare_inputs", function(args, ...) list())
+  # These run in prepare_report_steps(), out of reach of a stub on test_fn.
+  local_mocked_bindings(
+    determine_data_type = function(...) "bench",
+    stage_and_update_paths = function(args, ...) args,
+    validate_and_prepare_inputs = function(args, ...) list(),
+    .env = parent.frame()
+  )
   mockery::stub(test_fn, "rmarkdown::render", render_mock)
   mockery::stub(test_fn, "create_symlink_to_current", NULL)
 
@@ -201,7 +205,7 @@ test_that("run_report runs on_failure before the output directory is removed", {
   })
 
   test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
-  mockery::stub(test_fn, "determine_data_type", function(...) stop("boom"))
+  local_mocked_bindings(determine_data_type = function(...) stop("boom"))
 
   seen <- new.env(parent = emptyenv())
 
@@ -316,6 +320,66 @@ test_that("run_report removes the output directory when a publication-only run f
   expect_false(dir.exists(dummy_out))
 })
 
+test_that("run_report keeps the rendered steps when the data selection does not match the data", {
+
+  dummy_out <- tempfile()
+  dir.create(dummy_out)
+  template_dir <- .setup_dummy_templates()
+  on.exit({
+    unlink(dummy_out, recursive = TRUE)
+    unlink(template_dir, recursive = TRUE)
+  })
+
+  # Steps 1 and 2 render; the names of the selection are checked once step 2 wrote the data.
+  mock_symlink <- mockery::mock(NULL)
+  test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, TRUE))
+  mockery::stub(test_fn, "create_symlink_to_current", mock_symlink)
+  local_mocked_bindings(
+    read_report_mae = function(...) NULL,
+    select_report_data = function(...) .stop_selection("'drugs_of_interest' has value(s) not found in the data: nope.")
+  )
+
+  expect_error(
+    test_fn(
+      manifest = "manifest.xlsx",
+      output_dir = dummy_out,
+      rmd_template_path = template_dir,
+      steps = 1:3,
+      extra_render_params = list(drugs_of_interest = "nope")
+    ),
+    "drugs_of_interest"
+  )
+
+  expect_true(dir.exists(dummy_out))
+  expect_length(mockery::mock_args(mock_symlink), 1)
+})
+
+test_that("run_report refuses to narrow a report it publishes", {
+
+  dummy_out <- tempfile()
+  dir.create(dummy_out)
+  template_dir <- .setup_dummy_templates()
+  on.exit({
+    unlink(dummy_out, recursive = TRUE)
+    unlink(template_dir, recursive = TRUE)
+  })
+
+  mock_render <- mockery::mock(TRUE, cycle = TRUE)
+  test_fn <- .stub_run_report_io(run_report, dummy_out, mock_render)
+  run <- function(steps) {
+    test_fn(
+      manifest = "manifest.xlsx",
+      output_dir = dummy_out,
+      rmd_template_path = template_dir,
+      steps = steps,
+      extra_render_params = list(plots_to_generate = "sa_heatmap", cell_lines_of_interest = "x")
+    )
+  }
+
+  expect_error(run(1:4), "step 4.*'cell_lines_of_interest', 'plots_to_generate'")
+  expect_length(mockery::mock_args(mock_render), 0)
+})
+
 test_that("run_report injects extra_render_params into the template data", {
 
   dummy_out <- tempfile()
@@ -328,7 +392,7 @@ test_that("run_report injects extra_render_params into the template data", {
 
   mock_whisker <- mockery::mock("rendered", cycle = TRUE)
   test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
-  mockery::stub(test_fn, "whisker::whisker.render", mock_whisker)
+  local_mocked_bindings(whisker.render = mock_whisker, .package = "whisker")
 
   # 'output_dir' is shadowed by a computed parameter, which is reported to the caller.
   expect_warning(
@@ -369,7 +433,7 @@ test_that("run_report lets on_resolve_inputs rewrite inputs and render params", 
 
   mock_stage <- mockery::mock(list(), cycle = TRUE)
   test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
-  mockery::stub(test_fn, "stage_and_update_paths", mock_stage)
+  local_mocked_bindings(stage_and_update_paths = mock_stage)
 
   test_fn(
     manifest = "manifest.xlsx",
@@ -591,7 +655,7 @@ test_that("run_report refuses a qcs run without an injected import section", {
   })
 
   test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
-  mockery::stub(test_fn, "determine_data_type", function(...) "qcs")
+  local_mocked_bindings(determine_data_type = function(...) "qcs")
 
   # The driver cannot import screening-system sessions on its own.
   expect_error(
@@ -615,6 +679,20 @@ test_that("run_report refuses a qcs run without an injected import section", {
       extra_render_params = list(extra_sections_import = "```{r}\n1 + 1\n```")
     )
   )
+})
+
+test_that("build_report_rmd takes svg or png as viz_format, not a name containing one", {
+  out <- withr::local_tempdir()
+  template_dir <- withr::local_tempdir()
+  writeLines("{{viz_format}}", file.path(template_dir, "3-analysis.Rmd"))
+  file.create(file.path(template_dir, "gdr_logo-01.png"))
+  build <- function(viz_format) {
+    build_report_rmd(mae = gDRutils::get_synthetic_data("finalMAE_combo_matrix_small.qs2"), output_dir = out,
+                     rmd_template_path = template_dir, steps = 3, viz_format = viz_format)
+  }
+
+  expect_equal(readLines(build("png")[["3-analysis"]]), "png")
+  expect_error(build("mysvgfile"), "viz_format")
 })
 
 test_that("run_report reports a missing step template up front", {
@@ -743,7 +821,7 @@ test_that("run_report refuses a configuration file that could not be staged", {
   test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
   # Staging drops a path argument it cannot resolve; the report must not carry on with the
   # configuration the templates generate for themselves.
-  mockery::stub(test_fn, "stage_and_update_paths", function(args, ...) {
+  local_mocked_bindings(stage_and_update_paths = function(args, ...) {
     args$configuration_file_path <- NULL
     args
   })
@@ -768,7 +846,7 @@ test_that("run_report passes a staged configuration file through to the template
 
   test_fn <- .stub_run_report_io(run_report, dummy_out, mockery::mock(TRUE, cycle = TRUE))
   staged <- file.path(dummy_out, "raw_data", "my_windows.yml")
-  mockery::stub(test_fn, "stage_and_update_paths", function(args, ...) {
+  local_mocked_bindings(stage_and_update_paths = function(args, ...) {
     args$configuration_file_path <- staged
     args
   })
@@ -838,4 +916,195 @@ test_that("prepare_dynamic_render_params handles input without durations, as in 
   qs2::qs_save(raw_data, file.path(output_dir, "gDR_data", "gDR_input.qs2"))
   params <- gDR:::prepare_dynamic_render_params("prism_6", NULL, output_dir, c(1, 2, 3))
   expect_false(params$plot_GR_values)
+})
+
+# --- Tests for build_report_rmd ---
+
+# Runs run_report() with the render call stubbed out and returns the .Rmd files it wrote.
+.rmd_written_by_run_report <- function(output_dir, ...) {
+  test_fn <- run_report
+  mockery::stub(test_fn, "rmarkdown::render", TRUE)
+  test_fn(output_dir = output_dir, ...)
+  list.files(file.path(output_dir, "current"), pattern = "\\.Rmd$", full.names = TRUE)
+}
+
+test_that("build_report_rmd writes the same .Rmd files as run_report", {
+  templates <- system.file("report_templates", package = "gDR")
+  mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small.qs2")
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  cases <- list(
+    mae = list(mae = mae, steps = 3),
+    long_table = list(long_table = long_table, steps = 1)
+  )
+  for (case in names(cases)) {
+    out <- withr::local_tempdir()
+    expected <- do.call(.rmd_written_by_run_report, c(list(out, rmd_template_path = templates), cases[[case]]))
+    expected <- stats::setNames(lapply(expected, readLines), basename(expected))
+
+    # resume writes into the directory run_report() used, so the paths in the documents match
+    rmd <- do.call(
+      build_report_rmd,
+      c(list(output_dir = file.path(out, "current"), rmd_template_path = templates, resume = TRUE), cases[[case]])
+    )
+    expect_length(rmd, length(expected))
+    expect_equal(stats::setNames(lapply(rmd, readLines), basename(rmd)), expected, info = case)
+  }
+})
+
+test_that("build_report_rmd writes into a new run directory and renders nothing", {
+  out <- withr::local_tempdir()
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  rmd <- build_report_rmd(long_table = long_table, output_dir = out, rmd_template_path = template_dir, steps = 1)
+  expect_named(rmd, "1-data_import")
+  expect_equal(dirname(rmd), file.path(out, "v1"), ignore_attr = TRUE)
+  expect_true(file.exists(rmd))
+  expect_length(list.files(out, pattern = "\\.html$", recursive = TRUE), 0)
+  # 'current' is left to the run that renders the report
+  expect_false(file.exists(file.path(out, "current")))
+})
+
+test_that("build_report_rmd refuses a step whose input the previous step has not written yet", {
+  out <- withr::local_tempdir()
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  expect_error(
+    build_report_rmd(long_table = long_table, output_dir = out, rmd_template_path = template_dir),
+    "2-processing_and_QC, 3-analysis read\\(s\\) 'gDR_data/gDR_input.qs2', 'gDR_data/gDR_mae.qs2'"
+  )
+  expect_false(dir.exists(file.path(out, "v1")))
+})
+
+test_that("build_report_rmd with resume writes the next step into the given run directory", {
+  out <- withr::local_tempdir()
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+  local_mocked_bindings(prepare_dynamic_render_params = function(...) list())
+
+  rmd <- build_report_rmd(long_table = long_table, output_dir = out, rmd_template_path = template_dir, steps = 1)
+  run_dir <- dirname(rmd[[1]])
+  expect_error(
+    build_report_rmd(output_dir = run_dir, rmd_template_path = template_dir, steps = 2, resume = TRUE),
+    "No valid input source"
+  )
+  expect_true(dir.exists(run_dir))
+
+  # what rendering step 1 writes
+  qs2::qs_save(data.table::data.table(), file.path(run_dir, "gDR_data", "gDR_input.qs2"))
+  rmd2 <- build_report_rmd(output_dir = run_dir, rmd_template_path = template_dir, steps = 2, resume = TRUE)
+  expect_equal(rmd2, c("2-processing_and_QC" = file.path(normalizePath(run_dir), "2-processing_and_QC.Rmd")))
+  expect_length(list.dirs(out, recursive = FALSE), 1)
+
+  expect_error(
+    build_report_rmd(output_dir = file.path(out, "v2"), rmd_template_path = template_dir, steps = 2, resume = TRUE),
+    "does not exist"
+  )
+})
+
+test_that("build_report_rmd refuses the publication step", {
+  out <- withr::local_tempdir()
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+
+  expect_error(
+    build_report_rmd(manifest = "manifest.xlsx", output_dir = out, rmd_template_path = template_dir, steps = 3:4),
+    "steps 1 to 3 only"
+  )
+  expect_length(list.files(out), 0)
+})
+
+test_that("build_report_rmd removes the output directory it created when it fails", {
+  out <- withr::local_tempdir()
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+  unlink(file.path(template_dir, "1-data_import.Rmd"))
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  expect_error(
+    build_report_rmd(long_table = long_table, output_dir = out, rmd_template_path = template_dir, steps = 1),
+    "not available in this installation"
+  )
+  expect_false(dir.exists(file.path(out, "v1")))
+})
+
+test_that("build_report_rmd uses the templates shipped with gDR by default", {
+  out_default <- withr::local_tempdir()
+  out_explicit <- withr::local_tempdir()
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  rmd_default <- build_report_rmd(long_table = long_table, output_dir = out_default, steps = 1)
+  rmd_explicit <- build_report_rmd(
+    long_table = long_table,
+    output_dir = out_explicit,
+    rmd_template_path = system.file("report_templates", package = "gDR"),
+    steps = 1
+  )
+  expect_equal(
+    gsub(out_default, "", readLines(rmd_default), fixed = TRUE),
+    gsub(out_explicit, "", readLines(rmd_explicit), fixed = TRUE)
+  )
+})
+
+test_that("warn_misspelled_render_params reports names close to a template parameter only", {
+  template <- withr::local_tempfile(fileext = ".Rmd")
+  writeLines(c("{{#MAE}}x <- '{{viz_format}}'{{/MAE}}", "{{{report_inputs_file}}}"), template)
+
+  expect_warning(
+    warn_misspelled_render_params(list(viz_fromat = "png", report_input_file = "f"), template),
+    "'viz_fromat' \\(did you mean 'viz_format'\\?\\), 'report_input_file' \\(did you mean 'report_inputs_file'\\?\\)"
+  )
+  # read by a template, or far from every template parameter (read by the hooks of a deployment)
+  expect_no_warning(
+    warn_misspelled_render_params(list(viz_format = "png", push_to_DSDB = TRUE, username = "u"), template)
+  )
+})
+
+test_that("warn_misspelled_render_params allows fewer edits for a shorter name", {
+  template <- withr::local_tempfile(fileext = ".Rmd")
+  writeLines("{{dpi}} {{embed}} {{viz_format}}", template)
+
+  expect_no_warning(warn_misspelled_render_params(list(api = 1), template))
+  expect_warning(warn_misspelled_render_params(list(embd = 1), template), "'embd' \\(did you mean 'embed'\\?\\)")
+  expect_no_warning(warn_misspelled_render_params(list(emb = 1), template))
+  expect_no_warning(warn_misspelled_render_params(list(ebd = 1, embdd_x = 1), template))
+  expect_warning(warn_misspelled_render_params(list(viz_fromat = 1), template), "viz_fromat")
+})
+
+test_that("warn_misspelled_render_params reports names close to a selection of the report", {
+  template <- withr::local_tempfile(fileext = ".Rmd")
+  writeLines("{{viz_format}}", template)
+
+  expect_warning(
+    warn_misspelled_render_params(list(drug_of_interest = "x", norm_type = "GR"), template),
+    "'drug_of_interest' \\(did you mean 'drugs_of_interest'\\?\\), 'norm_type' \\(did you mean 'norm_types'\\?\\)"
+  )
+  expect_no_warning(warn_misspelled_render_params(list(drugs_of_interest = "x", norm_types = "GR"), template))
+})
+
+test_that("build_report_rmd warns about a misspelled entry of extra_render_params", {
+  out <- withr::local_tempdir()
+  long_table <- withr::local_tempfile(fileext = ".csv")
+  writeLines("Gnumber,clid,Duration,Concentration,ReadoutValue", long_table)
+
+  expect_warning(
+    build_report_rmd(
+      long_table = long_table,
+      output_dir = out,
+      steps = 1,
+      extra_render_params = list(extra_section_import = "", username = "u")
+    ),
+    "did you mean 'extra_sections_import'"
+  )
 })

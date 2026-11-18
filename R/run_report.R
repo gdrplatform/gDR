@@ -24,6 +24,14 @@
 # the clean-up in run_report()), so that publishing alone can be retried in resume mode.
 .PUBLICATION_STEP <- "4-publish_results.Rmd"
 
+# Data a step reads from its `gDR_data` directory that only rendering the previous step writes.
+# Without it the step loses its combination, GR and isobologram sections and still renders (see
+# prepare_dynamic_render_params()), so build_report_rmd() does not write such a step.
+.STEP_INPUTS <- c(
+  "2-processing_and_QC.Rmd" = "gDR_input.qs2",
+  "3-analysis.Rmd" = "gDR_mae.qs2"
+)
+
 #' Run a gDR report pipeline
 #'
 #' Infrastructure-agnostic driver for the gDR reporting pipeline. It stages all input files into
@@ -86,12 +94,12 @@
 #' @param metadata_columns Character. Metadata names from file pointed by \code{meta_data_path}
 #'  Required if using \code{special_sections} equal \code{"PRISM"}
 #' @param output_dir Character. Directory to store reports and output data. This is a required parameter.
-#' @param viz_format Character. Format for visualizations. Default is \code{"svg"}.
+#' @param viz_format Character. Format for visualizations, \code{"svg"} (the default) or \code{"png"}.
 #' @param rmd_template_path Character vector. One or more directories holding the RMarkdown
 #'  templates. Directories are searched in order and the first match wins, so a deployment can
 #'  both override individual templates and supply steps that the other directories do not carry
 #'  (for instance a publication step living outside the open-source template set).
-#'  This is a required parameter.
+#'  Default is the templates shipped with gDR.
 #' @param steps Integer vector. Steps to run in the pipeline:
 #'  1: data import, 2: processing and QC, 3: analysis, 4: publish results.
 #'  Default is \code{1:3}. Note: If \code{mae} is provided, steps 1 and 2 are automatically skipped.
@@ -123,7 +131,35 @@
 #'   with parameters computed by this function are dropped with a warning. One entry is read by
 #'   the templates themselves: \code{report_inputs_file}, the path to a qs2 file with a named list
 #'   of plain data describing the inputs of the run, which the processing step records as the
-#'   \code{"report"} step in the provenance of every experiment. Default is an empty list.
+#'   \code{"report"} step in the provenance of every experiment. Others select what the analysis
+#'   step draws. Leave one out to keep all its choices; there is no \code{"all"} value:
+#'   \itemize{
+#'     \item \code{sa_metrics}: single-agent metrics of the heatmaps and boxplots, from
+#'       \code{"xc50"}, \code{"x_max"}, \code{"x_mean"}, \code{"x_AOC"}, \code{"x_AOC_range"};
+#'     \item \code{combo_score_metrics}: combination scores of the heatmaps and boxplots, from
+#'       \code{"hsa_score"}, \code{"bliss_score"};
+#'     \item \code{iso_levels}: effect levels of the isobolograms, from -1 to 0.8, default
+#'       \code{"0.5"}; a level the data does not have draws no isoline and is warned about;
+#'     \item \code{norm_types}: normalization types, \code{"RV"} alone leaves out the GR sections;
+#'     \item \code{plots_to_generate}: sections of the report, from \code{"sa_drc_by_drug"},
+#'       \code{"sa_drc_by_cl"}, \code{"sa_heatmap"}, \code{"sa_boxplot_cl"},
+#'       \code{"sa_boxplot_drug"}, \code{"sa_boxplot_tissue"}, \code{"combo_drc"},
+#'       \code{"combo_metrics_panel"}, \code{"combo_isoref"}, \code{"combo_heatmap"},
+#'       \code{"combo_boxplot_cl"}, \code{"combo_boxplot_drug"}, \code{"combo_boxplot_tissue"};
+#'     \item \code{table_format}: formats of the assay tables, \code{"xlsx"} (a workbook per
+#'       experiment type, the default) and \code{"csv"} (a file per experiment type and assay);
+#'       \code{c("xlsx", "csv")} writes both, \code{"csv"} alone writes no assay workbook. The data of
+#'       the heatmaps is always a workbook, with a CSV of its \code{matrix} sheet for \code{"csv"}.
+#'   }
+#'   Others restrict the data the analysis step draws, by name: \code{drugs_of_interest},
+#'   \code{cell_lines_of_interest}, \code{codrugs_of_interest}, \code{tissues_of_interest},
+#'   \code{moa_of_interest}, and \code{drug_pairs_of_interest}, a list of pairs
+#'   \code{c(drug, co-drug)}. A combination is kept when either of its drugs is selected, and a
+#'   pair matches in either order. The subset is written to
+#'   \code{gDR_data/gDR_mae_selection.qs2}, the sections that need data it no longer has are left
+#'   out, and the analysis step lists the selections at its top. A run that publishes its results
+#'   (step 4) takes no selection.
+#'   Default is an empty list.
 #' @param on_resolve_inputs Function or NULL. Hook called before the data type is determined,
 #'   used to resolve input paths from an external source. It receives \code{args} (the list of
 #'   input arguments) and \code{extra_render_params}, and must return a list with exactly these
@@ -217,7 +253,7 @@ run_report <- function(
     ),
     output_dir,
     viz_format = "svg",
-    rmd_template_path,
+    rmd_template_path = system.file("report_templates", package = "gDR"),
     steps = seq_len(3),
     mae = NULL,
     special_sections = NULL,
@@ -236,45 +272,13 @@ run_report <- function(
     on_failure = NULL
 ) {
   # --- 1. Initial Assertions ---
-  checkmate::assert_string(output_dir)
-  checkmate::assert_character(rmd_template_path, min.len = 1, any.missing = FALSE)
-  checkmate::assert_directory_exists(rmd_template_path)
-  checkmate::assert_string(viz_format, pattern = "svg|png")
-  checkmate::assert_numeric(steps, lower = 1, upper = 4, any.missing = FALSE)
-  checkmate::assert_flag(verbose_mode)
-  checkmate::assert_flag(with_decoding)
-  checkmate::assert_number(dpi)
-  checkmate::assert_flag(embed)
-  checkmate::assert_flag(resume)
   checkmate::assert_flag(remove_on_failure)
-  checkmate::assert_choice(special_sections, choices = c("PRISM", "chemical_genomics"), null.ok = TRUE)
-  checkmate::assert_character(qcs_id, null.ok = TRUE)
-  checkmate::assert_character(long_table, null.ok = TRUE)
-  checkmate::assert_character(manifest, null.ok = TRUE)
-  checkmate::assert_character(treatment, null.ok = TRUE)
-  checkmate::assert_character(raw_data, null.ok = TRUE)
-  checkmate::assert_character(prism_data_path, null.ok = TRUE)
-  checkmate::assert_character(cell_line_data_path, null.ok = TRUE)
-  checkmate::assert_character(treatment_data_path, null.ok = TRUE)
-  checkmate::assert_character(drug_annotation_path, null.ok = TRUE)
-  checkmate::assert_character(cell_line_annotation_path, null.ok = TRUE)
-  checkmate::assert_character(meta_data_path, null.ok = TRUE)
-  checkmate::assert_character(feat_data_path, null.ok = TRUE)
-  checkmate::assert_character(configuration_file_path, null.ok = TRUE)
-  checkmate::assert_character(feature_sets, null.ok = TRUE)
-  checkmate::assert_character(metadata_columns, null.ok = TRUE)
   checkmate::assert_list(extra_render_params, names = "unique")
   checkmate::assert_function(on_resolve_inputs, null.ok = TRUE)
   checkmate::assert_function(on_start, null.ok = TRUE)
   checkmate::assert_function(on_before_render, null.ok = TRUE)
   checkmate::assert_function(on_success, null.ok = TRUE)
   checkmate::assert_function(on_failure, null.ok = TRUE)
-  checkmate::assert(
-    checkmate::check_class(mae, "MultiAssayExperiment"),
-    checkmate::check_string(mae),
-    null.ok = TRUE,
-    .var.name = "mae"
-  )
 
   # Everything that is not an input argument of the pipeline itself (hooks, deployment-specific
   # render parameters) must not leak into the argument list handed over to the templates.
@@ -287,6 +291,7 @@ run_report <- function(
     "on_success",
     "on_failure"
   )] <- NULL
+  assert_report_args(args)
 
   # Pass resume flag to setup_run_environment
   env <- setup_run_environment(args$output_dir, args$verbose_mode, args$resume)
@@ -298,6 +303,7 @@ run_report <- function(
   # The step being rendered when the run stopped, and the steps rendered before it.
   state$failed_step <- NULL
   state$rendered_steps <- character(0)
+  state$selection_failed <- FALSE
   on.exit({
     if (!state$success) {
       # The failure hook runs before any clean-up, so that it can still read the log files
@@ -317,20 +323,29 @@ run_report <- function(
       # a full re-run just to retry the upload.
       publication_failed <- identical(state$failed_step, .PUBLICATION_STEP) &&
         length(state$rendered_steps) > 0
+      # The names of a selection are checked against the data once the processing step rendered
+      # it; keeping that step lets the analysis be retried alone.
+      selection_failed <- state$selection_failed && length(state$rendered_steps) > 0
 
       # In RESUME mode, we generally do NOT want to delete the directory on failure
       # as it contains valuable data from previous steps.
       if (!resume && !is.null(env$output_dir) && dir.exists(env$output_dir)) {
 
-        if (publication_failed) {
+        if (publication_failed || selection_failed) {
           tryCatch({
             create_symlink_to_current(dirname(env$output_dir), env$output_dir, verbose_mode)
           }, error = function(e_link) {
             message(sprintf("Could not point 'current' at '%s': %s", env$output_dir, e_link$message))
           })
           message(sprintf(
-            paste("\nPublication failed, but the report was rendered. Keeping '%s' as 'current';",
-                  "retry the publication alone with steps = 4 and resume = TRUE."),
+            if (publication_failed) {
+              paste("\nPublication failed, but the report was rendered. Keeping '%s' as 'current';",
+                    "retry the publication alone with steps = 4 and resume = TRUE.")
+            } else {
+              paste("\nThe data selection does not match the data, but the steps before the analysis",
+                    "were rendered. Keeping '%s' as 'current'; fix the selection and write the analysis",
+                    "alone with steps = 3 and resume = TRUE.")
+            },
             env$output_dir
           ))
         } else if (remove_on_failure) {
@@ -371,204 +386,28 @@ run_report <- function(
     # Capture stdout from main execution block to a file
     utils::capture.output({
 
-      if (!is.null(on_resolve_inputs)) {
-        resolved <- on_resolve_inputs(args = args, extra_render_params = extra_render_params)
-        checkmate::assert_list(resolved)
-        checkmate::assert_names(names(resolved), must.include = c("args", "extra_render_params"))
-        checkmate::assert_list(resolved$args)
-        checkmate::assert_list(resolved$extra_render_params, names = "unique")
-
-        # Resolving inputs must not change how the run is executed - see .PROTECTED_RUN_ARGS.
-        tampered <- Filter(
-          function(nm) !identical(resolved$args[[nm]], args[[nm]]),
-          .PROTECTED_RUN_ARGS
-        )
-        if (length(tampered) > 0) {
-          stop(sprintf(
-            "'on_resolve_inputs' must not modify the run-control argument(s): %s.",
-            toString(tampered)
-          ))
-        }
-
-        args <- resolved$args
-        extra_render_params <- resolved$extra_render_params
-      }
-
-      data_type <- determine_data_type(args, env$output_dir)
-
-      message("Processing data type: ", data_type)
-
-      # The driver has no importer of its own for screening-system sessions: the import step is
-      # supplied as a rendered section through 'extra_render_params'. Without it the step would
-      # render empty and the run would fail much later, with nothing pointing at the cause.
-      if (data_type == "qcs" && 1 %in% args$steps &&
-          is_null_or_empty(extra_render_params$extra_sections_import)) {
-        stop(
-          "Data type 'qcs' requires the import section to be supplied via ",
-          "'extra_render_params$extra_sections_import'; this driver cannot import such data on ",
-          "its own. Supply that section from a deployment wrapper."
-        )
-      }
-
-      if (!is.null(on_before_render)) {
-        on_before_render(data_type = data_type)
-      }
-
-      # Create subdirectories
-      subdirs <- c("tables", "gDR_data", "raw_data", "plots", "data_annotation")
-      for (subdir in subdirs) {
-        dir.create(file.path(env$output_dir, subdir), showWarnings = FALSE, recursive = TRUE)
-      }
-
-      # Stage all input files into their respective directories and update args
-      staged_args <- stage_and_update_paths(args, env$output_dir, extra = extra_render_params)
-
-      # If the caller asked for a configuration but staging could not resolve it, fail loudly
-      # rather than silently falling back to the one the templates generate: the configuration
-      # fixes the time windows every normalised number depends on.
-      if (!is_null_or_empty(args$configuration_file_path) &&
-            is_null_or_empty(staged_args$configuration_file_path)) {
-        stop(sprintf(
-          paste("'configuration_file_path' was set to '%s', but no file could be resolved and",
-                "staged from it. Fix the path, or omit the argument to use the configuration",
-                "generated by the data import step."),
-          toString(args$configuration_file_path)
-        ))
-      }
-      # A comma-separated list or a multi-match pattern would reach the templates as a vector and
-      # interpolate unpredictably; a report reads exactly one configuration.
-      checkmate::assert_character(staged_args$configuration_file_path, len = 1, null.ok = TRUE)
-
-      # Validate inputs using the new, staged paths
-      processed_args <- validate_and_prepare_inputs(staged_args, data_type)
-      list2env(processed_args, envir = environment())
-
-      is_prism_data <- grepl("prism", data_type) || (!is.null(special_sections) && special_sections == "PRISM")
-      generate_prism_section <- !is.null(special_sections) && special_sections == "PRISM"
-      generate_chem_gen_section <- !is.null(special_sections) && special_sections == "chemical_genomics"
-
-      # Define all available steps
-      all_step_files <- c(
-        "1-data_import.Rmd",
-        "2-processing_and_QC.Rmd",
-        "3-analysis.Rmd",
-        "4-publish_results.Rmd"
+      plan <- prepare_report_steps(
+        args,
+        extra_render_params,
+        env$output_dir,
+        on_resolve_inputs = on_resolve_inputs,
+        on_before_render = on_before_render
       )
-
-      # Select requested steps
-      rmd_files <- all_step_files[steps]
-
-      if (3 %in% steps) {
-        idx <- which(rmd_files == "3-analysis.Rmd")
-        if (length(idx) > 0) {
-          if (generate_prism_section) {
-            rmd_files <- append(rmd_files, "3-1-PRISM_analysis.Rmd", after = idx)
-          }
-          if (generate_chem_gen_section) {
-            # re-find index in case vector shifted
-            idx <- which(rmd_files == "3-analysis.Rmd")
-            offset <- if (generate_prism_section) 1 else 0
-            rmd_files <- append(rmd_files, "3-1-chemical_genomics_analysis.Rmd", after = idx + offset)
-          }
-        }
-      }
-
-      template_paths <- find_template(rmd_files, rmd_template_path)
-      output_paths <- file.path(env$output_dir, rmd_files)
-
-      # Not every directory carries every step (the publication step, for one, only exists where
-      # publishing is supported), so report a missing template up front instead of letting
-      # readLines() fail with a bare 'cannot open file' halfway through the run.
-      missing_templates <- rmd_files[is.na(template_paths)]
-      if (length(missing_templates) > 0) {
-        stop(sprintf(
-          "Template(s) not found in %s: %s. The requested step(s) are not available in this installation.",
-          toString(sprintf("'%s'", rmd_template_path)),
-          toString(missing_templates)
-        ))
-      }
-
-      logo_src <- find_template("gdr_logo-01.png", rmd_template_path)
-      if (!is.na(logo_src)) {
-        file.copy(logo_src, file.path(env$output_dir, "gdr_logo-01.png"), overwrite = TRUE)
-      } else {
-        warning("Warning: 'gdr_logo-01.png' not found in the template directories.
-                 The logo may be missing from the compiled HTML reports.")
-      }
-
-      mae_path <- if (!is.null(mae)) {
-        # Only save MAE if we are running from MAE input, or ensuring data persistence
-        # If running full pipeline, Step 2 creates the MAE.
-        path <- file.path(env$output_dir, "gDR_data", paste0("gDR_mae", if (!all(steps == 3)) "_input" else "", ".qs2"))
-        qs2::qs_save(mae, path)
-        path
-      }
 
       # Names already reported as shadowed, so that each one is warned about exactly once.
       warned_shadowed <- character(0)
 
-      for (i in seq_along(template_paths)) {
-        message(sprintf("Rendering report step: %s", tools::file_path_sans_ext(basename(template_paths[[i]]))))
+      # Each step is written only after the previous one rendered: the parameters of a step are
+      # partly read from the data the previous step wrote (see prepare_dynamic_render_params()).
+      for (i in seq_along(plan$template_paths)) {
+        message(sprintf("Rendering report step: %s", tools::file_path_sans_ext(plan$rmd_files[[i]])))
+        warned_shadowed <- write_report_step(plan, i, env$output_dir, warned_shadowed)
 
-        # Start with processed arguments
-        render_params <- processed_args
-
-        # Set the correct versioned output_dir for the template
-        render_params$output_dir <- env$output_dir
-
-
-        # --- UPDATE: Format massive lists as multi-line vectors ---
-        render_params$manifest <- format_vector_for_rmd(processed_args$manifest)
-        render_params$treatment <- format_vector_for_rmd(processed_args$treatment)
-        render_params$raw_data <- format_vector_for_rmd(processed_args$raw_data)
-        render_params$long_table <- format_vector_for_rmd(processed_args$long_table)
-
-        render_params$feature_sets <- paste0("'", processed_args$feature_sets, "'", collapse = ", ")
-        render_params$metadata_columns <- paste0("'", processed_args$metadata_columns, "'", collapse = ", ")
-
-        # Add other dynamic and boolean parameters
-        render_params <- c(
-          render_params,
-          list(
-            mae_path = mae_path,
-            LONG_TABLE = (data_type == "long_table"),
-            gDRimport = (data_type == "bench"),
-            PRISM_level5 = (data_type == "prism_5"),
-            PRISM_level6 = (data_type == "prism_6"),
-            PRISM = is_prism_data,
-            PRISM_excluded = !is_prism_data,
-            MAE = (data_type == "mae")
-          ),
-          prepare_dynamic_render_params(data_type, mae, env$output_dir, steps)
-        )
-
-        # Deployment-specific parameters never override the ones computed above. Dropping them
-        # silently would let a deployment believe its value reached the templates, so warn once
-        # per name. The set is recomputed every step because prepare_dynamic_render_params()
-        # contributes different fields depending on what the previous steps produced.
-        dropped <- setdiff(
-          intersect(names(extra_render_params), names(render_params)),
-          warned_shadowed
-        )
-        if (length(dropped) > 0) {
-          warning(sprintf(
-            "Ignoring 'extra_render_params' entries shadowed by parameters computed by run_report(): %s.",
-            toString(dropped)
-          ))
-          warned_shadowed <- c(warned_shadowed, dropped)
-        }
-        render_params <- c(
-          render_params,
-          extra_render_params[setdiff(names(extra_render_params), names(render_params))]
-        )
-
-        rendered_content <- whisker::whisker.render(readLines(template_paths[[i]]), render_params)
-        writeLines(rendered_content, output_paths[[i]])
-
-        state$failed_step <- rmd_files[[i]]
-        rmarkdown::render(input = output_paths[[i]], output_file = gsub(".Rmd$", ".html", output_paths[[i]]))
+        output_path <- plan$output_paths[[i]]
+        state$failed_step <- plan$rmd_files[[i]]
+        rmarkdown::render(input = output_path, output_file = gsub(".Rmd$", ".html", output_path))
         state$failed_step <- NULL
-        state$rendered_steps <- c(state$rendered_steps, rmd_files[[i]])
+        state$rendered_steps <- c(state$rendered_steps, plan$rmd_files[[i]])
       }
 
     }, file = env$stdout_con)
@@ -613,6 +452,7 @@ run_report <- function(
     }
     # Store error message for the on.exit failure email
     state$error_for_mail <- full_error_msg
+    state$selection_failed <- inherits(e, "report_selection_error")
     stop(e)
 
   }, finally = {
@@ -623,6 +463,492 @@ run_report <- function(
       close(env$stderr_con)
     }
   })
+}
+
+#' Write the RMarkdown documents of a gDR report without rendering them
+#'
+#' Does everything \code{run_report()} does up to the render call: it creates the versioned
+#' output directory, stages and validates the inputs, and writes the parameterised \code{.Rmd} of
+#' each requested step into that directory. The documents are self-contained, so rendering one
+#' with \code{rmarkdown::render()} gives the same report as \code{run_report()}. Use it to inspect
+#' or edit a report before a long render, or to render it elsewhere.
+#'
+#' Only steps 1 to 3 are written. The publication step publishes when it is rendered, and the
+#' checks that guard it belong to the caller that runs it, so it is left to \code{run_report()}.
+#'
+#' The parameters of a step are partly read from the data that rendering the previous step
+#' writes, so a step is written only once that data is in the run directory. Write and render
+#' one step at a time, passing the run directory with \code{resume = TRUE} for the next one, or
+#' use \code{run_report()}. An \code{mae} input needs only step 3 and is written in one call.
+#'
+#' @inheritParams run_report
+#' @param output_dir Character. Directory in which a new versioned run directory is created, or
+#'   with \code{resume = TRUE} the run directory to write into.
+#' @param steps Integer vector. Steps to write, within \code{1:3}:
+#'  1: data import, 2: processing and QC, 3: analysis. Default is \code{1:3}.
+#'  If \code{mae} is provided, steps 1 and 2 are skipped.
+#' @param resume Logical. Whether \code{output_dir} is an existing run directory to write into,
+#'   e.g. \code{dirname(rmd[[1]])} or the \code{current} link of a \code{run_report()} run.
+#'   Default is \code{FALSE}.
+#'
+#' @return Named character vector of the paths of the written \code{.Rmd} files, in render order,
+#'   named after the steps (e.g. \code{"3-analysis"}).
+#' @keywords report
+#' @export
+#' @examples
+#'
+#' \dontrun{
+#' rmd <- build_report_rmd(
+#'   mae = "path/to/mae.qs2",
+#'   output_dir = "~/test_report_mae"
+#' )
+#' rmarkdown::render(rmd[["3-analysis"]])
+#'
+#' # one step at a time
+#' rmd <- build_report_rmd(long_table = "path/to/long_table.csv", output_dir = "~/test_report",
+#'                         rmd_template_path = "path/to/report_templates", steps = 1)
+#' rmarkdown::render(rmd[["1-data_import"]])
+#' rmd <- build_report_rmd(output_dir = dirname(rmd[[1]]), rmd_template_path = "path/to/report_templates",
+#'                         steps = 2, resume = TRUE)
+#' }
+build_report_rmd <- function(
+    qcs_id = NULL,
+    long_table = NULL,
+    manifest = NULL,
+    treatment = NULL,
+    raw_data = NULL,
+    prism_data_path = NULL,
+    cell_line_data_path = NULL,
+    treatment_data_path = NULL,
+    drug_annotation_path = NULL,
+    cell_line_annotation_path = NULL,
+    meta_data_path = NULL,
+    feat_data_path = NULL,
+    feature_sets = c(
+      "CRISPRGeneEffect",
+      "OmicsExpressionProteinCodingGenesTPMLogp1",
+      "OmicsSomaticMutationsMatrixHotspot",
+      "OmicsSomaticMutationsMatrixDamaging",
+      "OmicsCNGene"
+    ),
+    metadata_columns = c(
+      "OncotreeLineage",
+      "PatientRace"
+    ),
+    output_dir,
+    viz_format = "svg",
+    rmd_template_path = system.file("report_templates", package = "gDR"),
+    steps = seq_len(3),
+    mae = NULL,
+    special_sections = NULL,
+    verbose_mode = FALSE,
+    with_decoding = TRUE,
+    dpi = 96,
+    embed = TRUE,
+    configuration_file_path = NULL,
+    resume = FALSE,
+    extra_render_params = list(),
+    on_resolve_inputs = NULL
+) {
+  checkmate::assert_list(extra_render_params, names = "unique")
+  checkmate::assert_function(on_resolve_inputs, null.ok = TRUE)
+
+  args <- as.list(environment())
+  args[c("extra_render_params", "on_resolve_inputs")] <- NULL
+  assert_report_args(args)
+  if (!all(steps %in% 1:3)) {
+    stop(
+      "build_report_rmd() writes steps 1 to 3 only. The publication step (4) publishes when it is ",
+      "rendered; run it with run_report()."
+    )
+  }
+
+  # 'current' points to the last rendered run, so the run to resume is named directly
+  run_dir <- if (resume) {
+    checkmate::assert_directory_exists(output_dir)
+    normalizePath(output_dir)
+  } else {
+    env <- setup_run_environment(output_dir, verbose_mode)
+    # nothing is rendered, so nothing is logged
+    close(env$stdout_con)
+    close(env$stderr_con)
+    env$output_dir
+  }
+
+  done <- FALSE
+  on.exit({
+    if (!done && !resume) {
+      unlink(run_dir, recursive = TRUE, force = TRUE)
+    }
+  })
+
+  plan <- prepare_report_steps(args, extra_render_params, run_dir, on_resolve_inputs = on_resolve_inputs)
+  inputs <- .STEP_INPUTS[intersect(plan$rmd_files, names(.STEP_INPUTS))]
+  missing_inputs <- inputs[!file.exists(file.path(run_dir, "gDR_data", inputs))]
+  if (length(missing_inputs) > 0) {
+    stop(sprintf(
+      paste("%s read(s) %s, which rendering the previous step writes and which is not in '%s' yet.",
+            "Render that step first and write the next one with resume = TRUE, or use run_report()."),
+      toString(tools::file_path_sans_ext(names(missing_inputs))),
+      toString(sprintf("'gDR_data/%s'", missing_inputs)),
+      run_dir
+    ))
+  }
+
+  warned_shadowed <- character(0)
+  for (i in seq_along(plan$template_paths)) {
+    warned_shadowed <- write_report_step(plan, i, run_dir, warned_shadowed)
+  }
+
+  done <- TRUE
+  stats::setNames(plan$output_paths, tools::file_path_sans_ext(plan$rmd_files))
+}
+
+#' Assert the input arguments of a report run
+#'
+#' @param args Named list of the input arguments of \code{run_report()}.
+#'
+#' @return \code{args}, invisibly.
+#' @keywords internal
+assert_report_args <- function(args) {
+  checkmate::assert_list(args, names = "unique")
+  # evaluated inside the list, so that the messages name the arguments as the caller wrote them
+  with(args, {
+    checkmate::assert_string(output_dir)
+    checkmate::assert_character(rmd_template_path, min.len = 1, any.missing = FALSE)
+    checkmate::assert_directory_exists(rmd_template_path)
+    checkmate::assert_choice(viz_format, c("svg", "png"))
+    checkmate::assert_numeric(steps, lower = 1, upper = 4, any.missing = FALSE)
+    checkmate::assert_flag(verbose_mode)
+    checkmate::assert_flag(with_decoding)
+    checkmate::assert_number(dpi)
+    checkmate::assert_flag(embed)
+    checkmate::assert_flag(resume)
+    checkmate::assert_choice(special_sections, choices = c("PRISM", "chemical_genomics"), null.ok = TRUE)
+    checkmate::assert_character(qcs_id, null.ok = TRUE)
+    checkmate::assert_character(long_table, null.ok = TRUE)
+    checkmate::assert_character(manifest, null.ok = TRUE)
+    checkmate::assert_character(treatment, null.ok = TRUE)
+    checkmate::assert_character(raw_data, null.ok = TRUE)
+    checkmate::assert_character(prism_data_path, null.ok = TRUE)
+    checkmate::assert_character(cell_line_data_path, null.ok = TRUE)
+    checkmate::assert_character(treatment_data_path, null.ok = TRUE)
+    checkmate::assert_character(drug_annotation_path, null.ok = TRUE)
+    checkmate::assert_character(cell_line_annotation_path, null.ok = TRUE)
+    checkmate::assert_character(meta_data_path, null.ok = TRUE)
+    checkmate::assert_character(feat_data_path, null.ok = TRUE)
+    checkmate::assert_character(configuration_file_path, null.ok = TRUE)
+    checkmate::assert_character(feature_sets, null.ok = TRUE)
+    checkmate::assert_character(metadata_columns, null.ok = TRUE)
+    checkmate::assert(
+      checkmate::check_class(mae, "MultiAssayExperiment"),
+      checkmate::check_string(mae),
+      null.ok = TRUE,
+      .var.name = "mae"
+    )
+  })
+  invisible(args)
+}
+
+#' Prepare the steps of a report run
+#'
+#' Resolves, stages and validates the inputs of a run in its versioned output directory, and
+#' locates the templates of the requested steps. Everything \code{run_report()} does before the
+#' first step is written.
+#'
+#' @param args Named list of the input arguments of \code{run_report()}.
+#' @param extra_render_params Named list of deployment-specific render parameters.
+#' @param output_dir Character string of the versioned output directory.
+#' @param on_resolve_inputs,on_before_render Function or NULL, as in \code{run_report()}.
+#'
+#' @return A list with the validated arguments (\code{args}), the resolved
+#'   \code{extra_render_params} without the analysis selections, the resolved
+#'   \code{analysis_params} and \code{data_selection}, \code{data_type}, \code{steps}, \code{mae},
+#'   \code{mae_path},
+#'   \code{is_prism_data}, and the step files in render order (\code{rmd_files}) with their
+#'   \code{template_paths} and \code{output_paths}.
+#' @keywords internal
+prepare_report_steps <- function(args,
+                                 extra_render_params,
+                                 output_dir,
+                                 on_resolve_inputs = NULL,
+                                 on_before_render = NULL) {
+  if (!is.null(on_resolve_inputs)) {
+    resolved <- on_resolve_inputs(args = args, extra_render_params = extra_render_params)
+    checkmate::assert_list(resolved)
+    checkmate::assert_names(names(resolved), must.include = c("args", "extra_render_params"))
+    checkmate::assert_list(resolved$args)
+    checkmate::assert_list(resolved$extra_render_params, names = "unique")
+
+    # Resolving inputs must not change how the run is executed - see .PROTECTED_RUN_ARGS.
+    tampered <- Filter(
+      function(nm) !identical(resolved$args[[nm]], args[[nm]]),
+      .PROTECTED_RUN_ARGS
+    )
+    if (length(tampered) > 0) {
+      stop(sprintf(
+        "'on_resolve_inputs' must not modify the run-control argument(s): %s.",
+        toString(tampered)
+      ))
+    }
+
+    args <- resolved$args
+    extra_render_params <- resolved$extra_render_params
+  }
+
+  # Validated before anything is staged; they reach the templates as computed parameters, so
+  # they are taken out of the deployment-specific ones
+  analysis_params <- resolve_analysis_params(extra_render_params)
+  data_selection <- resolve_data_selection(extra_render_params)
+  # the publication step uploads the whole dataset, next to a report that would draw part of it
+  narrowed <- narrowing_selections(analysis_params, data_selection)
+  if (4 %in% args$steps && length(narrowed) > 0) {
+    stop(sprintf(
+      "A run that publishes its results (step 4) reports the whole dataset; leave out %s, or step 4.",
+      toString(sprintf("'%s'", narrowed))
+    ), call. = FALSE)
+  }
+
+  data_type <- determine_data_type(args, output_dir)
+
+  message("Processing data type: ", data_type)
+
+  # The driver has no importer of its own for screening-system sessions: the import step is
+  # supplied as a rendered section through 'extra_render_params'. Without it the step would
+  # render empty and the run would fail much later, with nothing pointing at the cause.
+  if (data_type == "qcs" && 1 %in% args$steps &&
+      is_null_or_empty(extra_render_params$extra_sections_import)) {
+    stop(
+      "Data type 'qcs' requires the import section to be supplied via ",
+      "'extra_render_params$extra_sections_import'; this driver cannot import such data on ",
+      "its own. Supply that section from a deployment wrapper."
+    )
+  }
+
+  if (!is.null(on_before_render)) {
+    on_before_render(data_type = data_type)
+  }
+
+  # Create subdirectories
+  subdirs <- c("tables", "gDR_data", "raw_data", "plots", "data_annotation")
+  for (subdir in subdirs) {
+    dir.create(file.path(output_dir, subdir), showWarnings = FALSE, recursive = TRUE)
+  }
+
+  # Stage all input files into their respective directories and update args
+  staged_args <- stage_and_update_paths(args, output_dir, extra = extra_render_params)
+
+  # If the caller asked for a configuration but staging could not resolve it, fail loudly
+  # rather than silently falling back to the one the templates generate: the configuration
+  # fixes the time windows every normalised number depends on.
+  if (!is_null_or_empty(args$configuration_file_path) &&
+        is_null_or_empty(staged_args$configuration_file_path)) {
+    stop(sprintf(
+      paste("'configuration_file_path' was set to '%s', but no file could be resolved and",
+            "staged from it. Fix the path, or omit the argument to use the configuration",
+            "generated by the data import step."),
+      toString(args$configuration_file_path)
+    ))
+  }
+  # A comma-separated list or a multi-match pattern would reach the templates as a vector and
+  # interpolate unpredictably; a report reads exactly one configuration.
+  checkmate::assert_character(staged_args$configuration_file_path, len = 1, null.ok = TRUE)
+
+  # Validate inputs using the new, staged paths
+  processed_args <- validate_and_prepare_inputs(staged_args, data_type)
+  # An argument the validation does not return keeps its input value
+  run_args <- c(processed_args, args[setdiff(names(args), names(processed_args))])
+  steps <- run_args$steps
+  mae <- run_args$mae
+  special_sections <- run_args$special_sections
+
+  is_prism_data <- grepl("prism", data_type) || (!is.null(special_sections) && special_sections == "PRISM")
+  generate_prism_section <- !is.null(special_sections) && special_sections == "PRISM"
+  generate_chem_gen_section <- !is.null(special_sections) && special_sections == "chemical_genomics"
+
+  # Define all available steps
+  all_step_files <- c(
+    "1-data_import.Rmd",
+    "2-processing_and_QC.Rmd",
+    "3-analysis.Rmd",
+    "4-publish_results.Rmd"
+  )
+
+  # Select requested steps
+  rmd_files <- all_step_files[steps]
+
+  if (3 %in% steps) {
+    idx <- which(rmd_files == "3-analysis.Rmd")
+    if (length(idx) > 0) {
+      if (generate_prism_section) {
+        rmd_files <- append(rmd_files, "3-1-PRISM_analysis.Rmd", after = idx)
+      }
+      if (generate_chem_gen_section) {
+        # re-find index in case vector shifted
+        idx <- which(rmd_files == "3-analysis.Rmd")
+        offset <- if (generate_prism_section) 1 else 0
+        rmd_files <- append(rmd_files, "3-1-chemical_genomics_analysis.Rmd", after = idx + offset)
+      }
+    }
+  }
+
+  template_paths <- find_template(rmd_files, run_args$rmd_template_path)
+
+  # Not every directory carries every step (the publication step, for one, only exists where
+  # publishing is supported), so report a missing template up front instead of letting
+  # readLines() fail with a bare 'cannot open file' halfway through the run.
+  missing_templates <- rmd_files[is.na(template_paths)]
+  if (length(missing_templates) > 0) {
+    stop(sprintf(
+      "Template(s) not found in %s: %s. The requested step(s) are not available in this installation.",
+      toString(sprintf("'%s'", run_args$rmd_template_path)),
+      toString(missing_templates)
+    ))
+  }
+
+  warn_misspelled_render_params(extra_render_params, template_paths)
+
+  logo_src <- find_template("gdr_logo-01.png", run_args$rmd_template_path)
+  if (!is.na(logo_src)) {
+    file.copy(logo_src, file.path(output_dir, "gdr_logo-01.png"), overwrite = TRUE)
+  } else {
+    warning("Warning: 'gdr_logo-01.png' not found in the template directories.
+             The logo may be missing from the compiled HTML reports.")
+  }
+
+  mae_path <- if (!is.null(mae)) {
+    # Only save MAE if we are running from MAE input, or ensuring data persistence
+    # If running full pipeline, Step 2 creates the MAE.
+    path <- file.path(output_dir, "gDR_data", paste0("gDR_mae", if (!all(steps == 3)) "_input" else "", ".qs2"))
+    qs2::qs_save(mae, path)
+    path
+  }
+
+  list(
+    args = processed_args,
+    extra_render_params = extra_render_params[
+      setdiff(names(extra_render_params), c(names(analysis_params), .DATA_SELECTIONS))
+    ],
+    analysis_params = analysis_params,
+    data_selection = data_selection,
+    data_type = data_type,
+    steps = steps,
+    mae = mae,
+    mae_path = mae_path,
+    is_prism_data = is_prism_data,
+    rmd_files = rmd_files,
+    template_paths = template_paths,
+    output_paths = file.path(output_dir, rmd_files)
+  )
+}
+
+#' Write one step of a report run
+#'
+#' Expands the template of step \code{i} of \code{plan} with its render parameters and writes the
+#' resulting \code{.Rmd} into the output directory.
+#'
+#' @param plan List returned by \code{prepare_report_steps()}.
+#' @param i Integer index of the step in \code{plan$rmd_files}.
+#' @param output_dir Character string of the versioned output directory.
+#' @param warned_shadowed Character vector of \code{extra_render_params} names already warned about.
+#'
+#' @return \code{warned_shadowed} with the names warned about in this step added.
+#' @keywords internal
+write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0)) {
+  processed_args <- plan$args
+  data_type <- plan$data_type
+  extra_render_params <- plan$extra_render_params
+
+  # Start with processed arguments
+  render_params <- processed_args
+
+  # Set the correct versioned output_dir for the template
+  render_params$output_dir <- output_dir
+
+  # Format massive lists as multi-line vectors
+  render_params$manifest <- format_vector_for_rmd(processed_args$manifest)
+  render_params$treatment <- format_vector_for_rmd(processed_args$treatment)
+  render_params$raw_data <- format_vector_for_rmd(processed_args$raw_data)
+  render_params$long_table <- format_vector_for_rmd(processed_args$long_table)
+
+  render_params$feature_sets <- paste0("'", processed_args$feature_sets, "'", collapse = ", ")
+  render_params$metadata_columns <- paste0("'", processed_args$metadata_columns, "'", collapse = ", ")
+
+  # Add other dynamic and boolean parameters
+  dynamic_params <- prepare_dynamic_render_params(data_type, plan$mae, output_dir, plan$steps)
+  analysis_mae_file <- "gDR_mae.qs2"
+  if (startsWith(plan$rmd_files[[i]], "3-") && length(plan$data_selection) > 0) {
+    analysis_mae_file <- .SELECTED_MAE_FILE
+    selected_path <- file.path(output_dir, "gDR_data", analysis_mae_file)
+    if (identical(plan$rmd_files[[i]], "3-analysis.Rmd")) {
+      selected <- select_report_data(read_report_mae(plan, output_dir), plan$data_selection)
+      qs2::qs_save(selected, selected_path)
+    } else {
+      # an add-on step draws the data its analysis step selected
+      selected <- qs2::qs_read(selected_path)
+    }
+    # the sections drawn follow the selected data, not the whole dataset; plot_GR_values comes from
+    # its Normalized assay here, and from the durations and division times of gDR_input.qs2 for a
+    # raw-file run without a selection, which agree for data that went through the processing step
+    dynamic_params <- prepare_dynamic_render_params("mae", selected, output_dir, 3)
+  }
+  report_selection <- describe_report_selection(plan$analysis_params, plan$data_selection)
+  iso_sections <- c("combo_metrics_panel", "combo_isoref")
+  if (identical(plan$rmd_files[[i]], "3-analysis.Rmd") &&
+        !identical(plan$analysis_params$iso_levels, .DEFAULT_ISO_LEVELS) &&
+        any(iso_sections %in% plan$analysis_params$plots_to_generate)) {
+    warn_missing_iso_levels(
+      if (length(plan$data_selection) > 0) selected else read_report_mae(plan, output_dir),
+      plan$analysis_params
+    )
+  }
+  render_params <- c(
+    render_params,
+    list(
+      mae_path = plan$mae_path,
+      LONG_TABLE = (data_type == "long_table"),
+      gDRimport = (data_type == "bench"),
+      PRISM_level5 = (data_type == "prism_5"),
+      PRISM_level6 = (data_type == "prism_6"),
+      PRISM = plan$is_prism_data,
+      PRISM_excluded = !plan$is_prism_data,
+      MAE = (data_type == "mae")
+    ),
+    lapply(plan$analysis_params, format_vector_for_rmd),
+    list(
+      analysis_mae_file = analysis_mae_file,
+      assay_file_types = paste(c(xlsx = "Excel", csv = "CSV")[plan$analysis_params$table_format], collapse = " and "),
+      has_report_selection = !is.null(report_selection),
+      report_selection = if (is.null(report_selection)) "" else report_selection
+    ),
+    dynamic_params,
+    analysis_section_flags(plan$analysis_params, dynamic_params$plot_GR_values)
+  )
+
+  # Deployment-specific parameters never override the ones computed above. Dropping them
+  # silently would let a deployment believe its value reached the templates, so warn once
+  # per name. The set is recomputed every step because prepare_dynamic_render_params()
+  # contributes different fields depending on what the previous steps produced.
+  dropped <- setdiff(
+    intersect(names(extra_render_params), names(render_params)),
+    warned_shadowed
+  )
+  if (length(dropped) > 0) {
+    warning(sprintf(
+      "Ignoring 'extra_render_params' entries shadowed by parameters computed by run_report(): %s.",
+      toString(dropped)
+    ))
+    warned_shadowed <- c(warned_shadowed, dropped)
+  }
+  render_params <- c(
+    render_params,
+    extra_render_params[setdiff(names(extra_render_params), names(render_params))]
+  )
+
+  rendered_content <- whisker::whisker.render(readLines(plan$template_paths[[i]]), render_params)
+  writeLines(rendered_content, plan$output_paths[[i]])
+
+  warned_shadowed
 }
 
 #' Check if an Object is NULL or Empty
@@ -1237,4 +1563,41 @@ find_template <- function(file_names, template_dirs) {
     character(1),
     USE.NAMES = FALSE
   )
+}
+
+#' Warn about likely misspelled render parameters
+#'
+#' Whisker drops a parameter that no template reads without a word. Most such entries of
+#' \code{extra_render_params} are read by the hooks of a deployment, so only a name close to a
+#' template parameter or to a selection of the report is reported, as the typo it most likely is:
+#' one edit away for a name of four to six characters, two for a longer one, and never for a name
+#' of three or fewer.
+#'
+#' @param extra_render_params Named list of deployment-specific render parameters.
+#' @param template_paths Character vector of the templates of the run.
+#'
+#' @return \code{NULL}, invisibly.
+#' @keywords internal
+warn_misspelled_render_params <- function(extra_render_params, template_paths) {
+  template_tags <- unlist(lapply(template_paths, function(path) {
+    lines <- readLines(path, warn = FALSE)
+    tags <- unlist(regmatches(lines, gregexpr("\\{\\{\\{?[#^/&]?\\s*[A-Za-z0-9_.]+\\s*\\}?\\}\\}", lines)))
+    trimws(gsub("[{}#^/&]", "", tags))
+  }))
+  tags <- unique(c(template_tags, names(.ANALYSIS_CHOICES), .DATA_SELECTIONS))
+  unread <- setdiff(names(extra_render_params), tags)
+  if (length(unread) == 0) {
+    return(invisible(NULL))
+  }
+
+  distance <- utils::adist(unread, tags)
+  close <- apply(distance, 1, min) <= pmin(2, (nchar(unread) - 1) %/% 3)
+  if (any(close)) {
+    nearest <- tags[apply(distance[close, , drop = FALSE], 1, which.min)]
+    warning(sprintf(
+      "'extra_render_params' entries not read by any template of this run: %s.",
+      toString(sprintf("'%s' (did you mean '%s'?)", unread[close], nearest))
+    ), call. = FALSE)
+  }
+  invisible(NULL)
 }

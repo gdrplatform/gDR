@@ -2,6 +2,7 @@
 
 export(add_treatment_column)
 export(apply_custom_metadata_tags)
+export(build_report_rmd)
 export(cast_to_wide)
 export(convert_growth_metric)
 export(create_symlink_to_current)
