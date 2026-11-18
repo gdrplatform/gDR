@@ -4,6 +4,9 @@
 #' @importFrom gDRcore merge_data
 #' @importFrom gDRutils fit_curves
 #' @importFrom data.table :=
+# MultiAssayExperiment is imported so that it loads with gDR: before it does, names() on an MAE
+# read from a file dispatches to the default method and stays empty for the rest of the session
+#' @importFrom MultiAssayExperiment experiments
 
 #' @keywords internal
 #' @return package help page
