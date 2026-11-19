@@ -495,7 +495,7 @@ invisible(loop(seq_along(nested_list_GR), function(x) {
 
 # GSEA: Comparing Resistant and Parental Cell Lines
 
-This second analysis compares each resistant cell line with its parental line, the cell line named in its `parental_identifier`. The resistant cells are taken at the co-treatment concentration they were screened with (the anchor drug they are resistant to), and the parental cells with the library drug alone. All drugs are ranked by the difference in their response (resistant minus parental), and GSEA tests which drug classes (MOAs) the resistant cells depend on more (negative NES) or less (positive NES) than their parental line. Cell lines are compared only with their own parental line; when the screen has no resistant line together with its parental line, this section is skipped.
+This second analysis compares each resistant cell line with its parental line, the cell line named in its `parental_identifier`. The resistant cells are taken at the co-treatment concentration they were screened with (the anchor drug they are resistant to), and the parental cells with the library drug alone. All drugs are ranked by the difference in their response (resistant minus parental), and GSEA tests which drug classes (MOAs) the resistant cells depend on more (negative NES) or less (positive NES) than their parental line. Cell lines are compared only with their own parental line; when the screen has no resistant line together with its parental line, this section is skipped. Every cell line whose `parental_identifier` names another cell line of the screen is taken as resistant, so an engineered or isogenic derivative, or a line with a wrongly annotated parent, would be compared here too: check the pairs listed below. A pair without data for the parental line alone is skipped with a message.
 
 *(The interpretation guide for the results table is the same as in the section above, but the NES now represents the difference between the resistant and the parental cells.)*
 
@@ -528,12 +528,20 @@ cgs_analysis_RV <- do.call(c, lapply(seq_len(NROW(resistant_pairs)), function(i)
   parental <- resistant_pairs$parental_identifier[i]
   # the resistant cells at the co-treatment concentration they were screened with (0 if none)
   cotrt <- max(response_metrics_combo_capped[get(cell_line_name) == resistant, cotrt_value], na.rm = TRUE)
-  analyze_cgs_conditions(response_metrics_combo_capped,
-                         condition1 = list(cell_line = resistant, cotrt_value = cotrt),
-                         condition2 = list(cell_line = parental, cotrt_value = 0),
-                         metrics = analyzed_metrics,
-                         normalization_type = "RV")
+  # a pair the data cannot compare (e.g. no drug-alone data for the parental line) is skipped
+  tryCatch(
+    analyze_cgs_conditions(response_metrics_combo_capped,
+                           condition1 = list(cell_line = resistant, cotrt_value = cotrt),
+                           condition2 = list(cell_line = parental, cotrt_value = 0),
+                           metrics = analyzed_metrics,
+                           normalization_type = "RV"),
+    error = function(e) {
+      message(sprintf("Skipping %s vs. %s: %s", resistant, parental, conditionMessage(e)))
+      NULL
+    }
+  )
 }))
+has_cl_pairs <- length(cgs_analysis_RV) > 0
 
 
 ```
