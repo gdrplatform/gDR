@@ -1320,9 +1320,11 @@ invisible(loop(seq_along(plot_plan$plt), function(i) {
 {{#has_prism_fits}}
 ## Data Analysis - gDR and PRISM Fits - Single-Agent Data
 
-The single-agent data hold two fits of each curve: the gDR fit and the fit PRISM delivered with the data (`fit_source = "PRISM"`, added without refitting). PRISM fits one curve per pool and compound plate, so a cell can have several PRISM fits; each of them is compared with the gDR fit of the cell. `ec50` is compared on the log10 scale, and failed fits are left out. The table gives, for each parameter, the number of pairs, the Spearman correlation and the median and 95th percentile of the absolute difference; all pairs are in `tables/sa_fits_gDR_vs_PRISM.xlsx`.
+The single-agent data hold two fits of each curve: the gDR fit and the fit PRISM delivered with the data (`fit_source = "PRISM"`, added without refitting). PRISM fits one curve per pool and compound plate, so a cell can have several PRISM fits; each of them is compared with the gDR fit of the cell.
 
-**What to look for:** points on the diagonal are curves the two fits describe the same way. Points away from it are worth a look at the curve itself, e.g. a flat curve whose `ec50` is poorly defined.
+The two fits describe a curve with different parameters (for relative viability gDR fixes `x_0` at 1 and fits a flat line where the response is flat), so the curves are compared by their AUC, computed from the parameters of each fit as PRISM defines it: the mean of the curve, clamped to [0, 1], over log10 concentration between the lowest and highest tested concentration. `ec50` (on the log10 scale) and `x_inf`, the response at high concentration, are compared only where both fits have their `ec50` within the tested concentrations, where the data define them (column `ec50_in_range` of the pairs). The table gives, for each of them, the number of pairs, the Spearman correlation and the median and 95th percentile of the absolute difference; all pairs are in `tables/sa_fits_gDR_vs_PRISM.xlsx`.
+
+**What to look for:** points on the diagonal are curves the two fits describe the same way. Points away from it are worth a look at the curve itself, e.g. a curve one fit sees as flat and the other as a weak response.
 
 ```{r prism_fit_comparison, warning=FALSE}
 library(gDR)
@@ -1332,11 +1334,12 @@ write_xlsx(list(summary = fit_cmp$summary, pairs = fit_cmp$pairs),
 generate_datatable(fit_cmp$summary, col_to_round = c("spearman", "median_abs_diff", "p95_abs_diff"))
 ```
 
-```{r prism_fit_comparison_plot, warning=FALSE, fig.width=14, fig.height=3.5}
-fit_params <- c("ec50", "x_inf", "x_0", "h", "r2")
+```{r prism_fit_comparison_plot, warning=FALSE, fig.width=10, fig.height=3.5}
+fit_params <- c("auc", "ec50", "x_inf")
 fit_pairs <- rbindlist(lapply(fit_params, function(p) {
-  prism <- fit_cmp$pairs[[paste0(p, "_PRISM")]]
-  gdr <- fit_cmp$pairs[[paste0(p, "_gDR")]]
+  shown <- p == "auc" | fit_cmp$pairs$ec50_in_range
+  prism <- fit_cmp$pairs[[paste0(p, "_PRISM")]][shown]
+  gdr <- fit_cmp$pairs[[paste0(p, "_gDR")]][shown]
   if (p == "ec50") {
     prism <- suppressWarnings(log10(prism))
     gdr <- suppressWarnings(log10(gdr))

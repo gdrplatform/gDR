@@ -1128,11 +1128,12 @@ mae <- standardize_mae(mae)
 # The curves PRISM fitted to the same data, added to Metrics next to the gDR fits as fit source "PRISM".
 # A table that does not match the data leaves the gDR results as they are.
 library(gDRimport)
+prism_import_error <- NULL
 mae[[sa_name]] <- tryCatch({
   prism_curves <- read_PRISM_drc(drc_path = "{{prism_drc_path}}", meta_data_path = "{{meta_data_path}}")
   add_PRISM_metrics(mae[[sa_name]], prism_curves)
 }, error = function(e) {
-  warning("The PRISM curves were not added: ", conditionMessage(e), call. = FALSE)
+  prism_import_error <<- conditionMessage(e)
   mae[[sa_name]]
 })
 {{/prism_drc_path}}
@@ -1150,6 +1151,19 @@ qs_save(mae, file.path(wd, "gDR_data", "gDR_mae.qs2"))
 
 
 ```
+{{#prism_drc_path}}
+
+```{r prism_drc_import, results="asis", echo=FALSE}
+if (is.null(prism_import_error)) {
+  prism_import <- get_SE_provenance(mae[[sa_name]])$steps$prism_drc_import$settings
+  cat(sprintf(paste("**PRISM curves:** %d of the %d curves of the DRC table were added; %d have no matching",
+                    "cell line, drug or Duration in the data and are left out.\n"),
+              prism_import$n_imported, prism_import$n_curves, prism_import$n_left_out))
+} else {
+  cat("**PRISM curves:** the DRC table was not added:", prism_import_error, "\n")
+}
+```
+{{/prism_drc_path}}
 
 # How These Numbers Were Produced
 

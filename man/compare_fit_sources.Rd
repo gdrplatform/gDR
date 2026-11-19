@@ -9,8 +9,9 @@ compare_fit_sources(
   other,
   reference = "gDR",
   normalization_type = "RV",
-  params = c("ec50", "x_inf", "x_0", "h", "r2"),
-  metrics_assay = "Metrics"
+  params = c("auc", "ec50", "x_inf"),
+  metrics_assay = "Metrics",
+  averaged_assay = "Averaged"
 )
 }
 \arguments{
@@ -22,27 +23,38 @@ compare_fit_sources(
 
 \item{normalization_type}{Character string, the normalization type of the fits.}
 
-\item{params}{Character vector, the parameters compared.}
+\item{params}{Character vector, the parameters compared: \code{"auc"} or columns of the
+\code{Metrics} assay.}
 
 \item{metrics_assay}{Character string, name of the assay with the fits.}
+
+\item{averaged_assay}{Character string, name of the assay giving the concentration range of
+each cell.}
 }
 \value{
 A list with \code{pairs}, a \code{data.table} with one row per fit of \code{other}: the
 drug, cell line and Duration, the columns that tell fits of one cell apart, and every
-parameter of both sources (\code{<param>_<source>}); and \code{summary}, a \code{data.table}
-with one row per parameter: the number of pairs, the Spearman correlation, and the median and
-95th percentile of the absolute difference.
+parameter of both sources (\code{<param>_<source>}), and \code{ec50_in_range}; and
+\code{summary}, a \code{data.table} with one row per parameter: the number of pairs, the
+Spearman correlation, and the median and 95th percentile of the absolute difference.
 }
 \description{
 Pairs every fit of \code{other} (e.g. the curves PRISM delivered, added by
 \code{gDRcore::add_PRISM_metrics()}) with the fit of \code{reference} in the same cell of the
-\code{Metrics} assay, and summarizes how close the curve parameters are. A cell can hold several
-fits of \code{other} (PRISM fits one curve per pool and compound plate); each one is paired with
-the single \code{reference} fit of the cell.
+\code{Metrics} assay, and summarizes how close they are. A cell can hold several fits of
+\code{other} (PRISM fits one curve per pool and compound plate); each one is paired with the
+single \code{reference} fit of the cell.
 }
 \details{
-\code{ec50} is compared on the log10 scale. A pair counts for a parameter only when both values
-are finite, so failed fits are left out of its summary.
+Two sources can describe the same curve with different parameters (gDR fixes \code{x_0} at 1 for
+relative viability and gives a flat curve \code{ec50 = 0}), so the curves are compared by
+\code{auc}: computed from the parameters of each fit as PRISM defines AUC, the mean of the curve,
+clamped to \link{0, 1}, over log10 concentration between the lowest and highest concentration of the
+cell in \code{averaged_assay}. The parameters of the curve shape (\code{ec50}, \code{x_inf},
+\code{x_0}, \code{h}) are compared only for pairs where both fits have their \code{ec50} within
+that range (\code{ec50_in_range}), where the data define them; \code{ec50} is compared on the
+log10 scale. A pair counts for a parameter only when both values are finite, so failed fits are
+left out of its summary.
 }
 \examples{
 mae <- gDRutils::get_synthetic_data("finalMAE_small")
