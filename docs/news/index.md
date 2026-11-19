@@ -1,5 +1,10 @@
 # Changelog
 
+## gDR 1.11.29 - 2026-11-18
+
+- replace the cell line comparison of the chemical genomics report with
+  resistant vs parental pairs
+
 ## gDR 1.11.28 - 2026-11-18
 
 - fix the Incucyte growth-rate axis label, which named a raw rate even
