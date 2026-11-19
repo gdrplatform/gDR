@@ -282,6 +282,10 @@ sa_name <- get_supported_experiments("sa")
 
 response_data_sa <- assay_list[[sa_name]][["Averaged"]]
 response_metrics_sa <- assay_list[[sa_name]][["Metrics"]]
+# the associations use the gDR fits; other fit sources (e.g. PRISM) are compared in the analysis step
+if ("fit_source" %in% names(response_metrics_sa)) {
+  response_metrics_sa <- response_metrics_sa[response_metrics_sa$fit_source == "gDR"]
+}
 response_metrics_sa_capped <- 
   cap_assay_infinities(conc_assay_dt = response_data_sa,
                        assay_dt = response_metrics_sa,

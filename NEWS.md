@@ -1,3 +1,6 @@
+## gDR 1.11.29 - 2026-11-19
+* add the curves of a PRISM DRC table to the report (prism_drc_path) and compare them with the gDR fits
+
 ## gDR 1.11.28 - 2026-11-18
 * fix the Incucyte growth-rate axis label, which named a raw rate even on runs where every plotted row was normalized
 * fix data selections in the report failing with MultiAssayExperiment 1.38 by loading MultiAssayExperiment with gDR

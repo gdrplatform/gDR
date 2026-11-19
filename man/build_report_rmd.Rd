@@ -11,6 +11,7 @@ build_report_rmd(
   treatment = NULL,
   raw_data = NULL,
   prism_data_path = NULL,
+  prism_drc_path = NULL,
   cell_line_data_path = NULL,
   treatment_data_path = NULL,
   drug_annotation_path = NULL,
@@ -58,6 +59,11 @@ or a regular expression pattern. Required if not using \code{qcs_id} or \code{pr
 or a regular expression pattern. Required if not using \code{qcs_id} or \code{prism_data_path}.}
 
 \item{prism_data_path}{Character. Path to the PRISM data file. Provide this if you want to process PRISM data.}
+
+\item{prism_drc_path}{Character or NULL. Path to the PRISM DRC table (the curves PRISM fitted, e.g.
+\code{<screen>_DRC_TABLE.csv}) of the data in \code{prism_data_path}. The curves are added to the
+\code{Metrics} assay as \code{fit_source = "PRISM"} (\code{gDRcore::add_PRISM_metrics()}), and the
+analysis step compares them with the gDR fits. The cell lines are mapped with \code{meta_data_path}.}
 
 \item{cell_line_data_path}{Character. Path to the cell line data file.
 Required if using \code{prism_data_path} and processing PRISM level 6 data.}

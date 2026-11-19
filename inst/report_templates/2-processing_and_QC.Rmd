@@ -1115,11 +1115,27 @@ invisible(loop(seq_along(ls_plt_GR), function(x) {
 # Assemble and Save Final Results
 
 Finally, all processed data and results are combined into a single `MultiAssayExperiment` (MAE) object. The MAE is a flexible container that holds all `SummarizedExperiment` objects, ensuring all data and metadata are stored together in an organized and accessible format.
+{{#prism_drc_path}}
+
+The curves PRISM fitted to the same data (its DRC table) are added to the `Metrics` assay of the single-agent data as a second fit source, `fit_source = "PRISM"`, without refitting. A cell can hold several PRISM curves, one per pool and compound plate. The analysis step compares them with the gDR fits.
+{{/prism_drc_path}}
 
 ```{r create_mae}
 # single-agent first, as before
 mae <- mae_pipeline[, , intersect(c(sa_name, get_supported_experiments("combo")), names(mae_pipeline))]
 mae <- standardize_mae(mae)
+{{#prism_drc_path}}
+# The curves PRISM fitted to the same data, added to Metrics next to the gDR fits as fit source "PRISM".
+# A table that does not match the data leaves the gDR results as they are.
+library(gDRimport)
+mae[[sa_name]] <- tryCatch({
+  prism_curves <- read_PRISM_drc(drc_path = "{{prism_drc_path}}", meta_data_path = "{{meta_data_path}}")
+  add_PRISM_metrics(mae[[sa_name]], prism_curves)
+}, error = function(e) {
+  warning("The PRISM curves were not added: ", conditionMessage(e), call. = FALSE)
+  mae[[sa_name]]
+})
+{{/prism_drc_path}}
 # What a caller of run_report() recorded about its inputs (extra_render_params$report_inputs_file,
 # a qs2 file with a named list), kept as the "report" step of every experiment
 report_inputs_file <- "{{report_inputs_file}}"

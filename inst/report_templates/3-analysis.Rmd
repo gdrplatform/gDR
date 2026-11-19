@@ -388,6 +388,10 @@ sa_name <- get_supported_experiments("sa")
 
 response_data_sa <- assay_list[[sa_name]][["Averaged"]]
 response_metrics_sa <- assay_list[[sa_name]][["Metrics"]]
+# the sections below draw the gDR fits; other fit sources (e.g. PRISM) are in the tables only
+if ("fit_source" %in% names(response_metrics_sa)) {
+  response_metrics_sa <- response_metrics_sa[response_metrics_sa$fit_source == "gDR"]
+}
 response_metrics_sa_capped <- 
   cap_assay_infinities(conc_assay_dt = response_data_sa,
                        assay_dt = response_metrics_sa,
@@ -1312,6 +1316,45 @@ invisible(loop(seq_along(plot_plan$plt), function(i) {
 :::
 {{/plot_GR}}
 {{/show_sa_boxplot_tissue}}
+
+{{#has_prism_fits}}
+## Data Analysis - gDR and PRISM Fits - Single-Agent Data
+
+The single-agent data hold two fits of each curve: the gDR fit and the fit PRISM delivered with the data (`fit_source = "PRISM"`, added without refitting). PRISM fits one curve per pool and compound plate, so a cell can have several PRISM fits; each of them is compared with the gDR fit of the cell. `ec50` is compared on the log10 scale, and failed fits are left out. The table gives, for each parameter, the number of pairs, the Spearman correlation and the median and 95th percentile of the absolute difference; all pairs are in `tables/sa_fits_gDR_vs_PRISM.xlsx`.
+
+**What to look for:** points on the diagonal are curves the two fits describe the same way. Points away from it are worth a look at the curve itself, e.g. a flat curve whose `ec50` is poorly defined.
+
+```{r prism_fit_comparison, warning=FALSE}
+library(gDR)
+fit_cmp <- compare_fit_sources(mae[[sa_name]], other = "PRISM", reference = "gDR", normalization_type = "RV")
+write_xlsx(list(summary = fit_cmp$summary, pairs = fit_cmp$pairs),
+           file.path(wd, "tables", "sa_fits_gDR_vs_PRISM.xlsx"))
+generate_datatable(fit_cmp$summary, col_to_round = c("spearman", "median_abs_diff", "p95_abs_diff"))
+```
+
+```{r prism_fit_comparison_plot, warning=FALSE, fig.width=14, fig.height=3.5}
+fit_params <- c("ec50", "x_inf", "x_0", "h", "r2")
+fit_pairs <- rbindlist(lapply(fit_params, function(p) {
+  prism <- fit_cmp$pairs[[paste0(p, "_PRISM")]]
+  gdr <- fit_cmp$pairs[[paste0(p, "_gDR")]]
+  if (p == "ec50") {
+    prism <- suppressWarnings(log10(prism))
+    gdr <- suppressWarnings(log10(gdr))
+  }
+  data.table(parameter = if (p == "ec50") "log10(ec50)" else p, gDR = gdr, PRISM = prism)
+}))
+fit_pairs <- fit_pairs[is.finite(fit_pairs$gDR) & is.finite(fit_pairs$PRISM)]
+fit_pairs$parameter <- factor(fit_pairs$parameter, levels = unique(fit_pairs$parameter))
+plt_fit_cmp <- ggplot(fit_pairs, aes(x = gDR, y = PRISM)) +
+  geom_abline(slope = 1, intercept = 0, colour = "grey60") +
+  geom_point(alpha = 0.3, size = 0.8) +
+  facet_wrap(~ parameter, nrow = 1, scales = "free") +
+  labs(x = "gDR fit", y = "PRISM fit") +
+  theme_bw()
+save_plot(plt = plt_fit_cmp, path = file.path(wd, "plots", "sa_fits_gDR_vs_PRISM"), format = "{{viz_format}}")
+plt_fit_cmp
+```
+{{/has_prism_fits}}
 
 
 {{#has_combo}}
