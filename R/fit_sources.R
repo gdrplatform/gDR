@@ -100,8 +100,8 @@ compare_fit_sources <- function(se,
   row_cols <- intersect(unlist(idfs[c("drug", "drug_name", "duration")]), names(rdata))
   col_cols <- intersect(unlist(idfs[c("cellline", "cellline_name")]), names(cdata))
   cell <- cbind(
-    data.table::as.data.table(as.data.frame(rdata)[pairs$rId, row_cols, drop = FALSE]),
-    data.table::as.data.table(as.data.frame(cdata)[pairs$cId, col_cols, drop = FALSE])
+    data.table::as.data.table(as.list(rdata[pairs$rId, row_cols, drop = FALSE])),
+    data.table::as.data.table(as.list(cdata[pairs$cId, col_cols, drop = FALSE]))
   )
   pairs <- cbind(cell, pairs)
 

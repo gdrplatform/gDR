@@ -1,5 +1,11 @@
-## gDR 1.11.29 - 2026-11-19
+## gDR 1.11.31 - 2026-11-23
 * add the curves of a PRISM DRC table to the report (prism_drc_path) and compare them with the gDR fits
+
+## gDR 1.11.30 - 2026-11-23
+* fix the PRISM report leaving out the GR plots and tables when GR values are selected
+
+## gDR 1.11.29 - 2026-11-18
+* replace the cell line comparison of the chemical genomics report with resistant vs parental pairs
 
 ## gDR 1.11.28 - 2026-11-18
 * fix the Incucyte growth-rate axis label, which named a raw rate even on runs where every plotted row was normalized
