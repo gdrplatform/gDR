@@ -235,6 +235,14 @@ wd <- "{{output_dir}}"
 
 ```
 
+{{^QCS}}
+```{r read_import}
+# run_report() imported the data with gDR::import_data(), the same call for every input type
+# and for callers that do not render this report; this page shows what it wrote.
+data_imported <- qs_read(file.path(wd, "gDR_data", "gDR_input.qs2"))
+```
+{{/QCS}}
+
 # Key Output Files
 
 This report generates several key files that are used in the subsequent steps of the gDR pipeline.
@@ -274,20 +282,6 @@ As with the other input types, drug and cell line annotations are added after im
 
 The file is loaded and validated with `load_long_table()` (from gDRimport), which checks that all required columns are present and that `Duration`, `Concentration`, and `ReadoutValue` are numeric.
 
-```{r load_data}
-long_table <- c(
-  {{{long_table}}}
-)
-
-# copy file to raw_data
-for (file_path in long_table) {
-  file.copy(file_path, file.path(wd, "raw_data", basename(file_path)))
-}
-
-data_imported <- load_long_table(long_table)
-
-
-```
 
 {{/LONG_TABLE}}
 {{#gDRimport}}
@@ -318,47 +312,6 @@ In addition to the minimum required fields, the data undergoes a transformation 
 
 The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
 
-```{r load_data}
-#import data
-manifest <- c(
-  {{{manifest}}}
-)
-treatment <- c(
-  {{{treatment}}}
-)
-raw_data <- c(
-  {{{raw_data}}}
-)
-
-# copy files to raw_data
-for (file_path in c(manifest, treatment, raw_data)) {
-  file_name <- basename(file_path)  # Extract the filename from the path
-  file.copy(file_path, file.path(wd, "raw_data", file_name))
-}
-
-# Annotations staged alongside the raw data take precedence. Without them the import falls
-# back to looking the annotations up in a database, which is not reachable everywhere.
-drug_annotation_path <- file.path(wd, "data_annotation", "drug_annotation.csv")
-cell_line_annotation_path <- file.path(wd, "data_annotation", "cell_line_annotation.csv")
-
-drug_annotation <- NULL
-if (file.exists(drug_annotation_path)) {
-  drug_annotation <- fread(drug_annotation_path)
-}
-cell_line_annotation <- NULL
-if (file.exists(cell_line_annotation_path)) {
-  cell_line_annotation <- fread(cell_line_annotation_path)
-}
-
-data_imported <- import_data(manifest,
-                             treatment,
-                             raw_data,
-                             instrument = detect_file_format(raw_data[1]),
-                             cell_line_annotation = cell_line_annotation,
-                             drug_annotation = drug_annotation)
-
-
-```
 
 ## Visual Quality Control of Plate-Level Data
 
@@ -454,14 +407,6 @@ In addition to the minimum required fields, the data undergoes a transformation 
 
 The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
 
-```{r load_data}
-#import data
-data_imported <- convert_LEVEL5_prism_to_gDR_input(prism_data_path = "{{prism_data_path}}",
-                                                   meta_data_path = "{{meta_data_path}}")
-data_imported <- cleanup_metadata(data_imported)
-
-
-```
 
 {{/PRISM_level5}}
 
@@ -493,16 +438,6 @@ In addition to the minimum required fields, the data undergoes a transformation 
 
 The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
 
-```{r load_data}
-#import data
-data_imported <- convert_LEVEL6_prism_to_gDR_input(prism_data_path = "{{prism_data_path}}",
-                                                   cell_line_data_path = "{{cell_line_data_path}}",
-                                                   treatment_data_path = "{{treatment_data_path}}",
-                                                   meta_data_path = "{{meta_data_path}}")
-data_imported <- cleanup_metadata(data_imported)
-
-
-```
 
 {{/PRISM_level6}}
 
@@ -516,45 +451,31 @@ This step involves transforming the MAE object into the raw data.
 
 The process for annotating the data adheres to the guidelines specified in the gDR annotation documentation. Detailed guidelines and instructions can be found in the [gDR Annotation Documentation](https://github.com/gdrplatform/gDRcore/blob/main/vignettes/gDR-annotation.Rmd).
 
-```{r load_data}
-#import data
-mae <- qs_read("{{mae_path}}")
-data_imported <- convert_mae_to_raw_data(standardize_mae(mae))
-data_imported <- cleanup_metadata(data_imported)
-
-
-```
 
 {{/MAE}}
 
 Before executing the pipeline, there exists a provision for manual alterations within the raw data. This allows for the manual modification of certain annotations and the correction of data as needed.
 
 ```{r cleanup_data}
-# preview the annotation used in the preprocessing
-drug_annotation_path <- file.path(wd, "data_annotation", "drug_annotation.csv")
-drug_annotation <- if (file.exists(drug_annotation_path)) {
-  fread(drug_annotation_path)
-} else {
-  get_drug_annotation_from_dt(data_imported)
-}
-data_imported <- annotate_dt_with_drug(data_imported, drug_annotation)
-fwrite(drug_annotation, drug_annotation_path)
+{{#QCS}}
+# qcs input is imported by deployment code above; it gets the same annotation pass as
+# import_data() gives every other input type.
+annotation_dir <- file.path(wd, "data_annotation")
+staged <- function(f) if (file.exists(file.path(annotation_dir, f))) file.path(annotation_dir, f)
+data_imported <- gDR:::.annotate_imported(
+  data_imported,
+  gDR:::.read_annotation(staged("drug_annotation.csv"), "drug_annotation"),
+  gDR:::.read_annotation(staged("cell_line_annotation.csv"), "cell_line_annotation"),
+  annotation_dir
+)
+qs_save(data_imported, file.path(wd, "gDR_data", "gDR_input.qs2"))
+{{/QCS}}
+# the annotation used in the import
+drug_annotation <- fread(file.path(wd, "data_annotation", "drug_annotation.csv"))
 generate_datatable(drug_annotation)
 
-
-cell_line_annotation_path <- file.path(wd, "data_annotation", "cell_line_annotation.csv")
-cell_line_annotation <- if (file.exists(cell_line_annotation_path)) {
-  fread(cell_line_annotation_path)
-} else {
-  get_cellline_annotation_from_dt(data_imported)
-}
-data_imported <- annotate_dt_with_cell_line(data_imported, cell_line_annotation)
-fwrite(cell_line_annotation, cell_line_annotation_path)
+cell_line_annotation <- fread(file.path(wd, "data_annotation", "cell_line_annotation.csv"))
 generate_datatable(cell_line_annotation)
-
-qs_save(data_imported, file.path(wd, "gDR_data", "gDR_input.qs2"))
-
-
 ```
 
 # Imported Data Summary

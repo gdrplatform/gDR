@@ -124,6 +124,12 @@
 #'   points to it, and publishing can be retried with \code{steps = 4, resume = TRUE}.
 #' @param resume Logical. Whether to resume execution in the existing 'current' output directory
 #'   instead of creating a new version. Default is \code{FALSE}.
+#' @param render Logical. Whether to render the reports. Default \code{TRUE}. Steps 1 and 2
+#'   write their data (\code{gDR_data/gDR_input.qs2}, \code{gDR_data/gDR_mae.qs2}) whether or
+#'   not they render: \code{run_report()} runs \code{import_data()} and
+#'   \code{gDRcore::runDrugResponseProcessingPipeline()} itself, and the templates only read
+#'   what it wrote. With \code{FALSE}, only steps 1 and 2 can be run, and the files are the
+#'   same as with \code{TRUE}.
 #' @param extra_render_params Named list. Additional parameters injected into every RMarkdown
 #'   template alongside the ones derived from the arguments above. Use it to pass values that are
 #'   specific to a given deployment (e.g. dataset registry metadata) without adding them to the
@@ -265,6 +271,7 @@ run_report <- function(
     remove_on_failure = TRUE,
     resume = FALSE,
     extra_render_params = list(),
+    render = TRUE,
     on_resolve_inputs = NULL,
     on_start = NULL,
     on_before_render = NULL,
@@ -273,6 +280,11 @@ run_report <- function(
 ) {
   # --- 1. Initial Assertions ---
   checkmate::assert_flag(remove_on_failure)
+  checkmate::assert_flag(render)
+  if (!render && !all(steps %in% 1:2)) {
+    stop("render = FALSE runs the data of steps 1 and 2 only; the analysis step is a report, ",
+         "use build_report_rmd() to write it without rendering.", call. = FALSE)
+  }
   checkmate::assert_list(extra_render_params, names = "unique")
   checkmate::assert_function(on_resolve_inputs, null.ok = TRUE)
   checkmate::assert_function(on_start, null.ok = TRUE)
@@ -285,6 +297,7 @@ run_report <- function(
   args <- as.list(environment())
   args[c(
     "extra_render_params",
+    "render",
     "on_resolve_inputs",
     "on_start",
     "on_before_render",
@@ -400,14 +413,18 @@ run_report <- function(
       # Each step is written only after the previous one rendered: the parameters of a step are
       # partly read from the data the previous step wrote (see prepare_dynamic_render_params()).
       for (i in seq_along(plan$template_paths)) {
-        message(sprintf("Rendering report step: %s", tools::file_path_sans_ext(plan$rmd_files[[i]])))
-        warned_shadowed <- write_report_step(plan, i, env$output_dir, warned_shadowed)
-
-        output_path <- plan$output_paths[[i]]
         state$failed_step <- plan$rmd_files[[i]]
-        rmarkdown::render(input = output_path, output_file = gsub(".Rmd$", ".html", output_path))
+        # The data of steps 1 and 2 is written here, rendered or not, and only read by
+        # their templates; see run_report_data_step().
+        run_report_data_step(plan, plan$rmd_files[[i]], env$output_dir, render)
+        if (render) {
+          message(sprintf("Rendering report step: %s", tools::file_path_sans_ext(plan$rmd_files[[i]])))
+          warned_shadowed <- write_report_step(plan, i, env$output_dir, warned_shadowed)
+          output_path <- plan$output_paths[[i]]
+          rmarkdown::render(input = output_path, output_file = gsub(".Rmd$", ".html", output_path))
+          state$rendered_steps <- c(state$rendered_steps, plan$rmd_files[[i]])
+        }
         state$failed_step <- NULL
-        state$rendered_steps <- c(state$rendered_steps, plan$rmd_files[[i]])
       }
 
     }, file = env$stdout_con)
@@ -910,6 +927,7 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
       gDRimport = (data_type == "bench"),
       PRISM_level5 = (data_type == "prism_5"),
       PRISM_level6 = (data_type == "prism_6"),
+      QCS = (data_type == "qcs"),
       PRISM = plan$is_prism_data,
       PRISM_excluded = !plan$is_prism_data,
       MAE = (data_type == "mae")
@@ -1146,6 +1164,9 @@ stage_and_update_paths <- function(args, output_dir, extra = list()) {
     "mae"
   )
 
+  # Inputs are staged by file name, so two different files with the same name would
+  # silently overwrite each other; that is refused instead.
+  staged_from <- character(0)
   for (arg_name in path_args) {
     path_spec <- args[[arg_name]]
     # 'mae' may be an in-memory MultiAssayExperiment rather than a file path;
@@ -1179,6 +1200,15 @@ stage_and_update_paths <- function(args, output_dir, extra = list()) {
 
       # NEW: Copy all resolved files and update argument to a vector of new paths
       new_paths <- file.path(dest_dir, basename(original_paths))
+      sources <- normalizePath(original_paths, mustWork = FALSE)
+      for (k in seq_along(new_paths)) {
+        previous <- staged_from[new_paths[k]]
+        if (!is.na(previous) && previous != sources[k]) {
+          stop(sprintf("Two different input files are named '%s'; rename one, since inputs are staged by name.",
+                       basename(new_paths[k])), call. = FALSE)
+        }
+        staged_from[new_paths[k]] <- sources[k]
+      }
       # An argument may already point at its staged copy, which is how a re-run iterates.
       # file.copy() errors on "file can not be copied both 'from' and 'to'".
       to_copy <- normalizePath(original_paths, mustWork = FALSE) !=
@@ -1195,6 +1225,61 @@ stage_and_update_paths <- function(args, output_dir, extra = list()) {
   # but only return the pipeline arguments themselves.
   qs2::qs_save(c(args, extra[setdiff(names(extra), names(args))]), file.path(raw_data_dir, "args.qs2"))
   return(args)
+}
+
+# The data of report steps 1 and 2, run by run_report() itself so that a run writes the same
+# files whether or not it renders: step 1 imports with import_data(), step 2 processes with
+# runDrugResponseProcessingPipeline() and records the report inputs. The templates of these
+# steps only read what is written here. qcs input is imported by deployment code in the step 1
+# template, so it needs rendering.
+#' @keywords internal
+run_report_data_step <- function(plan, step_file, output_dir, render = TRUE) {
+  data_dir <- file.path(output_dir, "gDR_data")
+  if (identical(step_file, "1-data_import.Rmd")) {
+    if (identical(plan$data_type, "qcs")) {
+      if (!render) {
+        stop("qcs input is imported by the step 1 report, so it cannot run with render = FALSE.",
+             call. = FALSE)
+      }
+      return(invisible(NULL))
+    }
+    a <- plan$args
+    annotation_dir <- file.path(output_dir, "data_annotation")
+    staged <- function(f) if (file.exists(file.path(annotation_dir, f))) file.path(annotation_dir, f)
+    dt <- import_data(
+      manifest_file = a$manifest,
+      template_file = a$treatment,
+      results_file = a$raw_data,
+      cell_line_annotation = staged("cell_line_annotation.csv"),
+      drug_annotation = staged("drug_annotation.csv"),
+      long_table = a$long_table,
+      prism_data_path = a$prism_data_path,
+      meta_data_path = a$meta_data_path,
+      cell_line_data_path = a$cell_line_data_path,
+      treatment_data_path = a$treatment_data_path,
+      annotation_dir = annotation_dir
+    )
+    qs2::qs_save(dt, file.path(data_dir, "gDR_input.qs2"))
+  } else if (identical(step_file, "2-processing_and_QC.Rmd")) {
+    dt <- qs2::qs_read(file.path(data_dir, "gDR_input.qs2"))
+    inter_dir <- file.path(data_dir, "intermediate")
+    dir.create(inter_dir, recursive = TRUE, showWarnings = FALSE)
+    mae <- gDRcore::runDrugResponseProcessingPipeline(dt, data_dir = inter_dir)
+    # single-agent and combination first, as the report has always written them
+    reported <- c(gDRutils::get_supported_experiments("sa"), gDRutils::get_supported_experiments("combo"))
+    mae <- mae[, , c(intersect(reported, names(mae)), setdiff(names(mae), reported))]
+    report_inputs_file <- plan$extra_render_params$report_inputs_file
+    if (!is.null(report_inputs_file) && nzchar(report_inputs_file)) {
+      report_inputs <- qs2::qs_read(report_inputs_file)
+      for (experiment in names(mae)) {
+        mae[[experiment]] <- gDRutils::record_processing_step(
+          mae[[experiment]], "report", settings = report_inputs, max_bytes = 1e6
+        )
+      }
+    }
+    qs2::qs_save(mae, file.path(data_dir, "gDR_mae.qs2"))
+  }
+  invisible(NULL)
 }
 
 #' Determine the data type from provided arguments

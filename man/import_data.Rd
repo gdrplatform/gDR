@@ -5,12 +5,19 @@
 \title{Import raw data}
 \usage{
 import_data(
-  manifest_file,
-  template_file,
-  results_file,
-  instrument = "EnVision",
+  manifest_file = NULL,
+  template_file = NULL,
+  results_file = NULL,
+  instrument = NULL,
   cell_line_annotation = NULL,
-  drug_annotation = NULL
+  drug_annotation = NULL,
+  long_table = NULL,
+  prism_data_path = NULL,
+  meta_data_path = NULL,
+  cell_line_data_path = NULL,
+  treatment_data_path = NULL,
+  annotate = TRUE,
+  annotation_dir = NULL
 )
 }
 \arguments{
@@ -22,19 +29,55 @@ or character with file path of templates file(s)}
 \item{results_file}{character, with datapaths and names of results file(s)
 or character with file path of results file(s)}
 
-\item{instrument}{string with type of instrument used}
+\item{instrument}{string with type of instrument used. \code{NULL} (default) detects
+it from the first results file with \code{gDRimport::detect_file_format()}.}
 
-\item{cell_line_annotation}{optional data.table with cell line annotations;
-if NULL (default), annotations are looked up from gDRinternal or gDRtestData}
+\item{cell_line_annotation}{optional cell line annotation, a \code{data.table} or the
+path of a CSV. If \code{NULL} (default), bench data is annotated from gDRinternal or
+gDRtestData, and the annotation pass uses the annotation already in the data.}
 
-\item{drug_annotation}{optional data.table with drug annotations;
-if NULL (default), annotations are looked up from gDRinternal or gDRtestData}
+\item{drug_annotation}{optional drug annotation, as \code{cell_line_annotation}.}
+
+\item{long_table}{character, file path(s) of a long table (\code{load_long_table()}).}
+
+\item{prism_data_path, meta_data_path}{character, the PRISM data and metadata files.}
+
+\item{cell_line_data_path, treatment_data_path}{character, the PRISM level 6 cell line
+and treatment files.}
+
+\item{annotate}{logical, whether to run the annotation pass. Default \code{TRUE}.}
+
+\item{annotation_dir}{optional directory in which to write the annotation used, as
+\code{drug_annotation.csv} and \code{cell_line_annotation.csv}.}
 }
 \value{
-a \code{data.table}
+a \code{data.table}, carrying the import record of gDRimport in its
+\code{gDR_import} attribute.
 }
 \description{
-Import raw data
+The one import of the gDR report and of every other caller: it reads any of the
+supported inputs, cleans the metadata, and annotates drugs and cell lines, returning
+the raw data that \code{gDRcore::runDrugResponseProcessingPipeline()} processes.
+\code{run_report()} calls it for step 1, so a caller who imports with it gets the
+same table as the report.
+}
+\details{
+The input type is decided as in \code{run_report()}: a long table if
+\code{long_table} is given, PRISM level 6 if \code{prism_data_path},
+\code{cell_line_data_path} and \code{treatment_data_path} are, PRISM level 5 if only
+\code{prism_data_path} is, and otherwise bench data from the manifest, templates and
+raw files.
+\itemize{
+\item bench: \code{gDRimport::load_data()} and \code{gDRcore::merge_data()}, which
+annotates from \code{cell_line_annotation} and \code{drug_annotation} when given.
+\item long table: \code{gDRimport::load_long_table()}, then
+\code{gDRcore::cleanup_metadata()}.
+\item PRISM level 5 or 6: \code{gDRimport::convert_LEVEL5_prism_to_gDR_input()} or
+\code{convert_LEVEL6_prism_to_gDR_input()}, then \code{gDRcore::cleanup_metadata()}.
+}
+Then, with \code{annotate = TRUE}, drugs and cell lines are annotated with
+\code{gDRcore::annotate_dt_with_drug()} and \code{annotate_dt_with_cell_line()}, from
+the annotation given or, without it, from the annotation the data already carries.
 }
 \examples{
 td <- get_test_data()

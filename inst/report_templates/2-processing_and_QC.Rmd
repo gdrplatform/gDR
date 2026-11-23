@@ -269,16 +269,15 @@ report_types <- c("control", sa_name, get_supported_experiments("combo"))
 ```
 
 ```{r, left_out_types, results="asis"}
-# rows of other types (e.g. co-dilution, time-course) do not reach any result below; say so
-# here and in the render log instead of dropping them without a word
-left_out <- dt_[!dt_$type %in% report_types, .N, by = "type"]
-if (NROW(left_out) > 0L) {
-  left_out_text <- toString(sprintf("%s (%d rows)", left_out$type, left_out$N))
-  cat("Warning: this report leaves out data it does not process:", left_out_text, "\n", file = stderr())
+# Every type is processed (see below); the quality control covers single-agent and
+# combination data, so say which processed types have none.
+no_qc <- dt_[!dt_$type %in% report_types, .N, by = "type"]
+if (NROW(no_qc) > 0L) {
+  no_qc_text <- toString(sprintf("%s (%d rows)", no_qc$type, no_qc$N))
   cat(
-    "\n> **Not in this report:** the input also has ", left_out_text, ". ",
-    "This report processes single-agent and combination data only, so these rows are left out ",
-    "of every result below. They are still in `gDR_data/gDR_input.qs2`.\n\n",
+    "\n> **Processed, no quality control here:** the input also has ", no_qc_text, ". ",
+    "These are processed and are in `gDR_data/gDR_mae.qs2`, but the sections below cover ",
+    "single-agent and combination data only.\n\n",
     sep = ""
   )
 }
@@ -299,15 +298,10 @@ dt_combo <- dt_list[[combo_name]]
 
 # Run the Processing Pipeline
 
-All processing is done by a single call to `runDrugResponseProcessingPipeline()`, the same function used outside the report. It runs the four steps described below on the single-agent and combination data, the types this report covers, and saves the `SummarizedExperiment` after each step in `gDR_data/intermediate/`. The sections that follow read those saved objects, so the quality control shows exactly the data the final results were computed from.
+All processing is done by a single call to `runDrugResponseProcessingPipeline()`, the same function used outside the report, which `run_report()` made before this page was written, on every data type. It runs the four steps described below and saves the `SummarizedExperiment` after each step in `gDR_data/intermediate/`. The sections that follow read those saved objects, so the quality control shows exactly the data the final results were computed from.
 
 ```{r run_pipeline}
 inter_dir <- file.path(wd, "gDR_data", "intermediate")
-dir.create(inter_dir, recursive = TRUE, showWarnings = FALSE)
-# keep the types the report covers with their controls; subsetting drops the import record, so carry it over
-dt_report <- dt_[dt_$type %in% report_types]
-setattr(dt_report, "gDR_import", attr(data_imported, "gDR_import", exact = TRUE))
-mae_pipeline <- runDrugResponseProcessingPipeline(dt_report, data_dir = inter_dir)
 read_step <- function(step, experiment) read_intermediate_data(inter_dir, step, experiment)
 
 
@@ -1114,25 +1108,12 @@ invisible(loop(seq_along(ls_plt_GR), function(x) {
 
 # Assemble and Save Final Results
 
-Finally, all processed data and results are combined into a single `MultiAssayExperiment` (MAE) object. The MAE is a flexible container that holds all `SummarizedExperiment` objects, ensuring all data and metadata are stored together in an organized and accessible format.
+All processed data and results are combined into a single `MultiAssayExperiment` (MAE) object. The MAE is a flexible container that holds all `SummarizedExperiment` objects, ensuring all data and metadata are stored together in an organized and accessible format.
 
 ```{r create_mae}
-# single-agent first, as before
-mae <- mae_pipeline[, , intersect(c(sa_name, get_supported_experiments("combo")), names(mae_pipeline))]
-mae <- standardize_mae(mae)
-# What a caller of run_report() recorded about its inputs (extra_render_params$report_inputs_file,
-# a qs2 file with a named list), kept as the "report" step of every experiment
-report_inputs_file <- "{{report_inputs_file}}"
-if (nzchar(report_inputs_file)) {
-  report_inputs <- qs_read(report_inputs_file)
-  for (experiment in names(mae)) {
-    mae[[experiment]] <- record_processing_step(mae[[experiment]], "report", settings = report_inputs,
-                                                max_bytes = 1e6)
-  }
-}
-qs_save(mae, file.path(wd, "gDR_data", "gDR_mae.qs2"))
-
-
+# Written by run_report() with the pipeline's result and the "report" step of every experiment
+# (what the caller recorded about the inputs, extra_render_params$report_inputs_file).
+mae <- qs_read(file.path(wd, "gDR_data", "gDR_mae.qs2"))
 ```
 
 # How These Numbers Were Produced

@@ -127,6 +127,8 @@ test_that("validate_and_prepare_inputs filters steps for MAE input", {
   )
   mockery::stub(test_fn, "rmarkdown::render", render_mock)
   mockery::stub(test_fn, "create_symlink_to_current", NULL)
+  # the data of steps 1 and 2 (import and processing) is not what these tests are about
+  mockery::stub(test_fn, "run_report_data_step", NULL)
 
   test_fn
 }
@@ -924,6 +926,7 @@ test_that("prepare_dynamic_render_params handles input without durations, as in 
 .rmd_written_by_run_report <- function(output_dir, ...) {
   test_fn <- run_report
   mockery::stub(test_fn, "rmarkdown::render", TRUE)
+  mockery::stub(test_fn, "run_report_data_step", NULL)
   test_fn(output_dir = output_dir, ...)
   list.files(file.path(output_dir, "current"), pattern = "\\.Rmd$", full.names = TRUE)
 }
