@@ -1,6 +1,6 @@
 ## gDR 1.11.30 - 2026-11-23
 * change `import_data()` to import every input type (bench, long table, PRISM 5/6) and annotate it, as the report did
-* change `run_report()` to run the data of steps 1-2 itself, with `render = FALSE` to write it without a report
+* change `run_report()` to run the data of steps 1-2 itself; `render_steps` picks which pages to render, or none
 * change the processing step to process every data type and stop on two inputs with the same file name
 
 ## gDR 1.11.29 - 2026-11-18

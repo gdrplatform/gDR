@@ -35,7 +35,7 @@ run_report(
   remove_on_failure = TRUE,
   resume = FALSE,
   extra_render_params = list(),
-  render = TRUE,
+  render_steps = steps,
   on_resolve_inputs = NULL,
   on_start = NULL,
   on_before_render = NULL,
@@ -176,12 +176,14 @@ out, and the analysis step lists the selections at its top. A run that publishes
 (step 4) takes no selection.
 Default is an empty list.}
 
-\item{render}{Logical. Whether to render the reports. Default \code{TRUE}. Steps 1 and 2
-write their data (\code{gDR_data/gDR_input.qs2}, \code{gDR_data/gDR_mae.qs2}) whether or
-not they render: \code{run_report()} runs \code{import_data()} and
+\item{render_steps}{Integer vector, the steps whose report is rendered; a subset of
+\code{steps}, all of them by default. Steps 1 and 2 write their data
+(\code{gDR_data/gDR_input.qs2}, \code{gDR_data/gDR_mae.qs2}) whether or not they render:
+\code{run_report()} runs \code{import_data()} and
 \code{gDRcore::runDrugResponseProcessingPipeline()} itself, and the templates only read
-what it wrote. With \code{FALSE}, only steps 1 and 2 can be run, and the files are the
-same as with \code{TRUE}.}
+what it wrote, so the files are the same for any \code{render_steps}. Steps 3 and 4 are
+reports and must be rendered. \code{integer(0)} with \code{steps = 1:2} processes the data
+without a report.}
 
 \item{on_resolve_inputs}{Function or NULL. Hook called before the data type is determined,
 used to resolve input paths from an external source. It receives \code{args} (the list of

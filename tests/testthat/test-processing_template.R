@@ -70,11 +70,11 @@ test_that("run_report_data_step records the report inputs a caller passes", {
 
 test_that("run_report_data_step refuses qcs input without rendering", {
   expect_error(run_report_data_step(list(data_type = "qcs"), "1-data_import.Rmd", tempdir(), render = FALSE),
-               "qcs input")
+               "step 1 must be in render_steps")
   expect_null(run_report_data_step(list(data_type = "qcs"), "1-data_import.Rmd", tempdir(), render = TRUE))
 })
 
-test_that("run_report with render = FALSE writes the data of steps 1 and 2 and no report", {
+test_that("run_report writes the data of steps 1 and 2 and only the pages in render_steps", {
   td <- gDRimport::get_test_data()
   out <- tempfile("gdr_report_")
   dir.create(out)
@@ -83,7 +83,7 @@ test_that("run_report with render = FALSE writes the data of steps 1 and 2 and n
     manifest = gDRimport::manifest_path(td),
     treatment = paste(gDRimport::template_path(td), collapse = ","),
     raw_data = paste(gDRimport::result_path(td), collapse = ","),
-    output_dir = out, steps = 1:2, render = FALSE
+    output_dir = out, steps = 1:2, render_steps = integer(0)
   )))
   run <- file.path(out, "current")
   input <- qs2::qs_read(file.path(run, "gDR_data", "gDR_input.qs2"))
@@ -93,5 +93,7 @@ test_that("run_report with render = FALSE writes the data of steps 1 and 2 and n
   expect_length(list.files(run, pattern = "[.]html$"), 0L)
   expect_true(file.exists(file.path(run, "data_annotation", "drug_annotation.csv")))
   expect_error(run_report(manifest = gDRimport::manifest_path(td), output_dir = out, steps = 1:3,
-                          render = FALSE), "steps 1 and 2 only")
+                          render_steps = 1:2), "Only steps 1 and 2 can run without rendering")
+  expect_error(run_report(manifest = gDRimport::manifest_path(td), output_dir = out, steps = 1:2,
+                          render_steps = 3), "render_steps must be among steps")
 })

@@ -124,12 +124,14 @@
 #'   points to it, and publishing can be retried with \code{steps = 4, resume = TRUE}.
 #' @param resume Logical. Whether to resume execution in the existing 'current' output directory
 #'   instead of creating a new version. Default is \code{FALSE}.
-#' @param render Logical. Whether to render the reports. Default \code{TRUE}. Steps 1 and 2
-#'   write their data (\code{gDR_data/gDR_input.qs2}, \code{gDR_data/gDR_mae.qs2}) whether or
-#'   not they render: \code{run_report()} runs \code{import_data()} and
+#' @param render_steps Integer vector, the steps whose report is rendered; a subset of
+#'   \code{steps}, all of them by default. Steps 1 and 2 write their data
+#'   (\code{gDR_data/gDR_input.qs2}, \code{gDR_data/gDR_mae.qs2}) whether or not they render:
+#'   \code{run_report()} runs \code{import_data()} and
 #'   \code{gDRcore::runDrugResponseProcessingPipeline()} itself, and the templates only read
-#'   what it wrote. With \code{FALSE}, only steps 1 and 2 can be run, and the files are the
-#'   same as with \code{TRUE}.
+#'   what it wrote, so the files are the same for any \code{render_steps}. Steps 3 and 4 are
+#'   reports and must be rendered. \code{integer(0)} with \code{steps = 1:2} processes the data
+#'   without a report.
 #' @param extra_render_params Named list. Additional parameters injected into every RMarkdown
 #'   template alongside the ones derived from the arguments above. Use it to pass values that are
 #'   specific to a given deployment (e.g. dataset registry metadata) without adding them to the
@@ -271,7 +273,7 @@ run_report <- function(
     remove_on_failure = TRUE,
     resume = FALSE,
     extra_render_params = list(),
-    render = TRUE,
+    render_steps = steps,
     on_resolve_inputs = NULL,
     on_start = NULL,
     on_before_render = NULL,
@@ -280,10 +282,15 @@ run_report <- function(
 ) {
   # --- 1. Initial Assertions ---
   checkmate::assert_flag(remove_on_failure)
-  checkmate::assert_flag(render)
-  if (!render && !all(steps %in% 1:2)) {
-    stop("render = FALSE runs the data of steps 1 and 2 only; the analysis step is a report, ",
-         "use build_report_rmd() to write it without rendering.", call. = FALSE)
+  checkmate::assert_integerish(render_steps, lower = 1, any.missing = FALSE)
+  if (!all(render_steps %in% steps)) {
+    stop("render_steps must be among steps; got render_steps = ", toString(render_steps),
+         " for steps = ", toString(steps), ".", call. = FALSE)
+  }
+  if (any(setdiff(steps, render_steps) > 2)) {
+    stop("Only steps 1 and 2 can run without rendering: their data is written either way. ",
+         "Steps 3 and 4 are reports; use build_report_rmd() to write them without rendering.",
+         call. = FALSE)
   }
   checkmate::assert_list(extra_render_params, names = "unique")
   checkmate::assert_function(on_resolve_inputs, null.ok = TRUE)
@@ -297,7 +304,7 @@ run_report <- function(
   args <- as.list(environment())
   args[c(
     "extra_render_params",
-    "render",
+    "render_steps",
     "on_resolve_inputs",
     "on_start",
     "on_before_render",
@@ -414,6 +421,10 @@ run_report <- function(
       # partly read from the data the previous step wrote (see prepare_dynamic_render_params()).
       for (i in seq_along(plan$template_paths)) {
         state$failed_step <- plan$rmd_files[[i]]
+        # The step a file belongs to: "3-1-PRISM_analysis.Rmd" is an add-on of step 3. Steps
+        # beyond 2 are reports, always rendered (MAE input moves the steps to 3 and 4).
+        step_no <- as.integer(sub("^([0-9]+).*", "\\1", plan$rmd_files[[i]]))
+        render <- step_no > 2L || step_no %in% render_steps
         # The data of steps 1 and 2 is written here, rendered or not, and only read by
         # their templates; see run_report_data_step().
         run_report_data_step(plan, plan$rmd_files[[i]], env$output_dir, render)
@@ -1238,7 +1249,7 @@ run_report_data_step <- function(plan, step_file, output_dir, render = TRUE) {
   if (identical(step_file, "1-data_import.Rmd")) {
     if (identical(plan$data_type, "qcs")) {
       if (!render) {
-        stop("qcs input is imported by the step 1 report, so it cannot run with render = FALSE.",
+        stop("qcs input is imported by the step 1 report, so step 1 must be in render_steps.",
              call. = FALSE)
       }
       return(invisible(NULL))
