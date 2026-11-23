@@ -301,7 +301,7 @@ head(convert_se_assay_to_dt(se, "Metrics"))
 #> 6:      1             -0.823909          NA      -Inf        NA        NA
 #>           rss         p_value   x_0       x_inf               fit_type
 #>         <num>           <num> <num>       <num>                 <char>
-#> 1: 0.06111735 0.0055517820958     1 -0.76364406 DRC3pHillFitModelFixS0
+#> 1: 0.06111735 0.0055517820959     1 -0.76364407 DRC3pHillFitModelFixS0
 #> 2: 0.03159935 0.0001450862960     1  0.14499197 DRC3pHillFitModelFixS0
 #> 3: 0.03576754 0.0000003349268     1 -0.48824612 DRC3pHillFitModelFixS0
 #> 4: 0.04890734 0.0000024023028     1  0.04254419 DRC3pHillFitModelFixS0
@@ -359,8 +359,8 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] kableExtra_1.4.1  gDR_1.11.29       gDRutils_1.11.26  gDRimport_1.11.15
-#> [5] gDRcore_1.11.32   BiocStyle_2.41.0 
+#> [1] kableExtra_1.4.1  gDR_1.11.30       gDRutils_1.11.26  gDRimport_1.11.17
+#> [5] gDRcore_1.11.33   BiocStyle_2.41.0 
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] viridisLite_0.4.3           farver_2.1.2               
@@ -368,11 +368,11 @@ sessionInfo()
 #>  [5] TH.data_1.1-5               digest_0.6.39              
 #>  [7] lifecycle_1.0.5             survival_3.8-12            
 #>  [9] magrittr_2.0.5              compiler_4.6.2             
-#> [11] rlang_1.3.0                 sass_0.4.10                
+#> [11] rlang_1.3.0                 sass_0.5.0                 
 #> [13] drc_4.0-0                   tools_4.6.2                
 #> [15] plotrix_3.8-14              yaml_2.3.12                
 #> [17] data.table_1.18.6.1         knitr_1.52                 
-#> [19] lambda.r_1.2.6              S4Arrays_1.13.2            
+#> [19] lambda.r_1.2.6              S4Arrays_1.13.3            
 #> [21] DelayedArray_0.39.8         xml2_1.6.0                 
 #> [23] RColorBrewer_1.1-3          abind_1.4-8                
 #> [25] multcomp_1.4-32             BiocParallel_1.47.0        
@@ -395,7 +395,7 @@ sessionInfo()
 #> [59] carData_3.0-6               bookdown_0.48              
 #> [61] car_3.1-5                   IRanges_2.47.5             
 #> [63] S4Vectors_0.51.10           Formula_1.2-6              
-#> [65] systemfonts_1.3.3           testthat_3.3.2             
+#> [65] systemfonts_1.3.4           testthat_3.3.2             
 #> [67] jquerylib_0.1.4             rematch_2.0.0              
 #> [69] glue_1.8.1                  pkgdown_2.2.1              
 #> [71] codetools_0.2-20            stringi_1.8.9              
@@ -403,7 +403,7 @@ sessionInfo()
 #> [75] tibble_3.3.1                pillar_1.11.1              
 #> [77] htmltools_0.5.9             Seqinfo_1.3.2              
 #> [79] brio_1.1.5                  R6_2.6.1                   
-#> [81] textshaping_1.0.5           evaluate_1.0.5             
+#> [81] textshaping_1.1.0           evaluate_1.0.5             
 #> [83] lattice_0.23-1              Biobase_2.73.2             
 #> [85] futile.options_1.0.1        backports_1.5.1            
 #> [87] bslib_0.12.0                svglite_2.2.2              
