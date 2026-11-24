@@ -1,3 +1,6 @@
+## gDR 1.13.1 - 2026-11-24
+* synchronize Bioconductor and GitHub versioning
+
 ## gDR 1.11.30 - 2026-11-23
 * fix the PRISM report leaving out the GR plots and tables when GR values are selected
 
