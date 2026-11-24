@@ -1108,13 +1108,32 @@ invisible(loop(seq_along(ls_plt_GR), function(x) {
 
 # Assemble and Save Final Results
 
-All processed data and results are combined into a single `MultiAssayExperiment` (MAE) object. The MAE is a flexible container that holds all `SummarizedExperiment` objects, ensuring all data and metadata are stored together in an organized and accessible format.
+Finally, all processed data and results are combined into a single `MultiAssayExperiment` (MAE) object. The MAE is a flexible container that holds all `SummarizedExperiment` objects, ensuring all data and metadata are stored together in an organized and accessible format.
+{{#prism_drc_path}}
+
+The curves PRISM fitted to the same data (its DRC table) are added to the `Metrics` assay of the single-agent data as a second fit source, `fit_source = "PRISM"`, without refitting. A cell can hold several PRISM curves, one per pool and compound plate. The analysis step compares them with the gDR fits.
+{{/prism_drc_path}}
 
 ```{r create_mae}
-# Written by run_report() with the pipeline's result and the "report" step of every experiment
-# (what the caller recorded about the inputs, extra_render_params$report_inputs_file).
+# Written by run_report() with the pipeline's result, the PRISM curves when a DRC table was given, and the
+# "report" step of every experiment (what the caller recorded about the inputs, extra_render_params$report_inputs_file).
 mae <- qs_read(file.path(wd, "gDR_data", "gDR_mae.qs2"))
 ```
+{{#prism_drc_path}}
+
+```{r prism_drc_import, results="asis", echo=FALSE}
+prism_steps <- get_SE_provenance(mae[[sa_name]])$steps
+# [[ ]], not $: $ would match prism_drc_import_error when prism_drc_import is absent
+if (!is.null(prism_steps[["prism_drc_import"]])) {
+  prism_import <- prism_steps[["prism_drc_import"]]$settings
+  cat(sprintf(paste("**PRISM curves:** %d of the %d curves of the DRC table were added; %d have no matching",
+                    "cell line, drug or Duration in the data and are left out.\n"),
+              prism_import$n_imported, prism_import$n_curves, prism_import$n_left_out))
+} else {
+  cat("**PRISM curves:** the DRC table was not added:", prism_steps[["prism_drc_import_error"]]$settings$error, "\n")
+}
+```
+{{/prism_drc_path}}
 
 # How These Numbers Were Produced
 

@@ -71,6 +71,10 @@
 #' @param raw_data Character. Path to the raw data file(s). Can be a single path, a comma-separated string of paths,
 #'  or a regular expression pattern. Required if not using \code{qcs_id} or \code{prism_data_path}.
 #' @param prism_data_path Character. Path to the PRISM data file. Provide this if you want to process PRISM data.
+#' @param prism_drc_path Character or NULL. Path to the PRISM DRC table (the curves PRISM fitted, e.g.
+#'  \code{<screen>_DRC_TABLE.csv}) of the data in \code{prism_data_path}. The curves are added to the
+#'  \code{Metrics} assay as \code{fit_source = "PRISM"} (\code{gDRcore::add_PRISM_metrics()}), and the
+#'  analysis step compares them with the gDR fits. The cell lines are mapped with \code{meta_data_path}.
 #' @param cell_line_data_path Character. Path to the cell line data file.
 #'  Required if using \code{prism_data_path} and processing PRISM level 6 data.
 #' @param treatment_data_path Character. Path to the treatment data file.
@@ -242,6 +246,7 @@ run_report <- function(
     treatment = NULL,
     raw_data = NULL,
     prism_data_path = NULL,
+    prism_drc_path = NULL,
     cell_line_data_path = NULL,
     treatment_data_path = NULL,
     drug_annotation_path = NULL,
@@ -546,6 +551,7 @@ build_report_rmd <- function(
     treatment = NULL,
     raw_data = NULL,
     prism_data_path = NULL,
+    prism_drc_path = NULL,
     cell_line_data_path = NULL,
     treatment_data_path = NULL,
     drug_annotation_path = NULL,
@@ -659,6 +665,7 @@ assert_report_args <- function(args) {
     checkmate::assert_character(treatment, null.ok = TRUE)
     checkmate::assert_character(raw_data, null.ok = TRUE)
     checkmate::assert_character(prism_data_path, null.ok = TRUE)
+    checkmate::assert_character(prism_drc_path, null.ok = TRUE)
     checkmate::assert_character(cell_line_data_path, null.ok = TRUE)
     checkmate::assert_character(treatment_data_path, null.ok = TRUE)
     checkmate::assert_character(drug_annotation_path, null.ok = TRUE)
@@ -1169,7 +1176,7 @@ stage_and_update_paths <- function(args, output_dir, extra = list()) {
 
   # Now, handle all other path arguments which can be file specs
   path_args <- c(
-    "manifest", "treatment", "raw_data", "long_table", "prism_data_path",
+    "manifest", "treatment", "raw_data", "long_table", "prism_data_path", "prism_drc_path",
     "cell_line_data_path", "treatment_data_path", "drug_annotation_path",
     "cell_line_annotation_path", "meta_data_path", "configuration_file_path",
     "mae"
@@ -1284,6 +1291,9 @@ run_report_data_step <- function(plan, step_file, output_dir, render = TRUE) {
     # single-agent and combination first, as the report has always written them
     reported <- c(gDRutils::get_supported_experiments("sa"), gDRutils::get_supported_experiments("combo"))
     mae <- mae[, , c(intersect(reported, names(mae)), setdiff(names(mae), reported))]
+    if (!is_null_or_empty(plan$args$prism_drc_path)) {
+      mae <- add_prism_drc(mae, plan$args$prism_drc_path, plan$args$meta_data_path)
+    }
     report_inputs_file <- plan$extra_render_params$report_inputs_file
     if (!is.null(report_inputs_file) && nzchar(report_inputs_file)) {
       report_inputs <- qs2::qs_read(report_inputs_file)
@@ -1296,6 +1306,29 @@ run_report_data_step <- function(plan, step_file, output_dir, render = TRUE) {
     qs2::qs_save(mae, file.path(data_dir, "gDR_mae.qs2"))
   }
   invisible(NULL)
+}
+
+# The curves PRISM fitted to the same data (its DRC table), added to the single-agent Metrics next to
+# the gDR fits as fit source "PRISM". A table that does not match the data leaves the gDR results as they
+# are; the error is kept as a processing step of the experiment, so the report can say so.
+#' @keywords internal
+add_prism_drc <- function(mae, drc_path, meta_data_path = NULL) {
+  sa_name <- gDRutils::get_supported_experiments("sa")
+  tryCatch({
+    prism_curves <- gDRimport::read_PRISM_drc(
+      drc_path = drc_path,
+      meta_data_path = if (!is_null_or_empty(meta_data_path)) meta_data_path
+    )
+    mae[[sa_name]] <- gDRcore::add_PRISM_metrics(mae[[sa_name]], prism_curves)
+    mae
+  }, error = function(e) {
+    # also in the log of a run started by generate_report.sh, not only in the report
+    warning("the PRISM DRC table was not added: ", conditionMessage(e), call. = FALSE)
+    mae[[sa_name]] <- gDRutils::record_processing_step(
+      mae[[sa_name]], "prism_drc_import_error", settings = list(error = conditionMessage(e))
+    )
+    mae
+  })
 }
 
 #' Determine the data type from provided arguments
@@ -1438,6 +1471,15 @@ validate_and_prepare_inputs <- function(args, data_type) {
     }
   )
 
+  # The PRISM DRC table holds the curves PRISM fitted to the data it is imported with
+  if (!is_null_or_empty(args$prism_drc_path)) {
+    if (!data_type %in% c("prism_5", "prism_6")) {
+      stop("'prism_drc_path' is only used with PRISM data ('prism_data_path').")
+    }
+    checkmate::assert_character(args$prism_drc_path, len = 1)
+    checkmate::assert_file_exists(args$prism_drc_path)
+  }
+
   # Process and validate metadata_columns
   if (!is.null(args$meta_data_path)) {
     # It's already staged and validated to exist, so we only expect one file
@@ -1486,6 +1528,26 @@ validate_and_prepare_inputs <- function(args, data_type) {
   return(args)
 }
 
+#' Whether the single-agent fits of an MAE include a fit source
+#'
+#' @param mae A MultiAssayExperiment object.
+#' @param fit_source Character string, the fit source (e.g. \code{"PRISM"}).
+#'
+#' @return \code{TRUE} if the \code{Metrics} assay of the single-agent experiment has rows of
+#'   \code{fit_source}.
+#' @keywords internal
+has_fit_source <- function(mae, fit_source) {
+  checkmate::assert_class(mae, "MultiAssayExperiment")
+  checkmate::assert_string(fit_source)
+  sa_name <- gDRutils::get_supported_experiments("sa")
+  if (!sa_name %in% names(mae) ||
+        !"Metrics" %in% SummarizedExperiment::assayNames(mae[[sa_name]])) {
+    return(FALSE)
+  }
+  metrics <- BumpyMatrix::unsplitAsDataFrame(SummarizedExperiment::assay(mae[[sa_name]], "Metrics"))
+  "fit_source" %in% names(metrics) && any(metrics$fit_source %in% fit_source)
+}
+
 #' Prepare dynamic parameters for RMarkdown rendering
 #'
 #' Calculates parameters that depend on the state of the pipeline (e.g., presence of combo data).
@@ -1495,7 +1557,8 @@ validate_and_prepare_inputs <- function(args, data_type) {
 #' @param output_dir Character string for the output directory.
 #' @param steps A numeric vector of pipeline steps to run.
 #'
-#' @return A list of dynamic parameters (`has_combo`, `plot_iso`, `plot_GR_values`).
+#' @return A list of dynamic parameters (`has_combo`, `plot_iso`, `plot_GR_values`,
+#'   `has_prism_fits`).
 #' @keywords internal
 prepare_dynamic_render_params <- function(data_type, mae, output_dir, steps) {
   checkmate::assert_string(data_type)
@@ -1514,6 +1577,7 @@ prepare_dynamic_render_params <- function(data_type, mae, output_dir, steps) {
       gDRutils::convert_se_assay_to_dt(mae[[gDRutils::get_supported_experiments("sa")]], "Normalized")
     params$plot_GR_values <-
       any(!is.na(norm_data[norm_data$normalization_type == "GR", "x"]))
+    params$has_prism_fits <- has_fit_source(mae, "PRISM")
   } else if (file.exists(input_dt_path)) {
     raw_data <- qs2::qs_read(input_dt_path)
     ids <- gDRutils::get_env_identifiers()
@@ -1528,6 +1592,9 @@ prepare_dynamic_render_params <- function(data_type, mae, output_dir, steps) {
 
   if (file.exists(mae_path_final)) {
     final_mae <- qs2::qs_read(mae_path_final)
+    if (is.null(params$has_prism_fits)) {
+      params$has_prism_fits <- has_fit_source(final_mae, "PRISM")
+    }
     if (gDRutils::get_supported_experiments("combo") %in% names(final_mae)) {
       combo_se <-
         final_mae[[gDRutils::get_supported_experiments("combo")]]

@@ -897,6 +897,21 @@ test_that("stage_and_update_paths leaves a file that is already staged intact", 
   expect_equal(readLines(staged), "early_period: [44, 92]")
 })
 
+test_that("stage_and_update_paths stages the PRISM DRC table next to the PRISM data", {
+  out <- withr::local_tempdir()
+  for (d in c("raw_data", "data_annotation")) {
+    dir.create(file.path(out, d))
+  }
+  src <- withr::local_tempdir()
+  drc <- file.path(src, "MTS_DRC_TABLE.csv")
+  writeLines("depmap_id,auc", drc)
+
+  res <- suppressMessages(stage_and_update_paths(list(prism_drc_path = drc), out))
+
+  expect_equal(res$prism_drc_path, file.path(out, "raw_data", "MTS_DRC_TABLE.csv"))
+  expect_true(file.exists(res$prism_drc_path))
+})
+
 test_that("prepare_dynamic_render_params handles input without durations, as in PRISM level 6", {
   td <- function(f) system.file("testdata", f, package = "gDRimport")
   raw_data <- purrr::quietly(gDRimport::convert_LEVEL6_prism_to_gDR_input)(

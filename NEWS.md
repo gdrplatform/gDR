@@ -1,9 +1,10 @@
+## gDR 1.13.3 - 2026-11-24
+* change `import_data()` to import and annotate every input type; `instrument` is detected unless given
+* change `run_report()` to run the data of steps 1-2 itself, with `render_steps` picking the pages to render, or none
+* change the processing step to process every data type, add PRISM curves, stop on duplicate files, skip Incucyte
+
 ## gDR 1.13.2 - 2026-11-24
-* change `import_data()` to import every input type (bench, long table, PRISM 5/6) and annotate it, as the report did
-* change `run_report()` to run the data of steps 1-2 itself; `render_steps` picks which pages to render, or none
-* change the processing step to process every data type and stop on two inputs with the same file name
-* change the default `instrument` of `import_data()` from `"EnVision"` to detecting it from the first results file
-* fix `run_report()` failing on Incucyte input: the data step of steps 1-2 now leaves it to the Incucyte templates, which import and process it themselves
+* add the curves of a PRISM DRC table to the report (prism_drc_path) and compare them with the gDR fits
 
 ## gDR 1.13.1 - 2026-11-24
 * synchronize Bioconductor and GitHub versioning

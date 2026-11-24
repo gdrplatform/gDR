@@ -74,6 +74,33 @@ test_that("run_report_data_step refuses qcs input without rendering", {
   expect_null(run_report_data_step(list(data_type = "qcs"), "1-data_import.Rmd", tempdir(), render = TRUE))
 })
 
+test_that("run_report_data_step adds the PRISM curves only when a DRC table was given", {
+  mae_in <- gDRutils::get_synthetic_data("finalMAE_combo_2dose_nonoise.qs2")
+  out <- tempfile("gdr_report_")
+  dir.create(file.path(out, "gDR_data"), recursive = TRUE)
+  on.exit(unlink(out, recursive = TRUE), add = TRUE)
+  qs2::qs_save(data.table::data.table(x = 1), file.path(out, "gDR_data", "gDR_input.qs2"))
+  seen <- NULL
+  local_mocked_bindings(
+    add_prism_drc = function(mae, drc_path, meta_data_path = NULL) {
+      seen <<- list(drc_path = drc_path, meta_data_path = meta_data_path)
+      mae
+    }
+  )
+  local_mocked_bindings(
+    runDrugResponseProcessingPipeline = function(x, data_dir) mae_in, .package = "gDRcore"
+  )
+  run_report_data_step(list(data_type = "bench", args = list(), extra_render_params = list()),
+                       "2-processing_and_QC.Rmd", out)
+  expect_null(seen)
+  run_report_data_step(
+    list(data_type = "prism_5", args = list(prism_drc_path = "drc.csv", meta_data_path = "model.csv"),
+         extra_render_params = list()),
+    "2-processing_and_QC.Rmd", out
+  )
+  expect_equal(seen, list(drc_path = "drc.csv", meta_data_path = "model.csv"))
+})
+
 test_that("run_report_data_step leaves Incucyte input to its own templates", {
   # the Incucyte templates share the file names of steps 1 and 2, so the step file alone
   # does not say whose data it is; importing Incucyte files as bench data fails
