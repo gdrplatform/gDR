@@ -1669,10 +1669,13 @@ create_symlink_to_current <- function(base_dir, latest_version, verbose_mode = F
   suffix <- if (verbose_mode) "_verbose" else ""
   current_link <- file.path(base_dir, paste0("current", suffix))
 
-  if (file.exists(current_link)) {
+  # A dangling link is not seen by file.exists(), which follows it, so ask for the link itself.
+  if (file.exists(current_link) || nzchar(Sys.readlink(current_link))) {
     file.remove(current_link)
   }
-  file.symlink(latest_version, current_link)
+  # A relative link target resolves from the folder of the link, not from the working directory,
+  # so a relative path would leave the link pointing nowhere.
+  file.symlink(normalizePath(latest_version, mustWork = TRUE), current_link)
 }
 
 #' Format a Character Vector for RMarkdown Injection

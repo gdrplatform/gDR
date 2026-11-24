@@ -1,3 +1,6 @@
+## gDR 1.13.4 - 2026-11-24
+* fix `create_symlink_to_current()` linking nowhere for a relative path, and not replacing a dangling `current` link
+
 ## gDR 1.13.3 - 2026-11-24
 * change `import_data()` to import and annotate every input type; `instrument` is detected unless given
 * change `run_report()` to run the data of steps 1-2 itself, with `render_steps` picking the pages to render, or none
