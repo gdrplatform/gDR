@@ -1328,7 +1328,11 @@ The two fits describe a curve with different parameters (for relative viability 
 
 ```{r prism_fit_comparison, warning=FALSE}
 library(gDR)
+# PRISM delivers fits of relative viability only, so the comparison is on RV
 fit_cmp <- compare_fit_sources(mae[[sa_name]], other = "PRISM", reference = "gDR", normalization_type = "RV")
+if (fit_cmp$n_unpaired > 0) {
+  cat(sprintf("%d PRISM fits are in cells with no gDR fit and are not compared.\n", fit_cmp$n_unpaired))
+}
 write_xlsx(list(summary = fit_cmp$summary, pairs = fit_cmp$pairs),
            file.path(wd, "tables", "sa_fits_gDR_vs_PRISM.xlsx"))
 generate_datatable(fit_cmp$summary, col_to_round = c("spearman", "median_abs_diff", "p95_abs_diff"))

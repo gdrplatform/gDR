@@ -9,7 +9,7 @@
 #' Two sources can describe the same curve with different parameters (gDR fixes \code{x_0} at 1 for
 #' relative viability and gives a flat curve \code{ec50 = 0}), so the curves are compared by
 #' \code{auc}: computed from the parameters of each fit as PRISM defines AUC, the mean of the curve,
-#' clamped to [0, 1], over log10 concentration between the lowest and highest concentration of the
+#' clamped between 0 and 1, over log10 concentration between the lowest and highest concentration of the
 #' cell in \code{averaged_assay}. The parameters of the curve shape (\code{ec50}, \code{x_inf},
 #' \code{x_0}, \code{h}) are compared only for pairs where both fits have their \code{ec50} within
 #' that range (\code{ec50_in_range}), where the data define them; \code{ec50} is compared on the
@@ -30,7 +30,9 @@
 #'   drug, cell line and Duration, the columns that tell fits of one cell apart, and every
 #'   parameter of both sources (\code{<param>_<source>}), and \code{ec50_in_range}; and
 #'   \code{summary}, a \code{data.table} with one row per parameter: the number of pairs, the
-#'   Spearman correlation, and the median and 95th percentile of the absolute difference.
+#'   Spearman correlation, and the median and 95th percentile of the absolute difference; and
+#'   \code{n_unpaired}, the number of fits of \code{other} in a cell with no \code{reference} fit,
+#'   which are not in \code{pairs}.
 #'
 #' @examples
 #' mae <- gDRutils::get_synthetic_data("finalMAE_small")
@@ -43,6 +45,7 @@
 #'                                   upsert_key_cols = c("fit_source", "normalization_type"))
 #' compare_fit_sources(se, other = "copy")$summary
 #'
+#' @keywords report
 #' @export
 compare_fit_sources <- function(se,
                                 other,
@@ -83,13 +86,14 @@ compare_fit_sources <- function(se,
   # the fit identity within a cell (text columns only the other source fills), kept so the
   # pairs can be traced back to it
   with_values <- function(dt) names(dt)[vapply(dt, function(x) any(!is.na(x)), logical(1))]
-  id_cols <- setdiff(with_values(oth), c(with_values(ref), "rId", "cId"))
+  id_cols <- setdiff(with_values(oth), c(with_values(ref), "rId", "cId", params, "in_range"))
   id_cols <- id_cols[!vapply(oth[, id_cols, with = FALSE], is.numeric, logical(1))]
   oth <- oth[, c("rId", "cId", id_cols, params, "in_range"), with = FALSE]
   ref <- ref[, c("rId", "cId", params, "in_range"), with = FALSE]
   data.table::setnames(oth, c(params, "in_range"), paste0(c(params, "in_range"), "_", other))
   data.table::setnames(ref, c(params, "in_range"), paste0(c(params, "in_range"), "_", reference))
   pairs <- merge(oth, ref, by = c("rId", "cId"), sort = FALSE)
+  n_unpaired <- NROW(oth) - NROW(pairs)
   pairs$ec50_in_range <- pairs[[paste0("in_range_", other)]] & pairs[[paste0("in_range_", reference)]]
   data.table::set(pairs, j = paste0("in_range_", c(other, reference)), value = NULL)
 
@@ -130,7 +134,7 @@ compare_fit_sources <- function(se,
     )
   }))
 
-  list(pairs = pairs, summary = summary)
+  list(pairs = pairs, summary = summary, n_unpaired = n_unpaired)
 }
 
 
@@ -152,11 +156,18 @@ compare_fit_sources <- function(se,
 
 # AUC as PRISM defines it: the mean of the curve x_inf + (x_0 - x_inf) / (1 + (c / ec50)^h),
 # clamped to [0, 1], over log10 concentration from lo to hi. A flat gDR fit (ec50 = 0) gives x_inf.
+# The fits are taken chunk_size at a time, so a table of many curves does not build one large matrix.
 #' @keywords internal
-.curve_auc <- function(x_0, x_inf, ec50, h, lo, hi, n_points = 201L) {
+.curve_auc <- function(x_0, x_inf, ec50, h, lo, hi, n_points = 201L, chunk_size = 10000L) {
   steps <- seq(0, 1, length.out = n_points)
-  log_conc <- log10(lo) + outer(log10(hi) - log10(lo), steps)
-  # rows are the fits; the vectors recycle down the columns
-  curve <- x_inf + (x_0 - x_inf) / (1 + (10^log_conc / ec50)^h)
-  rowMeans(pmin(pmax(curve, 0), 1))
+  n <- length(x_0)
+  auc <- numeric(n)
+  for (k in seq_len(ceiling(n / chunk_size))) {
+    i <- ((k - 1L) * chunk_size + 1L):min(k * chunk_size, n)
+    log_conc <- log10(lo[i]) + outer(log10(hi[i]) - log10(lo[i]), steps)
+    # rows are the fits; the vectors recycle down the columns
+    curve <- x_inf[i] + (x_0[i] - x_inf[i]) / (1 + (10^log_conc / ec50[i])^h[i])
+    auc[i] <- rowMeans(pmin(pmax(curve, 0), 1))
+  }
+  auc
 }

@@ -22,6 +22,7 @@ test_that("compare_fit_sources pairs every fit of the other source with the refe
   n_cells <- sum(x$metrics$normalization_type == "RV")
 
   expect_equal(NROW(res$pairs), 2 * n_cells)
+  expect_equal(res$n_unpaired, 0L)
   expect_true("pool_id" %in% names(res$pairs))
   idfs <- gDRutils::get_SE_identifiers(x$se, simplify = TRUE)
   expect_true(all(c(idfs[["drug"]], idfs[["cellline"]], idfs[["duration"]]) %in% names(res$pairs)))
@@ -55,6 +56,14 @@ test_that(".curve_auc follows PRISM's definition of AUC", {
   expect_true(is.na(.curve_auc(NA, 0.5, 1, 1, 0.01, 1)))
   # one value per fit
   expect_equal(.curve_auc(c(1, 1), c(0.8, 0.6), c(0, 0), c(1e-4, 1e-4), c(0.01, 0.01), c(1, 1)), c(0.8, 0.6))
+  # the chunks give the same values as one pass, and no fits give no values
+  x_inf <- c(0.1, 0.3, 0.5, 0.7, 0.9)
+  ec50 <- c(0.01, 0.1, 1, 10, 0)
+  one_pass <- .curve_auc(rep(1, 5), x_inf, ec50, rep(2, 5), rep(0.001, 5), rep(10, 5))
+  expect_equal(.curve_auc(rep(1, 5), x_inf, ec50, rep(2, 5), rep(0.001, 5), rep(10, 5), chunk_size = 2L),
+               one_pass)
+  expect_identical(.curve_auc(numeric(0), numeric(0), numeric(0), numeric(0), numeric(0), numeric(0)),
+                   numeric(0))
 })
 
 test_that("compare_fit_sources leaves non-finite values out of the summary", {
@@ -86,6 +95,10 @@ test_that("compare_fit_sources leaves non-finite values out of the summary", {
   res_none <- compare_fit_sources(x$se, other = "missing")
   expect_equal(NROW(res_none$pairs), 0L)
   expect_true(all(res_none$summary$n_pairs == 0))
+  # fits of the other source in cells with no reference fit are counted, not paired
+  expect_silent(res_no_ref <- compare_fit_sources(x$se, other = "copy", reference = "missing"))
+  expect_equal(NROW(res_no_ref$pairs), 0L)
+  expect_equal(res_no_ref$n_unpaired, 2L * sum(x$metrics$normalization_type == "RV"))
 })
 
 test_that("has_fit_source finds a fit source in the single-agent Metrics", {
@@ -138,13 +151,14 @@ test_that("the processing template adds the PRISM curves to the single-agent Met
   block <- .template_section("2-processing_and_QC.Rmd", "prism_drc_path")
   code <- block[[which(vapply(block, function(b) any(grepl("add_PRISM_metrics", b)), logical(1)))]]
 
-  run_block <- function(drc_path, env_out = FALSE) {
+  model <- system.file("testdata", "prism_drc_model.csv", package = "gDRimport")
+  run_block <- function(drc_path, env_out = FALSE, meta_data_path = model) {
     env <- new.env()
     env$sa_name <- gDRutils::get_supported_experiments("sa")
     env$mae <- gDRutils::get_synthetic_data("finalMAE_prism")
     params <- list(
       prism_drc_path = drc_path,
-      meta_data_path = system.file("testdata", "prism_drc_model.csv", package = "gDRimport")
+      meta_data_path = meta_data_path
     )
     eval(parse(text = whisker::whisker.render(paste(code, collapse = "\n"), params)), envir = env)
     if (env_out) env else env$mae
@@ -162,8 +176,20 @@ test_that("the processing template adds the PRISM curves to the single-agent Met
   good <- suppressWarnings(run_block(system.file("testdata", "prism_drc.csv", package = "gDRimport"), env_out = TRUE))
   expect_match(report_text(good), "4 of the 4 curves of the DRC table were added; 0 have no matching")
 
+  # a table with ccle_name needs no model table, so an empty meta_data_path is not passed on
+  drc <- data.table::fread(system.file("testdata", "prism_drc.csv", package = "gDRimport"),
+                           colClasses = list(character = "depmap_id"))
+  model_dt <- data.table::fread(model)
+  drc$ccle_name <- model_dt$CCLEName[match(drc$depmap_id, model_dt$ModelID)]
+  drc_ccle <- tempfile(fileext = ".csv")
+  on.exit(unlink(drc_ccle))
+  data.table::fwrite(drc, drc_ccle)
+  no_model <- suppressWarnings(run_block(drc_ccle, env_out = TRUE, meta_data_path = ""))
+  expect_null(no_model$prism_import_error)
+  expect_true(gDR:::has_fit_source(no_model$mae, "PRISM"))
+
   # a table that cannot be read leaves the gDR fits as they are, and the error is shown
-  bad <- run_block(tempfile(fileext = ".csv"), env_out = TRUE)
+  expect_warning(bad <- run_block(tempfile(fileext = ".csv"), env_out = TRUE), "DRC table was not added")
   expect_false(gDR:::has_fit_source(bad$mae, "PRISM"))
   expect_match(bad$prism_import_error, "exist")
   expect_match(report_text(bad), "the DRC table was not added")

@@ -36,7 +36,9 @@ A list with \code{pairs}, a \code{data.table} with one row per fit of \code{othe
 drug, cell line and Duration, the columns that tell fits of one cell apart, and every
 parameter of both sources (\code{<param>_<source>}), and \code{ec50_in_range}; and
 \code{summary}, a \code{data.table} with one row per parameter: the number of pairs, the
-Spearman correlation, and the median and 95th percentile of the absolute difference.
+Spearman correlation, and the median and 95th percentile of the absolute difference; and
+\code{n_unpaired}, the number of fits of \code{other} in a cell with no \code{reference} fit,
+which are not in \code{pairs}.
 }
 \description{
 Pairs every fit of \code{other} (e.g. the curves PRISM delivered, added by
@@ -49,7 +51,7 @@ single \code{reference} fit of the cell.
 Two sources can describe the same curve with different parameters (gDR fixes \code{x_0} at 1 for
 relative viability and gives a flat curve \code{ec50 = 0}), so the curves are compared by
 \code{auc}: computed from the parameters of each fit as PRISM defines AUC, the mean of the curve,
-clamped to \link{0, 1}, over log10 concentration between the lowest and highest concentration of the
+clamped between 0 and 1, over log10 concentration between the lowest and highest concentration of the
 cell in \code{averaged_assay}. The parameters of the curve shape (\code{ec50}, \code{x_inf},
 \code{x_0}, \code{h}) are compared only for pairs where both fits have their \code{ec50} within
 that range (\code{ec50_in_range}), where the data define them; \code{ec50} is compared on the
@@ -68,3 +70,4 @@ se <- gDRutils::persist_fit_assay(se, metrics, merge = "merge", assay_name = "Me
 compare_fit_sources(se, other = "copy")$summary
 
 }
+\keyword{report}

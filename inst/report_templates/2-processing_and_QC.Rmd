@@ -1129,13 +1129,19 @@ mae <- standardize_mae(mae)
 # A table that does not match the data leaves the gDR results as they are.
 library(gDRimport)
 prism_import_error <- NULL
+meta_data_path <- "{{meta_data_path}}"
 mae[[sa_name]] <- tryCatch({
-  prism_curves <- read_PRISM_drc(drc_path = "{{prism_drc_path}}", meta_data_path = "{{meta_data_path}}")
+  prism_curves <- read_PRISM_drc(drc_path = "{{prism_drc_path}}",
+                                 meta_data_path = if (nzchar(meta_data_path)) meta_data_path)
   add_PRISM_metrics(mae[[sa_name]], prism_curves)
 }, error = function(e) {
   prism_import_error <<- conditionMessage(e)
   mae[[sa_name]]
 })
+# also in the log of a run started by generate_report.sh, not only in the report
+if (!is.null(prism_import_error)) {
+  warning("the PRISM DRC table was not added: ", prism_import_error, call. = FALSE)
+}
 {{/prism_drc_path}}
 # What a caller of run_report() recorded about its inputs (extra_render_params$report_inputs_file,
 # a qs2 file with a named list), kept as the "report" step of every experiment
