@@ -11,13 +11,16 @@ test_that("create_symlink_to_current() links to a directory that resolves, also 
   withr::local_dir(root)
   dir.create("runs/v1", recursive = TRUE)
 
-  # relative base_dir and latest_version, as run_report(output_dir = "./runs/v1") hands them over
-  create_symlink_to_current("./runs", "./runs/v1")
+  # relative base_dir and latest_version, as run_report(output_dir = "./runs/v1") hands them over;
+  # nothing to replace the first time, so nothing to warn about (CI counts warnings as failures)
+  expect_no_warning(create_symlink_to_current("./runs", "./runs/v1"))
   expect_true(file.exists("runs/current"))
   expect_equal(normalizePath("runs/current"), normalizePath("runs/v1"))
 
   # absolute input keeps an absolute target
-  create_symlink_to_current(file.path(root, "runs"), file.path(root, "runs", "v1"), verbose_mode = TRUE)
+  expect_no_warning(
+    create_symlink_to_current(file.path(root, "runs"), file.path(root, "runs", "v1"), verbose_mode = TRUE)
+  )
   expect_equal(Sys.readlink("runs/current_verbose"), file.path(root, "runs", "v1"))
   expect_true(file.exists("runs/current_verbose"))
 })

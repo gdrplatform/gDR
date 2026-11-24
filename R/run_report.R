@@ -1670,7 +1670,9 @@ create_symlink_to_current <- function(base_dir, latest_version, verbose_mode = F
   current_link <- file.path(base_dir, paste0("current", suffix))
 
   # A dangling link is not seen by file.exists(), which follows it, so ask for the link itself.
-  if (file.exists(current_link) || nzchar(Sys.readlink(current_link))) {
+  # Sys.readlink() gives "" or NA (depending on the platform) for a path that is not a link.
+  link_target <- Sys.readlink(current_link)
+  if (file.exists(current_link) || (!is.na(link_target) && nzchar(link_target))) {
     file.remove(current_link)
   }
   # A relative link target resolves from the folder of the link, not from the working directory,
