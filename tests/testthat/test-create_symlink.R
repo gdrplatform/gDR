@@ -46,3 +46,23 @@ test_that("create_symlink_to_current() still requires both directories", {
   expect_error(create_symlink_to_current(root, file.path(root, "missing")))
   expect_error(create_symlink_to_current(file.path(root, "missing"), root))
 })
+
+test_that("create_symlink_to_current() keeps an absolute path as given, also through a symlinked parent", {
+  skip_on_os("windows")
+  root <- .symlink_root()
+  on.exit(unlink(root, recursive = TRUE), add = TRUE)
+  # /real/runs/v1 reached through the link /via, as /gne/web is on resdev
+  dir.create(file.path(root, "real", "runs", "v1"), recursive = TRUE)
+  file.symlink(file.path(root, "real"), file.path(root, "via"))
+  via_runs <- file.path(root, "via", "runs")
+
+  create_symlink_to_current(via_runs, file.path(via_runs, "v1"))
+  expect_equal(Sys.readlink(file.path(via_runs, "current")), file.path(via_runs, "v1"))
+  expect_true(file.exists(file.path(via_runs, "current")))
+
+  # a relative path becomes absolute from the working directory, links in it left alone
+  withr::local_dir(file.path(root, "via"))
+  create_symlink_to_current("./runs", "./runs/v1", verbose_mode = TRUE)
+  expect_true(file.exists(file.path(via_runs, "current_verbose")))
+  expect_true(startsWith(Sys.readlink(file.path(via_runs, "current_verbose")), "/"))
+})

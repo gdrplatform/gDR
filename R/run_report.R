@@ -1674,8 +1674,14 @@ create_symlink_to_current <- function(base_dir, latest_version, verbose_mode = F
     file.remove(current_link)
   }
   # A relative link target resolves from the folder of the link, not from the working directory,
-  # so a relative path would leave the link pointing nowhere.
-  file.symlink(normalizePath(latest_version, mustWork = TRUE), current_link)
+  # so a relative path would leave the link pointing nowhere. Make it absolute without resolving
+  # links: normalizePath() would also replace a symlinked parent (e.g. /gne/web) with its target
+  # and change where the links of existing reports point.
+  target <- path.expand(latest_version)
+  if (!grepl("^(/|[A-Za-z]:)", target)) {
+    target <- file.path(getwd(), sub("^\\./", "", target))
+  }
+  file.symlink(target, current_link)
 }
 
 #' Format a Character Vector for RMarkdown Injection
