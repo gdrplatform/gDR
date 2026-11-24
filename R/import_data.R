@@ -158,7 +158,7 @@ import_data <- function(manifest_file = NULL,
     data.table::fwrite(drug_annotation, file.path(annotation_dir, "drug_annotation.csv"))
     data.table::fwrite(cell_line_annotation, file.path(annotation_dir, "cell_line_annotation.csv"))
   }
-  # the joins in the annotation return new tables (also fixed in gDRcore 1.11.38)
+  # the joins in the annotation return new tables; older gDRcore dropped the record there
   data.table::setattr(dt, "gDR_import", record)
   dt
 }

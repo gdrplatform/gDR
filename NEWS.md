@@ -1,7 +1,15 @@
-## gDR 1.11.30 - 2026-11-23
+## gDR 1.13.2 - 2026-11-24
 * change `import_data()` to import every input type (bench, long table, PRISM 5/6) and annotate it, as the report did
 * change `run_report()` to run the data of steps 1-2 itself; `render_steps` picks which pages to render, or none
 * change the processing step to process every data type and stop on two inputs with the same file name
+* change the default `instrument` of `import_data()` from `"EnVision"` to detecting it from the first results file
+* fix `run_report()` failing on Incucyte input: the data step of steps 1-2 now leaves it to the Incucyte templates, which import and process it themselves
+
+## gDR 1.13.1 - 2026-11-24
+* synchronize Bioconductor and GitHub versioning
+
+## gDR 1.11.30 - 2026-11-23
+* fix the PRISM report leaving out the GR plots and tables when GR values are selected
 
 ## gDR 1.11.29 - 2026-11-18
 * replace the cell line comparison of the chemical genomics report with resistant vs parental pairs

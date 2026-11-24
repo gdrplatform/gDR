@@ -74,6 +74,30 @@ test_that("run_report_data_step refuses qcs input without rendering", {
   expect_null(run_report_data_step(list(data_type = "qcs"), "1-data_import.Rmd", tempdir(), render = TRUE))
 })
 
+test_that("run_report_data_step leaves Incucyte input to its own templates", {
+  # the Incucyte templates share the file names of steps 1 and 2, so the step file alone
+  # does not say whose data it is; importing Incucyte files as bench data fails
+  local_mocked_bindings(
+    import_data = function(...) stop("import_data() must not run for Incucyte input"),
+    .package = "gDR"
+  )
+  local_mocked_bindings(
+    runDrugResponseProcessingPipeline = function(...) {
+      stop("the pipeline must not run for Incucyte input")
+    },
+    .package = "gDRcore"
+  )
+  for (step_file in c("1-data_import.Rmd", "2-processing_and_QC.Rmd")) {
+    for (render in c(TRUE, FALSE)) {
+      out <- tempfile("gdr_incucyte_")
+      dir.create(out)
+      expect_null(run_report_data_step(list(data_type = "incucyte"), step_file, out, render = render))
+      expect_length(list.files(out, recursive = TRUE, all.files = TRUE), 0L)
+      unlink(out, recursive = TRUE)
+    }
+  }
+})
+
 test_that("run_report writes the data of steps 1 and 2 and only the pages in render_steps", {
   td <- gDRimport::get_test_data()
   out <- tempfile("gdr_report_")

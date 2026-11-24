@@ -1242,10 +1242,15 @@ stage_and_update_paths <- function(args, output_dir, extra = list()) {
 # files whether or not it renders: step 1 imports with import_data(), step 2 processes with
 # runDrugResponseProcessingPipeline() and records the report inputs. The templates of these
 # steps only read what is written here. qcs input is imported by deployment code in the step 1
-# template, so it needs rendering.
+# template, so it needs rendering; Incucyte input is imported and processed by its own templates,
+# which share these file names, so this step leaves it alone.
 #' @keywords internal
 run_report_data_step <- function(plan, step_file, output_dir, render = TRUE) {
   data_dir <- file.path(output_dir, "gDR_data")
+  # Incucyte templates import and process the data themselves
+  if (identical(plan$data_type, "incucyte")) {
+    return(invisible(NULL))
+  }
   if (identical(step_file, "1-data_import.Rmd")) {
     if (identical(plan$data_type, "qcs")) {
       if (!render) {
