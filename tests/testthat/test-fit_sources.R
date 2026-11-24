@@ -146,35 +146,28 @@ test_that("validate_and_prepare_inputs accepts a PRISM DRC table only with PRISM
   lapply(seq_along(start), function(i) lines[(start[i] + 1):(end[i] - 1)])
 }
 
-test_that("the processing template adds the PRISM curves to the single-agent Metrics", {
+test_that("the processing step adds the PRISM curves to the single-agent Metrics", {
   testthat::skip_if_not(exists("read_PRISM_drc", asNamespace("gDRimport")), "gDRimport without read_PRISM_drc")
-  block <- .template_section("2-processing_and_QC.Rmd", "prism_drc_path")
-  code <- block[[which(vapply(block, function(b) any(grepl("add_PRISM_metrics", b)), logical(1)))]]
-
+  sa_name <- gDRutils::get_supported_experiments("sa")
   model <- system.file("testdata", "prism_drc_model.csv", package = "gDRimport")
-  run_block <- function(drc_path, env_out = FALSE, meta_data_path = model) {
-    env <- new.env()
-    env$sa_name <- gDRutils::get_supported_experiments("sa")
-    env$mae <- gDRutils::get_synthetic_data("finalMAE_prism")
-    params <- list(
-      prism_drc_path = drc_path,
-      meta_data_path = meta_data_path
-    )
-    eval(parse(text = whisker::whisker.render(paste(code, collapse = "\n"), params)), envir = env)
-    if (env_out) env else env$mae
+  run_step <- function(drc_path, meta_data_path = model) {
+    gDR:::add_prism_drc(gDRutils::get_synthetic_data("finalMAE_prism"), drc_path, meta_data_path)
   }
 
-  mae <- suppressWarnings(run_block(system.file("testdata", "prism_drc.csv", package = "gDRimport")))
+  mae <- suppressWarnings(run_step(system.file("testdata", "prism_drc.csv", package = "gDRimport")))
   expect_true(gDR:::has_fit_source(mae, "PRISM"))
 
-  # the report says how many curves were added
+  # the report says how many curves were added; it reads that from the MAE, as the template does
+  block <- .template_section("2-processing_and_QC.Rmd", "prism_drc_path")
   summary_block <- block[[which(vapply(block, function(b) any(grepl("prism_drc_import, results", b)), logical(1)))]]
   summary_code <- summary_block[!grepl("^```", summary_block)]
-  report_text <- function(env) {
+  report_text <- function(mae) {
+    env <- new.env()
+    env$mae <- mae
+    env$sa_name <- sa_name
     paste(utils::capture.output(eval(parse(text = summary_code), envir = env)), collapse = " ")
   }
-  good <- suppressWarnings(run_block(system.file("testdata", "prism_drc.csv", package = "gDRimport"), env_out = TRUE))
-  expect_match(report_text(good), "4 of the 4 curves of the DRC table were added; 0 have no matching")
+  expect_match(report_text(mae), "4 of the 4 curves of the DRC table were added; 0 have no matching")
 
   # a table with ccle_name needs no model table, so an empty meta_data_path is not passed on
   drc <- data.table::fread(system.file("testdata", "prism_drc.csv", package = "gDRimport"),
@@ -184,14 +177,14 @@ test_that("the processing template adds the PRISM curves to the single-agent Met
   drc_ccle <- tempfile(fileext = ".csv")
   on.exit(unlink(drc_ccle))
   data.table::fwrite(drc, drc_ccle)
-  no_model <- suppressWarnings(run_block(drc_ccle, env_out = TRUE, meta_data_path = ""))
-  expect_null(no_model$prism_import_error)
-  expect_true(gDR:::has_fit_source(no_model$mae, "PRISM"))
+  no_model <- suppressWarnings(run_step(drc_ccle, meta_data_path = ""))
+  expect_null(gDRutils::get_SE_provenance(no_model[[sa_name]])$steps$prism_drc_import_error)
+  expect_true(gDR:::has_fit_source(no_model, "PRISM"))
 
   # a table that cannot be read leaves the gDR fits as they are, and the error is shown
-  expect_warning(bad <- run_block(tempfile(fileext = ".csv"), env_out = TRUE), "DRC table was not added")
-  expect_false(gDR:::has_fit_source(bad$mae, "PRISM"))
-  expect_match(bad$prism_import_error, "exist")
+  expect_warning(bad <- run_step(tempfile(fileext = ".csv")), "DRC table was not added")
+  expect_false(gDR:::has_fit_source(bad, "PRISM"))
+  expect_match(gDRutils::get_SE_provenance(bad[[sa_name]])$steps$prism_drc_import_error$settings$error, "exist")
   expect_match(report_text(bad), "the DRC table was not added")
 })
 

@@ -1,3 +1,8 @@
+## gDR 1.13.3 - 2026-11-24
+* change `import_data()` to import and annotate every input type; `instrument` is detected unless given
+* change `run_report()` to run the data of steps 1-2 itself, with `render_steps` picking the pages to render, or none
+* change the processing step to process every data type, add PRISM curves, stop on duplicate files, skip Incucyte
+
 ## gDR 1.13.2 - 2026-11-24
 * add the curves of a PRISM DRC table to the report (prism_drc_path) and compare them with the gDR fits
 

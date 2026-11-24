@@ -1,7 +1,7 @@
 Type: Package
 Package: gDR
 Title: Umbrella package for R packages in the gDR suite
-Version: 1.13.2
+Version: 1.13.3
 Date: 2026-11-24
 Authors@R: c(
     person("Allison", "Vuong", , "vuong.allison@gene.com", role = "aut"),
@@ -23,7 +23,7 @@ Description: Package is a part of the gDR suite. It reexports functions from oth
 License: Artistic-2.0
 Depends:
     R (>= 4.2),
-    gDRcore (>= 1.11.33),
+    gDRcore (>= 1.13.3),
     gDRimport (>= 1.11.17),
     gDRutils (>= 1.7.1)
 Imports:

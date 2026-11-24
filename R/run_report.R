@@ -128,6 +128,14 @@
 #'   points to it, and publishing can be retried with \code{steps = 4, resume = TRUE}.
 #' @param resume Logical. Whether to resume execution in the existing 'current' output directory
 #'   instead of creating a new version. Default is \code{FALSE}.
+#' @param render_steps Integer vector, the steps whose report is rendered; a subset of
+#'   \code{steps}, all of them by default. Steps 1 and 2 write their data
+#'   (\code{gDR_data/gDR_input.qs2}, \code{gDR_data/gDR_mae.qs2}) whether or not they render:
+#'   \code{run_report()} runs \code{import_data()} and
+#'   \code{gDRcore::runDrugResponseProcessingPipeline()} itself, and the templates only read
+#'   what it wrote, so the files are the same for any \code{render_steps}. Steps 3 and 4 are
+#'   reports and must be rendered. \code{integer(0)} with \code{steps = 1:2} processes the data
+#'   without a report.
 #' @param extra_render_params Named list. Additional parameters injected into every RMarkdown
 #'   template alongside the ones derived from the arguments above. Use it to pass values that are
 #'   specific to a given deployment (e.g. dataset registry metadata) without adding them to the
@@ -270,6 +278,7 @@ run_report <- function(
     remove_on_failure = TRUE,
     resume = FALSE,
     extra_render_params = list(),
+    render_steps = steps,
     on_resolve_inputs = NULL,
     on_start = NULL,
     on_before_render = NULL,
@@ -278,6 +287,16 @@ run_report <- function(
 ) {
   # --- 1. Initial Assertions ---
   checkmate::assert_flag(remove_on_failure)
+  checkmate::assert_integerish(render_steps, lower = 1, any.missing = FALSE)
+  if (!all(render_steps %in% steps)) {
+    stop("render_steps must be among steps; got render_steps = ", toString(render_steps),
+         " for steps = ", toString(steps), ".", call. = FALSE)
+  }
+  if (any(setdiff(steps, render_steps) > 2)) {
+    stop("Only steps 1 and 2 can run without rendering: their data is written either way. ",
+         "Steps 3 and 4 are reports; use build_report_rmd() to write them without rendering.",
+         call. = FALSE)
+  }
   checkmate::assert_list(extra_render_params, names = "unique")
   checkmate::assert_function(on_resolve_inputs, null.ok = TRUE)
   checkmate::assert_function(on_start, null.ok = TRUE)
@@ -290,6 +309,7 @@ run_report <- function(
   args <- as.list(environment())
   args[c(
     "extra_render_params",
+    "render_steps",
     "on_resolve_inputs",
     "on_start",
     "on_before_render",
@@ -405,14 +425,22 @@ run_report <- function(
       # Each step is written only after the previous one rendered: the parameters of a step are
       # partly read from the data the previous step wrote (see prepare_dynamic_render_params()).
       for (i in seq_along(plan$template_paths)) {
-        message(sprintf("Rendering report step: %s", tools::file_path_sans_ext(plan$rmd_files[[i]])))
-        warned_shadowed <- write_report_step(plan, i, env$output_dir, warned_shadowed)
-
-        output_path <- plan$output_paths[[i]]
         state$failed_step <- plan$rmd_files[[i]]
-        rmarkdown::render(input = output_path, output_file = gsub(".Rmd$", ".html", output_path))
+        # The step a file belongs to: "3-1-PRISM_analysis.Rmd" is an add-on of step 3. Steps
+        # beyond 2 are reports, always rendered (MAE input moves the steps to 3 and 4).
+        step_no <- as.integer(sub("^([0-9]+).*", "\\1", plan$rmd_files[[i]]))
+        render <- step_no > 2L || step_no %in% render_steps
+        # The data of steps 1 and 2 is written here, rendered or not, and only read by
+        # their templates; see run_report_data_step().
+        run_report_data_step(plan, plan$rmd_files[[i]], env$output_dir, render)
+        if (render) {
+          message(sprintf("Rendering report step: %s", tools::file_path_sans_ext(plan$rmd_files[[i]])))
+          warned_shadowed <- write_report_step(plan, i, env$output_dir, warned_shadowed)
+          output_path <- plan$output_paths[[i]]
+          rmarkdown::render(input = output_path, output_file = gsub(".Rmd$", ".html", output_path))
+          state$rendered_steps <- c(state$rendered_steps, plan$rmd_files[[i]])
+        }
         state$failed_step <- NULL
-        state$rendered_steps <- c(state$rendered_steps, plan$rmd_files[[i]])
       }
 
     }, file = env$stdout_con)
@@ -917,6 +945,7 @@ write_report_step <- function(plan, i, output_dir, warned_shadowed = character(0
       gDRimport = (data_type == "bench"),
       PRISM_level5 = (data_type == "prism_5"),
       PRISM_level6 = (data_type == "prism_6"),
+      QCS = (data_type == "qcs"),
       PRISM = plan$is_prism_data,
       PRISM_excluded = !plan$is_prism_data,
       MAE = (data_type == "mae")
@@ -1153,6 +1182,9 @@ stage_and_update_paths <- function(args, output_dir, extra = list()) {
     "mae"
   )
 
+  # Inputs are staged by file name, so two different files with the same name would
+  # silently overwrite each other; that is refused instead.
+  staged_from <- character(0)
   for (arg_name in path_args) {
     path_spec <- args[[arg_name]]
     # 'mae' may be an in-memory MultiAssayExperiment rather than a file path;
@@ -1186,6 +1218,15 @@ stage_and_update_paths <- function(args, output_dir, extra = list()) {
 
       # NEW: Copy all resolved files and update argument to a vector of new paths
       new_paths <- file.path(dest_dir, basename(original_paths))
+      sources <- normalizePath(original_paths, mustWork = FALSE)
+      for (k in seq_along(new_paths)) {
+        previous <- staged_from[new_paths[k]]
+        if (!is.na(previous) && previous != sources[k]) {
+          stop(sprintf("Two different input files are named '%s'; rename one, since inputs are staged by name.",
+                       basename(new_paths[k])), call. = FALSE)
+        }
+        staged_from[new_paths[k]] <- sources[k]
+      }
       # An argument may already point at its staged copy, which is how a re-run iterates.
       # file.copy() errors on "file can not be copied both 'from' and 'to'".
       to_copy <- normalizePath(original_paths, mustWork = FALSE) !=
@@ -1202,6 +1243,92 @@ stage_and_update_paths <- function(args, output_dir, extra = list()) {
   # but only return the pipeline arguments themselves.
   qs2::qs_save(c(args, extra[setdiff(names(extra), names(args))]), file.path(raw_data_dir, "args.qs2"))
   return(args)
+}
+
+# The data of report steps 1 and 2, run by run_report() itself so that a run writes the same
+# files whether or not it renders: step 1 imports with import_data(), step 2 processes with
+# runDrugResponseProcessingPipeline() and records the report inputs. The templates of these
+# steps only read what is written here. qcs input is imported by deployment code in the step 1
+# template, so it needs rendering; Incucyte input is imported and processed by its own templates,
+# which share these file names, so this step leaves it alone.
+#' @keywords internal
+run_report_data_step <- function(plan, step_file, output_dir, render = TRUE) {
+  data_dir <- file.path(output_dir, "gDR_data")
+  # Incucyte templates import and process the data themselves
+  if (identical(plan$data_type, "incucyte")) {
+    return(invisible(NULL))
+  }
+  if (identical(step_file, "1-data_import.Rmd")) {
+    if (identical(plan$data_type, "qcs")) {
+      if (!render) {
+        stop("qcs input is imported by the step 1 report, so step 1 must be in render_steps.",
+             call. = FALSE)
+      }
+      return(invisible(NULL))
+    }
+    a <- plan$args
+    annotation_dir <- file.path(output_dir, "data_annotation")
+    staged <- function(f) if (file.exists(file.path(annotation_dir, f))) file.path(annotation_dir, f)
+    dt <- import_data(
+      manifest_file = a$manifest,
+      template_file = a$treatment,
+      results_file = a$raw_data,
+      cell_line_annotation = staged("cell_line_annotation.csv"),
+      drug_annotation = staged("drug_annotation.csv"),
+      long_table = a$long_table,
+      prism_data_path = a$prism_data_path,
+      meta_data_path = a$meta_data_path,
+      cell_line_data_path = a$cell_line_data_path,
+      treatment_data_path = a$treatment_data_path,
+      annotation_dir = annotation_dir
+    )
+    qs2::qs_save(dt, file.path(data_dir, "gDR_input.qs2"))
+  } else if (identical(step_file, "2-processing_and_QC.Rmd")) {
+    dt <- qs2::qs_read(file.path(data_dir, "gDR_input.qs2"))
+    inter_dir <- file.path(data_dir, "intermediate")
+    dir.create(inter_dir, recursive = TRUE, showWarnings = FALSE)
+    mae <- gDRcore::runDrugResponseProcessingPipeline(dt, data_dir = inter_dir)
+    # single-agent and combination first, as the report has always written them
+    reported <- c(gDRutils::get_supported_experiments("sa"), gDRutils::get_supported_experiments("combo"))
+    mae <- mae[, , c(intersect(reported, names(mae)), setdiff(names(mae), reported))]
+    if (!is_null_or_empty(plan$args$prism_drc_path)) {
+      mae <- add_prism_drc(mae, plan$args$prism_drc_path, plan$args$meta_data_path)
+    }
+    report_inputs_file <- plan$extra_render_params$report_inputs_file
+    if (!is.null(report_inputs_file) && nzchar(report_inputs_file)) {
+      report_inputs <- qs2::qs_read(report_inputs_file)
+      for (experiment in names(mae)) {
+        mae[[experiment]] <- gDRutils::record_processing_step(
+          mae[[experiment]], "report", settings = report_inputs, max_bytes = 1e6
+        )
+      }
+    }
+    qs2::qs_save(mae, file.path(data_dir, "gDR_mae.qs2"))
+  }
+  invisible(NULL)
+}
+
+# The curves PRISM fitted to the same data (its DRC table), added to the single-agent Metrics next to
+# the gDR fits as fit source "PRISM". A table that does not match the data leaves the gDR results as they
+# are; the error is kept as a processing step of the experiment, so the report can say so.
+#' @keywords internal
+add_prism_drc <- function(mae, drc_path, meta_data_path = NULL) {
+  sa_name <- gDRutils::get_supported_experiments("sa")
+  tryCatch({
+    prism_curves <- gDRimport::read_PRISM_drc(
+      drc_path = drc_path,
+      meta_data_path = if (!is_null_or_empty(meta_data_path)) meta_data_path
+    )
+    mae[[sa_name]] <- gDRcore::add_PRISM_metrics(mae[[sa_name]], prism_curves)
+    mae
+  }, error = function(e) {
+    # also in the log of a run started by generate_report.sh, not only in the report
+    warning("the PRISM DRC table was not added: ", conditionMessage(e), call. = FALSE)
+    mae[[sa_name]] <- gDRutils::record_processing_step(
+      mae[[sa_name]], "prism_drc_import_error", settings = list(error = conditionMessage(e))
+    )
+    mae
+  })
 }
 
 #' Determine the data type from provided arguments
