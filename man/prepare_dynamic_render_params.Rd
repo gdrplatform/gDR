@@ -16,7 +16,8 @@ prepare_dynamic_render_params(data_type, mae, output_dir, steps)
 \item{steps}{A numeric vector of pipeline steps to run.}
 }
 \value{
-A list of dynamic parameters (\code{has_combo}, \code{plot_iso}, \code{plot_GR_values}).
+A list of dynamic parameters (\code{has_combo}, \code{plot_iso}, \code{plot_GR_values},
+\code{has_prism_fits}).
 }
 \description{
 Calculates parameters that depend on the state of the pipeline (e.g., presence of combo data).
