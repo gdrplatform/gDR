@@ -15,7 +15,7 @@ or edit a report before a long render, or to render it elsewhere."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">gDR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.13.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.13.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,6 +59,7 @@ or edit a report before a long render, or to render it elsewhere.</p>
 <span>  treatment <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  raw_data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prism_data_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  prism_drc_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cell_line_data_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  treatment_data_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  drug_annotation_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -121,6 +122,13 @@ or a regular expression pattern. Required if not using <code>qcs_id</code> or <c
 
 <dt id="arg-prism-data-path">prism_data_path<a class="anchor" aria-label="anchor" href="#arg-prism-data-path"></a></dt>
 <dd><p>Character. Path to the PRISM data file. Provide this if you want to process PRISM data.</p></dd>
+
+
+<dt id="arg-prism-drc-path">prism_drc_path<a class="anchor" aria-label="anchor" href="#arg-prism-drc-path"></a></dt>
+<dd><p>Character or NULL. Path to the PRISM DRC table (the curves PRISM fitted, e.g.
+<code>&lt;screen&gt;_DRC_TABLE.csv</code>) of the data in <code>prism_data_path</code>. The curves are added to the
+<code>Metrics</code> assay as <code>fit_source = "PRISM"</code> (<code><a href="https://gdrplatform.github.io/gDRcore/reference/add_PRISM_metrics.html">gDRcore::add_PRISM_metrics()</a></code>), and the
+analysis step compares them with the gDR fits. The cell lines are mapped with <code>meta_data_path</code>.</p></dd>
 
 
 <dt id="arg-cell-line-data-path">cell_line_data_path<a class="anchor" aria-label="anchor" href="#arg-cell-line-data-path"></a></dt>

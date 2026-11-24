@@ -29,5 +29,5 @@ prepare_dynamic_render_params(data_type, mae, output_dir, steps)
 
 ## Value
 
-A list of dynamic parameters (`has_combo`, `plot_iso`,
-`plot_GR_values`).
+A list of dynamic parameters (`has_combo`, `plot_iso`, `plot_GR_values`,
+`has_prism_fits`).

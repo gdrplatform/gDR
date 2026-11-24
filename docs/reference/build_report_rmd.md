@@ -22,6 +22,7 @@ build_report_rmd(
   treatment = NULL,
   raw_data = NULL,
   prism_data_path = NULL,
+  prism_drc_path = NULL,
   cell_line_data_path = NULL,
   treatment_data_path = NULL,
   drug_annotation_path = NULL,
@@ -89,6 +90,16 @@ build_report_rmd(
 
   Character. Path to the PRISM data file. Provide this if you want to
   process PRISM data.
+
+- prism_drc_path:
+
+  Character or NULL. Path to the PRISM DRC table (the curves PRISM
+  fitted, e.g. `<screen>_DRC_TABLE.csv`) of the data in
+  `prism_data_path`. The curves are added to the `Metrics` assay as
+  `fit_source = "PRISM"`
+  ([`gDRcore::add_PRISM_metrics()`](https://gdrplatform.github.io/gDRcore/reference/add_PRISM_metrics.html)),
+  and the analysis step compares them with the gDR fits. The cell lines
+  are mapped with `meta_data_path`.
 
 - cell_line_data_path:
 
