@@ -1,5 +1,8 @@
-## gDR 1.11.31 - 2026-11-23
+## gDR 1.13.2 - 2026-11-24
 * add the curves of a PRISM DRC table to the report (prism_drc_path) and compare them with the gDR fits
+
+## gDR 1.13.1 - 2026-11-24
+* synchronize Bioconductor and GitHub versioning
 
 ## gDR 1.11.30 - 2026-11-23
 * fix the PRISM report leaving out the GR plots and tables when GR values are selected
