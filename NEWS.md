@@ -1,3 +1,8 @@
+## gDR 1.13.5 - 2026-11-27
+* fix `run_report()` ignoring `dpi`: the templates now set it as the resolution of their figures
+* fix `run_report()` ignoring an annotation file not named `drug_annotation.csv` or `cell_line_annotation.csv`; it is staged under that name
+* fix `run_report()` saving an MAE passed with the publication step as `gDR_mae_input.qs2`, which no step reads; it is saved as `gDR_mae.qs2`
+
 ## gDR 1.13.4 - 2026-11-24
 * fix `create_symlink_to_current()` linking nowhere for a relative path, and not replacing a dangling `current` link
 
