@@ -128,7 +128,8 @@ visualizations by cell line name and drug name. This also affects the output dir
 \item{with_decoding}{logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot
 and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme}
 
-\item{dpi}{number defining dpi of all images in report}
+\item{dpi}{number, the resolution of the figures in the report pages; the files in \code{plots/} are
+saved at 300 dpi}
 
 \item{embed}{Logical. Whether to generate a self-contained HTML report.}
 

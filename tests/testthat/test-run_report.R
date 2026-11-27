@@ -1126,3 +1126,55 @@ test_that("build_report_rmd warns about a misspelled entry of extra_render_param
     "did you mean 'extra_sections_import'"
   )
 })
+
+test_that("every shipped template sets the dpi of its figures from run_report()", {
+  templates <- list.files(system.file("report_templates", package = "gDR"), pattern = "\\.Rmd$",
+                          recursive = TRUE, full.names = TRUE)
+  expect_length(templates, 8)
+  for (template in templates) {
+    rendered <- whisker::whisker.render(readLines(template), list(dpi = 150))
+    chunk_opts <- paste(rendered[grep("opts_chunk\\$set", rendered) + 0:1], collapse = " ")
+    expect_match(chunk_opts, "dpi = 150", info = basename(template))
+  }
+})
+
+test_that("stage_and_update_paths stages an annotation file under the name the import reads", {
+  out <- withr::local_tempdir()
+  for (d in c("raw_data", "data_annotation")) {
+    dir.create(file.path(out, d))
+  }
+  src <- withr::local_tempdir()
+  drugs <- file.path(src, "my_drugs.csv")
+  cell_lines <- file.path(src, "my_cell_lines.csv")
+  writeLines("Gnumber,DrugName,drug_moa", drugs)
+  writeLines("clid,CellLineName", cell_lines)
+
+  res <- suppressMessages(
+    stage_and_update_paths(list(drug_annotation_path = drugs, cell_line_annotation_path = cell_lines), out)
+  )
+
+  expect_equal(res$drug_annotation_path, file.path(out, "data_annotation", "drug_annotation.csv"))
+  expect_equal(res$cell_line_annotation_path, file.path(out, "data_annotation", "cell_line_annotation.csv"))
+  expect_equal(readLines(res$drug_annotation_path), "Gnumber,DrugName,drug_moa")
+  expect_false(file.exists(file.path(out, "data_annotation", "my_drugs.csv")))
+
+  writeLines("Gnumber,DrugName,drug_moa", file.path(src, "more_drugs.csv"))
+  expect_error(
+    suppressMessages(stage_and_update_paths(list(drug_annotation_path = file.path(src, "*drugs.csv")), out)),
+    "'drug_annotation_path' must name one file"
+  )
+})
+
+test_that("run_report saves an MAE passed with the publication step where steps 3 and 4 read it", {
+  template_dir <- .setup_dummy_templates()
+  withr::defer(unlink(template_dir, recursive = TRUE))
+  mae <- gDRutils::get_synthetic_data("finalMAE_combo_matrix_small.qs2")
+
+  for (steps in list(3, 3:4, 4)) {
+    out <- withr::local_tempdir()
+    suppressWarnings(.rmd_written_by_run_report(out, mae = mae, steps = steps, rmd_template_path = template_dir))
+    saved <- file.path(out, "current", "gDR_data", "gDR_mae.qs2")
+    expect_true(file.exists(saved), info = toString(steps))
+    expect_false(file.exists(file.path(out, "current", "gDR_data", "gDR_mae_input.qs2")), info = toString(steps))
+  }
+})
