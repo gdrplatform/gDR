@@ -24,6 +24,12 @@
 # the clean-up in run_report()), so that publishing alone can be retried in resume mode.
 .PUBLICATION_STEP <- "4-publish_results.Rmd"
 
+# Names under which the annotation files are staged in data_annotation/
+.ANNOTATION_FILES <- c(
+  drug_annotation_path = "drug_annotation.csv",
+  cell_line_annotation_path = "cell_line_annotation.csv"
+)
+
 # Data a step reads from its `gDR_data` directory that only rendering the previous step writes.
 # Without it the step loses its combination, GR and isobologram sections and still renders (see
 # prepare_dynamic_render_params()), so build_report_rmd() does not write such a step.
@@ -116,7 +122,8 @@
 #'  visualizations by cell line name and drug name. This also affects the output directory naming.
 #' @param with_decoding logical whether the feature OmicsArmLevelCNA, OmicsSomaticMutationsMatrixHotspot
 #'  and OmicsSomaticMutationsMatrixDamaging should be encoded into a 0-1 scheme
-#' @param dpi number defining dpi of all images in report
+#' @param dpi number, the resolution of the figures in the report pages; the files in \code{plots/} are
+#'  saved at 300 dpi
 #' @param embed Logical. Whether to generate a self-contained HTML report.
 #' @param configuration_file_path Character. Path to the configuration file.
 #'  Currently, required only for Incucyte data
@@ -852,9 +859,8 @@ prepare_report_steps <- function(args,
   }
 
   mae_path <- if (!is.null(mae)) {
-    # Only save MAE if we are running from MAE input, or ensuring data persistence
-    # If running full pipeline, Step 2 creates the MAE.
-    path <- file.path(output_dir, "gDR_data", paste0("gDR_mae", if (!all(steps == 3)) "_input" else "", ".qs2"))
+    # An MAE input skips steps 1 and 2, so it is saved where steps 3 and 4 read the MAE
+    path <- file.path(output_dir, "gDR_data", "gDR_mae.qs2")
     qs2::qs_save(mae, path)
     path
   }
@@ -1216,8 +1222,16 @@ stage_and_update_paths <- function(args, output_dir, extra = list()) {
         raw_data_dir
       }
 
-      # NEW: Copy all resolved files and update argument to a vector of new paths
-      new_paths <- file.path(dest_dir, basename(original_paths))
+      # The import and the templates read the annotation by these names, whatever the file is called
+      staged_names <- basename(original_paths)
+      if (arg_name %in% names(.ANNOTATION_FILES)) {
+        if (length(original_paths) > 1) {
+          stop(sprintf("'%s' must name one file; it resolved to %d.", arg_name, length(original_paths)),
+               call. = FALSE)
+        }
+        staged_names <- .ANNOTATION_FILES[[arg_name]]
+      }
+      new_paths <- file.path(dest_dir, staged_names)
       sources <- normalizePath(original_paths, mustWork = FALSE)
       for (k in seq_along(new_paths)) {
         previous <- staged_from[new_paths[k]]

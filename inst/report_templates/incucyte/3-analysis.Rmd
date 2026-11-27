@@ -20,7 +20,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 gdr_start_time <- proc.time()
-knitr::opts_chunk$set(warning = FALSE, message = FALSE,
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, dpi = {{dpi}},
                       dev = "png", dev.args = if (capabilities("cairo")) list(type = "cairo-png") else list())
 
 ```
